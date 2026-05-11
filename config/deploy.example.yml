@@ -10,22 +10,26 @@ service: teamdraft
 #   registry.example.com/teamdraft           (self-hosted)
 image: registry.example.com/teamdraft
 
-# Servers Kamal deploys to. With kamal-proxy disabled, bind Puma to a host
-# port so the local nginx can reach it. 127.0.0.1 keeps the container off
-# the public interface — only nginx on the same host can reach it.
-# Solid Queue runs in-puma (SOLID_QUEUE_IN_PUMA=1 in env), so no separate
-# `job` role is required until queue load justifies it.
+# Servers Kamal deploys to. Solid Queue runs in-puma (SOLID_QUEUE_IN_PUMA=1
+# in env), so no separate `job` role is required until queue load justifies it.
 servers:
   web:
     hosts:
       - 203.0.113.10
-    # Opt out of kamal-proxy at the role level — TLS + routing are handled
-    # by an existing nginx in front of the host. (Top-level `proxy: false`
-    # isn't valid; Kamal expects a hash there.)
-    proxy: false
-    options:
-      publish:
-        - "127.0.0.1:3000:3000"
+
+# kamal-proxy sits between the host's nginx and the app container, doing
+# the rolling-deploy traffic switch so we get zero-downtime handoffs.
+# nginx terminates TLS and proxy_passes to host_port; the proxy keeps
+# connections to the old container alive until the new one passes its
+# healthcheck, then swaps. Pick host_port to avoid the nginx vhost (80/443).
+proxy:
+  ssl: false        # nginx handles TLS
+  host_port: 8080   # the port nginx upstreams to
+  app_port: 3000    # Puma inside the container
+  hosts:
+    - teamdraft.example.com
+  healthcheck:
+    path: /up
 
 # Container registry. Works with GHCR, Docker Hub, or any self-hosted
 # Docker Registry v2 endpoint (e.g. nginx-fronted `registry:2`). Both the
