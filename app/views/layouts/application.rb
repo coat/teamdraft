@@ -9,8 +9,9 @@ class Views::Layouts::Application < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
   include Components::Helpers::CurrentUser
 
-  def initialize(title: "Team Draft")
+  def initialize(title: "Team Draft", turbo_cache_control: nil)
     @title = title
+    @turbo_cache_control = turbo_cache_control
   end
 
   def view_template(&)
@@ -23,6 +24,9 @@ class Views::Layouts::Application < Views::Base
         meta(name: "mobile-web-app-capable", content: "yes")
         meta(name: "turbo-refresh-method", content: "morph")
         meta(name: "turbo-refresh-scroll", content: "preserve")
+        if @turbo_cache_control
+          meta(name: "turbo-cache-control", content: @turbo_cache_control)
+        end
         csrf_meta_tags
         csp_meta_tag
         stylesheet_link_tag :tailwind, data_turbo_track: "reload"

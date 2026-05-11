@@ -6,7 +6,10 @@ class Views::Pages::Home < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Team Draft") do
+    # no-preview keeps Turbo Drive from flashing the anonymous landing
+    # page snapshot before the server-side redirect lands a logged-in
+    # user on their league.
+    render Views::Layouts::Application.new(title: "Team Draft", turbo_cache_control: "no-preview") do
       main(class: "py-8 space-y-6") do
         render_hero
         render_quick_start
