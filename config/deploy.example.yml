@@ -1,0 +1,86 @@
+# Kamal deploy config — copy to config/deploy.yml and fill in your values.
+# See: https://kamal-deploy.org/docs/configuration
+
+# Name of your service. Used in container names. No dashes, lowercase.
+service: teamdraft
+
+# Docker image — host prefix must match `registry.server` below. Examples:
+#   ghcr.io/<your-github-user>/teamdraft     (GitHub Container Registry)
+#   docker.io/<your-dockerhub-user>/teamdraft (Docker Hub)
+#   registry.example.com/teamdraft           (self-hosted)
+image: registry.example.com/teamdraft
+
+# Servers Kamal deploys to. With kamal-proxy disabled, bind Puma to a host
+# port so the local nginx can reach it. 127.0.0.1 keeps the container off
+# the public interface — only nginx on the same host can reach it.
+# Solid Queue runs in-puma (SOLID_QUEUE_IN_PUMA=1 in env), so no separate
+# `job` role is required until queue load justifies it.
+servers:
+  web:
+    hosts:
+      - 203.0.113.10
+    # Opt out of kamal-proxy at the role level — TLS + routing are handled
+    # by an existing nginx in front of the host. (Top-level `proxy: false`
+    # isn't valid; Kamal expects a hash there.)
+    proxy: false
+    options:
+      publish:
+        - "127.0.0.1:3000:3000"
+
+# Container registry. Works with GHCR, Docker Hub, or any self-hosted
+# Docker Registry v2 endpoint (e.g. nginx-fronted `registry:2`). Both the
+# username and password come from .kamal/secrets — wrapping in a list tells
+# Kamal to read from those env vars rather than committing them here.
+registry:
+  server: registry.example.com
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Build settings (only used if you `kamal build push` from this repo).
+# If you exclusively pull the image published by GitHub Actions, you can omit this.
+builder:
+  arch: amd64
+  # Uncomment to build from source on the deploying machine instead of pulling:
+  # local: true
+
+# SSH into the server as the deploy user (not root). The user must be in the
+# docker group on the host.
+ssh:
+  user: teamdraft
+
+# Environment passed into the app container. Anything under `secret:` is read
+# from .kamal/secrets at deploy time. Anything under `clear:` is committed via
+# this file (so put only non-sensitive values here).
+env:
+  clear:
+    SOLID_QUEUE_IN_PUMA: "1"
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    # Hostname Rails uses to reach Postgres. With the bundled accessory,
+    # Kamal puts both containers on the same Docker network and the
+    # accessory is reachable as `teamdraft-postgres`.
+    DB_HOST: teamdraft-postgres
+  secret:
+    - RAILS_MASTER_KEY
+    - TEAMDRAFT_DATABASE_PASSWORD
+    - THESPORTSDB_KEY
+
+# Postgres accessory. Remove this block if you point at managed Postgres
+# instead — in that case set DB_HOST in env.clear to the managed host.
+accessories:
+  postgres:
+    image: postgres:17
+    host: 203.0.113.10
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: teamdraft
+        POSTGRES_DB: teamdraft_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+
+asset_path: /rails/public/assets
