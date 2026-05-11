@@ -1,0 +1,101 @@
+# frozen_string_literal: true
+
+class Views::Leagues::Index < Views::Base
+  def initialize(participants:)
+    @participants = participants
+  end
+
+  def view_template
+    render Views::Layouts::Application.new(title: "Your leagues") do
+      main(class: "py-6 space-y-4") do
+        div(class: "flex items-center justify-between") do
+          h1(class: "text-3xl font-bold") { "Your leagues" }
+          a(href: new_league_path, class: "btn btn-primary btn-sm") { "Start a new league" }
+        end
+
+        div(class: "space-y-3") do
+          sorted_participants.each { |participant| render_league_card(participant) }
+        end
+      end
+    end
+  end
+
+  private
+
+  def sorted_participants
+    @participants.sort_by { |p| status_rank(p.league.status) }
+  end
+
+  def status_rank(status)
+    case status
+    when "drafting" then 0
+    when "in_season" then 1
+    when "draft_pending" then 2
+    when "completed" then 3
+    else 4
+    end
+  end
+
+  def render_league_card(participant)
+    league = participant.league
+    div(class: "card bg-base-100 shadow") do
+      div(class: "card-body") do
+        div(class: "flex items-start justify-between gap-3") do
+          h2(class: "card-title") {
+            a(href: league_path(league), class: "link link-hover") { league.name }
+          }
+          span(class: status_badge_class(league.status)) { humanized_status(league) }
+        end
+        render_summary(league, participant)
+      end
+    end
+  end
+
+  def status_badge_class(status)
+    base = "badge"
+    case status
+    when "drafting" then "#{base} badge-primary"
+    when "in_season" then "#{base} badge-success"
+    when "draft_pending" then "#{base} badge-warning"
+    when "completed" then "#{base} badge-ghost"
+    else base
+    end
+  end
+
+  def humanized_status(league)
+    case league.status
+    when "draft_pending" then league_pending_label(league)
+    when "drafting" then "Drafting (pick ##{league.current_pick_number} of #{league.total_picks})"
+    when "in_season" then "In season"
+    when "completed" then "Completed"
+    end
+  end
+
+  def league_pending_label(league)
+    if league.draft_scheduled_at.present? && league.draft_scheduled_at > Time.current
+      "Drafts #{league.draft_scheduled_at.strftime("%a %b %-d at %-l:%M %p %Z")}"
+    elsif league.participants.where(joined_at: nil).any?
+      "Awaiting opponent"
+    else
+      "Draft pending"
+    end
+  end
+
+  def render_summary(league, current_participant)
+    return if league.status == "draft_pending"
+    rows = Standings::Calculate.call(league: league)
+    div(class: "overflow-x-auto mt-2") do
+      table(class: "table table-sm") do
+        tbody do
+          rows.each do |row|
+            is_you = (row.participant.id == current_participant.id)
+            tr(class: is_you ? "bg-primary/5" : nil) do
+              td(class: is_you ? "font-medium" : nil) { row.participant.display_name }
+              td(class: "text-right") { "#{row.total_points} pts" }
+            end
+          end
+        end
+      end
+    end
+  end
+end
