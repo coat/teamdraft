@@ -67,6 +67,15 @@ env:
     - TEAMDRAFT_DATABASE_PASSWORD
     - THESPORTSDB_KEY
 
+# Pin the logging driver if your host's Docker daemon defaults to
+# something other than json-file (e.g. journald, which rejects the
+# `max-size` option Kamal applies).
+logging:
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 # Postgres accessory. Remove this block if you point at managed Postgres
 # instead — in that case set DB_HOST in env.clear to the managed host.
 accessories:
