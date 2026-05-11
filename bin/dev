@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Standalone dev runner for environments outside `nix run .#` (devcontainer,
+# direct laptop install, etc.). Starts everything in Procfile.dev under
+# foreman, which propagates SIGINT/SIGTERM to the whole process group.
+#
+# In Nix-based dev, prefer `nix run .#` — the flake's process-compose
+# orchestrates the same processes alongside Postgres.
+
+set -e
+
+export PORT="${PORT:-3000}"
+export RUBY_DEBUG_OPEN="true"
+export RUBY_DEBUG_LAZY="true"
+
+exec bundle exec foreman start -f Procfile.dev "$@"

@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* daisyUI 5 — standalone plugin files vendored under vendor/javascript/.
+   Tailwind v4's @plugin directive loads them at build time, no node_modules
+   required. Update the files via:
+     curl -fsSL -o vendor/javascript/daisyui.js \
+       https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+     curl -fsSL -o vendor/javascript/daisyui-theme.js \
+       https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
+*/
+@plugin "../../../vendor/javascript/daisyui.js" {
+  themes: light --default, dark --prefersdark;
+}
+
+@plugin "../../../vendor/javascript/daisyui-theme.js";
+
+/* Surface Phlex views/components to Tailwind's content scanner. v4 follows
+   Rails defaults but doesn't know about our .rb view templates. */
+@source "../../views";
+@source "../../components";
+
+/* Minimal stand-in for @tailwindcss/typography — covers what the About and
+   Privacy pages use. Replace with the real plugin if content grows. */
+@layer components {
+  .prose h2 { @apply text-2xl font-semibold mt-6 mb-2; }
+  .prose h3 { @apply text-xl font-semibold mt-4 mb-2; }
+  .prose p { @apply my-3 leading-relaxed; }
+  .prose ul { @apply list-disc pl-6 my-3 space-y-1; }
+  .prose ol { @apply list-decimal pl-6 my-3 space-y-1; }
+  .prose a { @apply link link-primary; }
+  .prose table { @apply my-4; }
+}
+
+/* draft_clock_controller toggles these states as the clock counts down. */
+@layer components {
+  [data-controller~="draft-clock"].draft-clock--warning {
+    @apply alert-warning animate-pulse;
+  }
+  [data-controller~="draft-clock"].draft-clock--expired {
+    @apply alert-error;
+  }
+}

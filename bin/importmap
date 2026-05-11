@@ -1,0 +1,4 @@
+#!/nix/store/hlfxn8kccz8gzv11syi1vb0niva99c8s-ruby-4.0.3/bin/ruby
+
+require_relative "../config/application"
+require "importmap/commands"
