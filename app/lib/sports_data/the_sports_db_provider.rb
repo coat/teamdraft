@@ -10,9 +10,9 @@ module SportsData
   # Notes:
   # - NFL idLeague is 4391; future sports will need their own mapping.
   # - Their `strSeason` for NFL is "2025-2026" style (across calendar years).
-  # - Round numbering: 1..18 = regular season weeks; 125 = Wild Card,
-  #   150 = Divisional, 160 = Conference, 200 = Super Bowl. (Other ints
-  #   show up for preseason / pro bowl etc and are filtered out.)
+  # - Round numbering: 1..18 = regular season weeks; 160 = Wild Card,
+  #   125 = Divisional, 150 = Conference, 200 = Super Bowl. (500 =
+  #   preseason and other ints for pro bowl etc are filtered out.)
   class TheSportsDbProvider < Provider
     BASE_URL = "https://www.thesportsdb.com/api/v1/json"
     DEFAULT_KEY = "123"
@@ -22,11 +22,23 @@ module SportsData
     }.freeze
 
     PLAYOFF_ROUNDS = {
-      "125" => "wildcard",
-      "150" => "divisional",
-      "160" => "conference",
+      "160" => "wildcard",
+      "125" => "divisional",
+      "150" => "conference",
       "200" => "championship"
     }.freeze
+
+    # eventsseason.php on the free key only returns a small preseason sample,
+    # so we fetch each round individually to capture every regular-season +
+    # playoff game. Preseason (500) and pro bowl rounds are never requested.
+    ROUND_NUMBERS = ((1..18).map(&:to_s) + PLAYOFF_ROUNDS.keys).freeze
+
+    ROUND_LABELS = (1..18).each_with_object({}) { |n, h| h[n.to_s] = "Week #{n}" }.merge(
+      "160" => "Wild Card",
+      "125" => "Divisional",
+      "150" => "Conference",
+      "200" => "Super Bowl"
+    ).freeze
 
     def initialize(season:, api_key: ENV.fetch("THESPORTSDB_API_KEY", DEFAULT_KEY), http: Net::HTTP)
       super(season:)
@@ -34,13 +46,23 @@ module SportsData
       @http = http
     end
 
-    def fetch_games(since: nil)
-      payload = request("eventsseason.php", id: league_id, s: season_string)
-      events = Array(payload["events"])
-      events.filter_map { |e| parse_event(e) }
+    def fetch_games(rounds: nil)
+      rounds_to_fetch = rounds_to_fetch_for(rounds)
+      rounds_to_fetch.flat_map do |round|
+        payload = request("eventsround.php", id: league_id, r: round, s: season_string)
+        Array(payload["events"]).filter_map { |e| parse_event(e) }
+      end
     end
 
     private
+
+    def rounds_to_fetch_for(rounds)
+      return ROUND_NUMBERS if rounds.nil?
+      requested = Array(rounds).map(&:to_s)
+      unknown = requested - ROUND_NUMBERS
+      raise FetchFailed, "unknown round(s): #{unknown.inspect}" if unknown.any?
+      requested
+    end
 
     def league_id
       SPORT_LEAGUE_ID.fetch(@season.sport.key) {
@@ -48,9 +70,10 @@ module SportsData
       }
     end
 
-    # NFL season "2025-2026"; format may differ for other sports later.
+    # NFL season uses just "2025"; format seems to differ for other sports,
+    # like 2025-2026 in the future
     def season_string
-      "#{@season.year}-#{@season.year + 1}"
+      @season.year.to_s
     end
 
     def request(path, **params)

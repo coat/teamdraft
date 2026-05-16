@@ -8,7 +8,7 @@ RSpec.describe "Admin syncs", type: :request do
     season = create_nfl_season(team_count: 2)
 
     expect { post admin_syncs_path, params: {kind: "games", season_id: season.id} }
-      .to have_enqueued_job(Sync::GamesJob).with(season.id)
+      .to have_enqueued_job(Sync::GamesJob).with(season.id, rounds: nil)
 
     expect(response).to redirect_to(admin_root_path)
   end

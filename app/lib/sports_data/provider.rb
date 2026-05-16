@@ -22,7 +22,7 @@ module SportsData
       @season = season
     end
 
-    def fetch_games(since: nil)
+    def fetch_games(rounds: nil)
       raise NotImplementedError
     end
   end

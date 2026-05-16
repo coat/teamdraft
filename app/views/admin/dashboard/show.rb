@@ -2,6 +2,7 @@
 
 class Views::Admin::Dashboard::Show < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::FormWith
 
   def initialize(stats:)
     @stats = stats
@@ -26,9 +27,6 @@ class Views::Admin::Dashboard::Show < Views::Base
       div(class: "card-body") do
         h2(class: "card-title") { "Counts" }
         dl(class: "grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2 text-sm") do
-          stat("Sports", @stats[:sports])
-          stat("Seasons", @stats[:seasons])
-          stat("Teams", "#{@stats[:teams]} (#{@stats[:teams_unmapped]} unmapped)")
           stat("Leagues", "#{@stats[:leagues]} (#{@stats[:drafting_leagues]} mid-draft)")
           stat("Games", "#{@stats[:games]} (#{@stats[:games_final]} final)")
           stat("Scoring events", @stats[:scoring_events])
@@ -63,11 +61,17 @@ class Views::Admin::Dashboard::Show < Views::Base
   def render_season_actions(season)
     div(class: "border border-base-300 rounded-lg p-3 space-y-2") do
       h3(class: "font-medium") { season.label }
-      div(class: "flex flex-wrap gap-2") do
-        button_to "Pull games from #{season.external_provider.presence || "thesportsdb"}",
-          admin_syncs_path,
-          params: {kind: "games", season_id: season.id},
-          form: {class: "inline"}, class: "btn btn-sm"
+      div(class: "flex flex-wrap gap-2 items-center") do
+        form_with(url: admin_syncs_path, method: :post, class: "inline-flex gap-2 items-center") do |form|
+          form.hidden_field :kind, value: "games"
+          form.hidden_field :season_id, value: season.id
+          form.select :round,
+            [["All rounds", ""]] + SportsData::TheSportsDbProvider::ROUND_LABELS.map { |k, v| [v, k] },
+            {},
+            class: "select select-sm select-bordered"
+          form.submit "Pull games from #{season.external_provider.presence || "thesportsdb"}",
+            class: "btn btn-sm"
+        end
         button_to "Recompute scoring",
           admin_syncs_path,
           params: {kind: "scoring", season_id: season.id},
@@ -84,6 +88,7 @@ class Views::Admin::Dashboard::Show < Views::Base
           li { a(href: admin_seasons_path) { "Seasons" } }
           li { a(href: admin_teams_path) { "Teams" } }
           li { a(href: admin_games_path) { "Games" } }
+          li { a(href: admin_leagues_path) { "Leagues" } }
           li { a(href: admin_jobs_path) { "Jobs (Mission Control)" } }
         end
       end

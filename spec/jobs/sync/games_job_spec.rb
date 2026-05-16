@@ -8,19 +8,21 @@ RSpec.describe Sync::GamesJob do
     home, away = season.teams.first(2)
     home.update!(external_id: "T1")
     away.update!(external_id: "T2")
-    stub_request(:get, "https://www.thesportsdb.com/api/v1/json/123/eventsseason.php?id=4391&s=#{season.year}-#{season.year + 1}")
-      .to_return(
-        status: 200,
-        body: {
-          "events" => [
-            {"idEvent" => "G-1", "idHomeTeam" => "T1", "idAwayTeam" => "T2",
-             "intHomeScore" => "24", "intAwayScore" => "10",
-             "dateEvent" => "2025-09-07", "strTime" => "17:00:00",
-             "intRound" => "1", "strStatus" => "Match Finished"}
-          ]
-        }.to_json,
-        headers: {"Content-Type" => "application/json"}
-      )
+
+    SportsData::TheSportsDbProvider::ROUND_NUMBERS.each do |round|
+      events = (round == "1") ? [
+        {"idEvent" => "G-1", "idHomeTeam" => "T1", "idAwayTeam" => "T2",
+         "intHomeScore" => "24", "intAwayScore" => "10",
+         "dateEvent" => "2025-09-07", "strTime" => "17:00:00",
+         "intRound" => "1", "strStatus" => "Match Finished"}
+      ] : []
+      stub_request(:get, "https://www.thesportsdb.com/api/v1/json/123/eventsround.php?id=4391&r=#{round}&s=#{season.year}")
+        .to_return(
+          status: 200,
+          body: {"events" => events}.to_json,
+          headers: {"Content-Type" => "application/json"}
+        )
+    end
 
     expect { Sync::GamesJob.perform_now(season.id) }
       .to change(Game, :count).by(1)
