@@ -65,19 +65,24 @@ class LeaguesController < ApplicationController
   end
 
   def edit
-    render Views::Leagues::Edit.new(league: @league)
+    @league_season = @league.current_league_season
+    render Views::Leagues::Edit.new(league: @league, league_season: @league_season)
   end
 
   def update
-    new_name = params.dig(:league, :name).to_s.strip.presence
-    @league.name = new_name if new_name
-
-    if @league.save
-      redirect_to league_path(@league), notice: "League updated."
-    else
-      render Views::Leagues::Edit.new(league: @league),
-        status: :unprocessable_entity
+    @league_season = @league.current_league_season
+    ApplicationRecord.transaction do
+      @league.update!(league_params) if params[:league].present?
+      if params[:league_season].present? && @league_season && @league_season.draft_picks.none?
+        @league_season.assign_attributes(league_season_params)
+        normalize_draft_mode_switch(@league_season)
+        @league_season.save!
+      end
     end
+    redirect_to league_path(@league), notice: "League updated."
+  rescue ActiveRecord::RecordInvalid
+    render Views::Leagues::Edit.new(league: @league, league_season: @league_season),
+      status: :unprocessable_entity
   end
 
   def history
@@ -154,6 +159,25 @@ class LeaguesController < ApplicationController
   def default_season
     Season.where(status: "active").joins(:sport).find_by(sports: {key: "nfl"}) ||
       Season.joins(:sport).where(sports: {key: "nfl"}).order(year: :desc).first
+  end
+
+  def league_params
+    params.require(:league).permit(:name, :private)
+  end
+
+  def league_season_params
+    params.require(:league_season).permit(:draft_mode, :draft_order_style,
+      :draft_scheduled_at, :pick_clock_seconds)
+  end
+
+  # Keep live-only fields consistent with the chosen mode. Manual drafts
+  # don't carry a scheduled time or pick clock; live drafts need a clock.
+  def normalize_draft_mode_switch(league_season)
+    case league_season.draft_mode
+    when "manual"
+      league_season.pick_clock_seconds = nil
+      league_season.draft_scheduled_at = nil
+    end
   end
 
   def render_no_season

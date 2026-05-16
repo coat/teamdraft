@@ -11,7 +11,7 @@ export default class extends Controller {
   }
 
   sync() {
-    const selected = this.element.querySelector('input[name="league[draft_mode]"]:checked')
+    const selected = this.element.querySelector('input[type="radio"][name$="[draft_mode]"]:checked')
     const isLive = !selected || selected.value === "live"
     this.liveOnlyTargets.forEach((el) => el.classList.toggle("hidden", !isLive))
   }

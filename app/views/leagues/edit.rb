@@ -3,8 +3,9 @@
 class Views::Leagues::Edit < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
-  def initialize(league:)
+  def initialize(league:, league_season:)
     @league = league
+    @league_season = league_season
   end
 
   def view_template
@@ -17,14 +18,11 @@ class Views::Leagues::Edit < Views::Base
               plain "The URL updates when you rename. Old links keep redirecting#{history_hint}."
             end
 
-            render_errors if @league.errors.any?
+            render_errors
 
-            form_with(model: @league, url: league_path(@league), method: :patch, scope: :league, class: "space-y-3 mt-3") do |form|
-              div(class: "space-y-1") do
-                form.label :name, "Name", class: "label label-text font-medium"
-                form.text_field :name, value: @league.name, required: true,
-                  class: "input w-full"
-              end
+            form_with(model: @league, url: league_path(@league), method: :patch, class: "space-y-4 mt-3") do |form|
+              render_identity_section(form)
+              render_draft_section
               div(class: "card-actions justify-end pt-2") do
                 a(href: league_path(@league), class: "btn btn-ghost") { "Cancel" }
                 form.submit "Save changes", class: "btn btn-primary"
@@ -38,10 +36,99 @@ class Views::Leagues::Edit < Views::Base
 
   private
 
+  def render_identity_section(form)
+    fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
+      legend(class: "fieldset-legend text-sm font-medium") { "League" }
+      div(class: "space-y-1") do
+        form.label :name, "Name", class: "label label-text font-medium"
+        form.text_field :name, value: @league.name, required: true, class: "input w-full"
+      end
+      label(class: "label cursor-pointer justify-start gap-3") do
+        form.check_box :private, class: "checkbox checkbox-primary"
+        span(class: "label-text") { "Private — hide this league from public season listings" }
+      end
+    end
+  end
+
+  def render_draft_section
+    return unless @league_season
+
+    if @league_season.draft_picks.any?
+      div(class: "alert alert-info") do
+        p { "Draft has started — these settings are locked." }
+      end
+      return
+    end
+
+    div(data: {controller: "draft-mode"}, class: "space-y-3") do
+      fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
+        legend(class: "fieldset-legend text-sm font-medium") { "Draft" }
+        mode_radio("manual", "Manual — record both picks yourself")
+        mode_radio("live", "Live — each player picks on the clock")
+
+        div(class: "space-y-4 #{"hidden" unless @league_season.draft_mode == "live"}".strip,
+          data_draft_mode_target: "liveOnly") do
+          render_style_field
+          render_datetime_field
+          render_clock_field
+        end
+      end
+    end
+  end
+
+  def mode_radio(value, copy)
+    div(class: "space-y-1") do
+      label(class: "label cursor-pointer justify-start gap-3") do
+        input(type: "radio", name: "league_season[draft_mode]", value: value,
+          checked: @league_season.draft_mode == value,
+          class: "radio radio-primary",
+          data: {action: "change->draft-mode#sync"})
+        span(class: "label-text") { copy }
+      end
+    end
+  end
+
+  def render_style_field
+    div(class: "space-y-1") do
+      label(for: "league_season_draft_order_style", class: "label label-text font-medium") { "Draft order" }
+      select(name: "league_season[draft_order_style]",
+        id: "league_season_draft_order_style",
+        class: "select w-full") do
+        LeagueSeason::DRAFT_ORDER_STYLES.each do |style|
+          option(value: style, selected: style == @league_season.draft_order_style) { style.capitalize }
+        end
+      end
+    end
+  end
+
+  def render_datetime_field
+    div(class: "space-y-1") do
+      label(for: "league_season_draft_scheduled_at", class: "label label-text font-medium") { "Draft date" }
+      input(type: "datetime-local",
+        name: "league_season[draft_scheduled_at]",
+        id: "league_season_draft_scheduled_at",
+        value: @league_season.draft_scheduled_at&.strftime("%Y-%m-%dT%H:%M"),
+        class: "input w-full")
+    end
+  end
+
+  def render_clock_field
+    div(class: "space-y-1") do
+      label(for: "league_season_pick_clock_seconds", class: "label label-text font-medium") { "Pick clock (seconds)" }
+      input(type: "number",
+        name: "league_season[pick_clock_seconds]",
+        id: "league_season_pick_clock_seconds",
+        value: @league_season.pick_clock_seconds || 60,
+        min: 10, step: 5, class: "input w-32")
+    end
+  end
+
   def render_errors
+    return unless @league.errors.any? || @league_season&.errors&.any?
     div(class: "alert alert-error mt-3", role: "alert") do
       ul(class: "list-disc list-inside") do
         @league.errors.full_messages.each { |msg| li { msg } }
+        @league_season&.errors&.full_messages&.each { |msg| li { msg } }
       end
     end
   end
