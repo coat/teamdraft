@@ -10,7 +10,7 @@ RSpec.describe "Account linking on league actions", type: :request do
     create_league_via_http(your_name: "Alice", opponent_name: "Bob")
 
     league = user.participants.first.league
-    expect(user.participants.find_by(league_id: league.id, is_owner: true)).to be_present
+    expect(user.participants.joins(:league_season).find_by(league_seasons: {league_id: league.id}, is_owner: true)).to be_present
   end
 
   it "links a participant to current_user when a signed-in user claims an open seat" do
@@ -32,7 +32,7 @@ RSpec.describe "Account linking on league actions", type: :request do
     get league_path(league)
 
     expect(response.body).not_to include("Save your seat across devices")
-    expect(user.participants.find_by(league_id: league.id, is_owner: true)).to be_present
+    expect(user.participants.joins(:league_season).find_by(league_seasons: {league_id: league.id}, is_owner: true)).to be_present
   end
 
   def sign_in_new_user(email)

@@ -6,7 +6,7 @@ RSpec.describe "Draft picks", type: :request do
   it "owner can record a pick" do
     season = create_nfl_season(team_count: 4)
     league = create_league_via_http(draft_mode: "manual")
-    start_drafting!(league)
+    start_drafting!(league.current_league_season)
     season_team = season.season_teams.first
 
     expect {

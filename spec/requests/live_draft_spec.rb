@@ -31,7 +31,7 @@ RSpec.describe "Live draft", type: :request do
     ).first
     bob_seat = league.participants.find_by(draft_position: 2)
     claim_seat_via_http(league, bob_seat)
-    Drafts::SubmitPick.call(league: league.reload, season_team: season.season_teams.first)
+    Drafts::SubmitPick.call(league_season: league.reload.current_league_season, season_team: season.season_teams.first)
 
     expect { post league_draft_picks_path(league), params: {season_team_id: season.season_teams.second.id} }
       .to change(DraftPick, :count).by(1)

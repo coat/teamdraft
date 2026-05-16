@@ -13,8 +13,13 @@ class ApplicationController < ActionController::Base
 
   def current_participant_for(league)
     @current_participant_for ||= {}
-    @current_participant_for[league.id] ||=
-      participant_claims.participant_for(league) ||
-      current_user&.participants&.find_by(league_id: league.id)
+    @current_participant_for[league.id] ||= resolve_current_participant(league)
+  end
+
+  def resolve_current_participant(league)
+    ls = league.current_league_season
+    return nil unless ls
+    participant_claims.participant_for(league) ||
+      current_user&.participants&.find_by(league_season_id: ls.id)
   end
 end

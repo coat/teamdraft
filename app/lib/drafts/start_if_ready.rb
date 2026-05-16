@@ -6,18 +6,18 @@ module Drafts
   # Live drafts wait for both seats to be claimed and (optionally) for a
   # scheduled start time. Manual drafts — where the owner records both
   # players' picks — don't need either, since picks can be entered solo
-  # offline. They start as soon as the league is created.
+  # offline. They start as soon as the league season is created.
   #
   # Idempotent — safe to call from create, claim, and scheduled-job paths.
   class StartIfReady
     def self.call(...) = new(...).call
 
-    def initialize(league:)
-      @league = league
+    def initialize(league_season:)
+      @league_season = league_season
     end
 
     def call
-      return unless @league.status == "draft_pending"
+      return unless @league_season.status == "draft_pending"
       return unless ready?
 
       if scheduled_in_future?
@@ -25,7 +25,7 @@ module Drafts
         return
       end
 
-      @league.update!(status: "drafting", draft_started_at: Time.current)
+      @league_season.update!(status: "drafting", draft_started_at: Time.current)
       schedule_first_clock
     end
 
@@ -35,35 +35,34 @@ module Drafts
       manual? ? owner_joined? : seats_filled?
     end
 
-    def manual? = @league.draft_mode == "manual"
+    def manual? = @league_season.draft_mode == "manual"
 
     def owner_joined?
-      @league.participants.where(is_owner: true).where.not(joined_at: nil).exists?
+      @league_season.participants.where(is_owner: true).where.not(joined_at: nil).exists?
     end
 
     def seats_filled?
-      @league.participants.where(joined_at: nil).none? &&
-        @league.participants.count >= @league.size
+      @league_season.participants.where(joined_at: nil).none? &&
+        @league_season.participants.count >= @league_season.size
     end
 
-    # Scheduling only applies to live drafts — manual has no clock.
     def scheduled_in_future?
       !manual? &&
-        @league.draft_scheduled_at.present? &&
-        @league.draft_scheduled_at > Time.current
+        @league_season.draft_scheduled_at.present? &&
+        @league_season.draft_scheduled_at > Time.current
     end
 
     def schedule_start_job
       Drafts::StartDraftJob
-        .set(wait_until: @league.draft_scheduled_at)
-        .perform_later(@league.id)
+        .set(wait_until: @league_season.draft_scheduled_at)
+        .perform_later(@league_season.id)
     end
 
     def schedule_first_clock
-      return unless @league.draft_mode == "live" && @league.pick_clock_seconds.present?
+      return unless @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
       Drafts::PickClockJob
-        .set(wait: @league.pick_clock_seconds.seconds)
-        .perform_later(@league.id, @league.current_pick_number)
+        .set(wait: @league_season.pick_clock_seconds.seconds)
+        .perform_later(@league_season.id, @league_season.current_pick_number)
     end
   end
 end

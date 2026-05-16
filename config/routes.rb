@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  resources :seasons, only: [:index, :show] do
+    resources :teams, only: [:show], param: :slug
+  end
   get "about" => "pages#about"
   get "privacy" => "pages#privacy"
 
@@ -20,7 +23,9 @@ Rails.application.routes.draw do
     resources :draft_picks, only: [:create]
     member do
       post :claim
+      get :history
     end
+    resources :seasons, only: [:show], param: :year, controller: "league_seasons"
   end
 
   namespace :admin do
@@ -30,6 +35,7 @@ Rails.application.routes.draw do
     end
     resources :teams, only: [:index, :edit, :update]
     resources :games, only: [:index, :edit, :update]
+    resources :leagues, only: [:index, :edit, :update, :destroy]
     resources :syncs, only: [:create]
     mount MissionControl::Jobs::Engine, at: "/jobs", as: :jobs
   end

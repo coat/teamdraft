@@ -6,7 +6,8 @@ class Season < ApplicationRecord
   belongs_to :sport
   has_many :season_teams, dependent: :destroy
   has_many :teams, through: :season_teams
-  has_many :leagues, dependent: :restrict_with_exception
+  has_many :league_seasons, dependent: :restrict_with_exception
+  has_many :leagues, through: :league_seasons
   has_many :games, dependent: :destroy
 
   validates :year, presence: true,

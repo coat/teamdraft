@@ -6,19 +6,19 @@ module Standings
   # and sum to a grand total. Sorted by total desc.
   class Calculate
     Row = Data.define(:participant, :total_points, :teams)
-    TeamLine = Data.define(:season_team, :team, :pick_number, :points, :events)
+    TeamLine = Data.define(:season_team, :team, :pick_number, :autopicked, :points, :events)
 
     def self.call(...) = new(...).call
 
-    def initialize(league:)
-      @league = league
+    def initialize(league_season:)
+      @league_season = league_season
     end
 
     def call
-      picks = @league.draft_picks.includes(:participant, season_team: [:team, :scoring_events]).to_a
+      picks = @league_season.draft_picks.includes(:participant, season_team: [:team, :scoring_events]).to_a
       grouped = picks.group_by(&:participant)
 
-      ordered_participants = @league.participants.to_a
+      ordered_participants = @league_season.participants.to_a
       rows = ordered_participants.map do |participant|
         team_lines = (grouped[participant] || []).map { |pick| build_team_line(pick) }
           .sort_by { |line| -line.points }
@@ -43,6 +43,7 @@ module Standings
         season_team: pick.season_team,
         team: pick.season_team.team,
         pick_number: pick.pick_number,
+        autopicked: pick.autopicked,
         points:,
         events: breakdown
       )

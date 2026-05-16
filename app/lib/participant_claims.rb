@@ -32,6 +32,8 @@ class ParticipantClaims
   end
 
   def participant_for(league)
-    league.participants.where(claim_token: tokens).first
+    ls = league.current_league_season
+    return nil unless ls
+    ls.participants.where(claim_token: tokens).first
   end
 end

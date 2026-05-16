@@ -23,7 +23,7 @@ class Views::Leagues::Index < Views::Base
   private
 
   def sorted_participants
-    @participants.sort_by { |p| status_rank(p.league.status) }
+    @participants.sort_by { |p| status_rank(p.league_season.status) }
   end
 
   def status_rank(status)
@@ -37,16 +37,17 @@ class Views::Leagues::Index < Views::Base
   end
 
   def render_league_card(participant)
-    league = participant.league
+    league = participant.league_season.league
+    ls = participant.league_season
     div(class: "card bg-base-100 shadow") do
       div(class: "card-body") do
         div(class: "flex items-start justify-between gap-3") do
           h2(class: "card-title") {
             a(href: league_path(league), class: "link link-hover") { league.name }
           }
-          span(class: status_badge_class(league.status)) { humanized_status(league) }
+          span(class: status_badge_class(ls.status)) { humanized_status(ls) }
         end
-        render_summary(league, participant)
+        render_summary(ls, participant)
       end
     end
   end
@@ -62,28 +63,28 @@ class Views::Leagues::Index < Views::Base
     end
   end
 
-  def humanized_status(league)
-    case league.status
-    when "draft_pending" then league_pending_label(league)
-    when "drafting" then "Drafting (pick ##{league.current_pick_number} of #{league.total_picks})"
+  def humanized_status(ls)
+    case ls.status
+    when "draft_pending" then league_pending_label(ls)
+    when "drafting" then "Drafting (pick ##{ls.current_pick_number} of #{ls.total_picks})"
     when "in_season" then "In season"
     when "completed" then "Completed"
     end
   end
 
-  def league_pending_label(league)
-    if league.draft_scheduled_at.present? && league.draft_scheduled_at > Time.current
-      "Drafts #{league.draft_scheduled_at.strftime("%a %b %-d at %-l:%M %p %Z")}"
-    elsif league.participants.where(joined_at: nil).any?
+  def league_pending_label(ls)
+    if ls.draft_scheduled_at.present? && ls.draft_scheduled_at > Time.current
+      "Drafts #{ls.draft_scheduled_at.strftime("%a %b %-d at %-l:%M %p %Z")}"
+    elsif ls.participants.where(joined_at: nil).any?
       "Awaiting opponent"
     else
       "Draft pending"
     end
   end
 
-  def render_summary(league, current_participant)
-    return if league.status == "draft_pending"
-    rows = Standings::Calculate.call(league: league)
+  def render_summary(ls, current_participant)
+    return if ls.status == "draft_pending"
+    rows = Standings::Calculate.call(league_season: ls)
     div(class: "overflow-x-auto mt-2") do
       table(class: "table table-sm") do
         tbody do

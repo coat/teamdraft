@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :participant do
-    league
+    league_season
     sequence(:display_name) { |n| "Player #{n}" }
     draft_position { 1 }
     is_owner { false }

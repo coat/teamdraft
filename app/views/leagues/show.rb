@@ -6,8 +6,9 @@ class Views::Leagues::Show < Views::Base
   include Phlex::Rails::Helpers::TurboStreamFrom
   include Components::Helpers::CurrentUser
 
-  def initialize(league:, current_participant:)
+  def initialize(league:, league_season:, current_participant:)
     @league = league
+    @league_season = league_season
     @current_participant = current_participant
   end
 
@@ -19,11 +20,11 @@ class Views::Leagues::Show < Views::Base
         render_share_card if unclaimed_seat.present?
         render_claim_prompt if needs_claim_prompt?
         render_account_upsell if needs_account_upsell?
-        render_participants
+        post_draft_with_picks = viewable? && draft_finished? && @league_season.draft_picks.any?
+        render_leaderboard(standings_rows) if post_draft_with_picks
+        render_participants unless post_draft_with_picks
         if viewable? && draft_finished?
-          # Once the draft is over, standings (which already include each
-          # pick's number) are the headline — pick history would just repeat.
-          render_standings if @league.draft_picks.any?
+          render_standings(standings_rows) if @league_season.draft_picks.any?
         elsif viewable?
           render_draft_section
         end
@@ -35,15 +36,15 @@ class Views::Leagues::Show < Views::Base
 
   def claimed? = @current_participant.present?
 
-  def draft_finished? = %w[in_season completed].include?(@league.status)
+  def draft_finished? = @league_season&.draft_finished?
 
   def viewable?
     return true if claimed?
     return false if @league.private?
-    @league.participants.where(joined_at: nil).none?
+    @league_season.participants.where(joined_at: nil).none?
   end
 
-  def unclaimed_seat = @league.participants.find_by(joined_at: nil)
+  def unclaimed_seat = @league_season.participants.find_by(joined_at: nil)
 
   def needs_claim_prompt?
     !claimed? && unclaimed_seat.present?
@@ -55,11 +56,24 @@ class Views::Leagues::Show < Views::Base
 
   def render_header
     div(class: "flex items-start justify-between gap-4") do
-      h1(class: "text-3xl font-bold") { @league.name }
-      if @current_participant&.is_owner? && @current_participant.user_id.present?
-        a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
+      div do
+        h1(class: "text-3xl font-bold") { @league.name }
+        render_season_chip
+      end
+      div(class: "flex items-center gap-2") do
+        if @league.league_seasons.count > 1
+          a(href: history_league_path(@league), class: "btn btn-ghost btn-sm") { "History" }
+        end
+        if @current_participant&.is_owner? && @current_participant.user_id.present?
+          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
+        end
       end
     end
+  end
+
+  def render_season_chip
+    return unless @league_season&.season
+    span(class: "badge badge-ghost badge-sm mt-1") { @league_season.season.label }
   end
 
   def render_share_card
@@ -123,7 +137,7 @@ class Views::Leagues::Show < Views::Base
       div(class: "card-body") do
         h2(class: "card-title") { "Participants" }
         ol(class: "space-y-2 mt-2") do
-          @league.participants.each do |p|
+          @league_season.participants.each do |p|
             li(class: "flex items-center gap-2") do
               span(class: "badge badge-neutral") { "#" + p.draft_position.to_s }
               strong { p.display_name }
@@ -142,9 +156,9 @@ class Views::Leagues::Show < Views::Base
       div(class: "card-body") do
         h2(class: "card-title") { "Draft" }
 
-        case @league.status
+        case @league_season.status
         when "in_season", "completed"
-          p { "Draft complete (#{@league.draft_picks.count} of #{@league.total_picks} picks)." }
+          p { "Draft complete (#{@league_season.draft_picks.count} of #{@league_season.total_picks} picks)." }
           render_pick_history
         when "draft_pending"
           render_pending_notice
@@ -158,7 +172,7 @@ class Views::Leagues::Show < Views::Base
   def render_drafting_state
     on_the_clock = clock_participant
     div(class: "flex items-center gap-3 mb-3") do
-      span(class: "badge badge-lg") { "Pick ##{@league.current_pick_number} of #{@league.total_picks}" }
+      span(class: "badge badge-lg") { "Pick ##{@league_season.current_pick_number} of #{@league_season.total_picks}" }
       if on_the_clock
         span do
           plain "On the clock: "
@@ -166,15 +180,15 @@ class Views::Leagues::Show < Views::Base
         end
       end
     end
-    render_clock if @league.draft_mode == "live" && @league.pick_clock_seconds.present?
+    render_clock if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
     render_pick_form if can_pick?(on_the_clock)
-    render_pick_history if @league.draft_picks.any?
+    render_pick_history if @league_season.draft_picks.any?
   end
 
   def render_pending_notice
-    if @league.participants.where(joined_at: nil).any?
+    if @league_season.participants.where(joined_at: nil).any?
       p(class: "text-base-content/70") { "Waiting for the other player to claim their seat." }
-    elsif @league.draft_scheduled_at.present? && @league.draft_scheduled_at > Time.current
+    elsif @league_season.draft_scheduled_at.present? && @league_season.draft_scheduled_at > Time.current
       render_scheduled_notice
     else
       p(class: "text-base-content/70") { "Draft is starting…" }
@@ -182,7 +196,7 @@ class Views::Leagues::Show < Views::Base
   end
 
   def render_scheduled_notice
-    starts_at = @league.draft_scheduled_at
+    starts_at = @league_season.draft_scheduled_at
     if starts_at <= 5.minutes.from_now
       div(
         class: "alert alert-info",
@@ -208,7 +222,7 @@ class Views::Leagues::Show < Views::Base
 
   def can_pick?(on_the_clock)
     return false unless @current_participant
-    case @league.draft_mode
+    case @league_season.draft_mode
     when "manual" then @current_participant.is_owner?
     when "live" then on_the_clock && @current_participant.id == on_the_clock.id
     end
@@ -223,7 +237,7 @@ class Views::Leagues::Show < Views::Base
       data_controller: "draft-clock",
       data_draft_clock_deadline_value: deadline.iso8601
     ) do
-      span(class: "font-mono text-lg", data_draft_clock_target: "display") { "#{@league.pick_clock_seconds}s" }
+      span(class: "font-mono text-lg", data_draft_clock_target: "display") { "#{@league_season.pick_clock_seconds}s" }
       if autopick
         span(class: "hidden text-sm", data_draft_clock_target: "autopick") do
           plain "Auto-pick if time expires: "
@@ -234,8 +248,8 @@ class Views::Leagues::Show < Views::Base
   end
 
   def next_autopick_team
-    drafted = @league.draft_picks.pluck(:season_team_id)
-    @league.season.season_teams
+    drafted = @league_season.draft_picks.pluck(:season_team_id)
+    @league_season.season.season_teams
       .joins(:team)
       .where.not(season_teams: {id: drafted})
       .order(Arel.sql("teams.default_pick_rank NULLS LAST, teams.name ASC"))
@@ -243,26 +257,26 @@ class Views::Leagues::Show < Views::Base
   end
 
   def clock_deadline
-    last_pick_at = @league.draft_picks.maximum(:picked_at)
-    started_at = @league.draft_started_at || last_pick_at
+    last_pick_at = @league_season.draft_picks.maximum(:picked_at)
+    started_at = @league_season.draft_started_at || last_pick_at
     return nil if started_at.nil? && last_pick_at.nil?
     base = last_pick_at || started_at
-    base + @league.pick_clock_seconds.seconds
+    base + @league_season.pick_clock_seconds.seconds
   end
 
   def clock_participant
-    return nil if @league.current_pick_number > @league.total_picks
+    return nil if @league_season.current_pick_number > @league_season.total_picks
     pos = Drafts::Order.position_for(
-      pick_number: @league.current_pick_number,
-      size: @league.size,
-      style: @league.draft_order_style
+      pick_number: @league_season.current_pick_number,
+      size: @league_season.size,
+      style: @league_season.draft_order_style
     )
-    @league.participants.find_by(draft_position: pos)
+    @league_season.participants.find_by(draft_position: pos)
   end
 
   def available_season_teams
-    drafted = @league.draft_picks.pluck(:season_team_id)
-    @league.season.season_teams.includes(:team).where.not(id: drafted)
+    drafted = @league_season.draft_picks.pluck(:season_team_id)
+    @league_season.season.season_teams.includes(:team).where.not(id: drafted)
   end
 
   def render_pick_form
@@ -282,20 +296,51 @@ class Views::Leagues::Show < Views::Base
     div(class: "mt-4") do
       h3(class: "font-medium mb-2") { "Picks" }
       ol(class: "space-y-1") do
-        @league.draft_picks.includes(:participant, season_team: :team).each do |pick|
+        @league_season.draft_picks.includes(:participant, season_team: :team).each do |pick|
           li(class: "flex items-baseline gap-2 text-sm") do
             span(class: "badge badge-ghost font-mono") { "##{pick.pick_number}" }
             strong { pick.participant.display_name }
             span(class: "opacity-60") { "→" }
             span { "#{pick.team.name} (#{pick.team.abbreviation})" }
+            span(class: "badge badge-sm badge-warning badge-outline") { "auto" } if pick.autopicked
           end
         end
       end
     end
   end
 
-  def render_standings
-    rows = Standings::Calculate.call(league: @league)
+  def standings_rows
+    @standings_rows ||= Standings::Calculate.call(league_season: @league_season)
+  end
+
+  def render_leaderboard(rows)
+    leader_points = rows.first.total_points
+    has_leader = leader_points.positive?
+    div(class: "card bg-base-100 shadow") do
+      div(class: "card-body") do
+        div(class: "flex flex-wrap gap-3") do
+          rows.each_with_index do |row, idx|
+            leading = has_leader && row.total_points == leader_points
+            render_leaderboard_pill(row, idx + 1, leading)
+          end
+        end
+      end
+    end
+  end
+
+  def render_leaderboard_pill(row, rank, leading)
+    container = "flex items-center gap-2 px-3 py-2 rounded-lg border #{leading ? "border-warning bg-warning/10" : "border-base-300"}"
+    div(class: container) do
+      span(class: "badge badge-sm #{leading ? "badge-warning" : "badge-neutral"}") { "##{rank}" }
+      span(class: "font-medium") { row.participant.display_name }
+      span(class: "badge badge-primary badge-outline badge-sm") { "you" } if row.participant == @current_participant
+      span(class: "badge badge-secondary badge-outline badge-sm") { "owner" } if row.participant.is_owner?
+      span(class: "font-bold tabular-nums") { row.total_points.to_s }
+      span(class: "text-xs opacity-60") { "pts" }
+    end
+  end
+
+  def render_standings(rows)
     div(class: "card bg-base-100 shadow") do
       div(class: "card-body") do
         h2(class: "card-title") { "Standings" }
@@ -308,8 +353,12 @@ class Views::Leagues::Show < Views::Base
 
   def render_standings_row(row)
     div do
-      div(class: "flex items-baseline justify-between mb-2") do
-        h3(class: "font-medium") { row.participant.display_name }
+      div(class: "flex items-baseline justify-between mb-2 gap-2") do
+        div(class: "flex items-baseline gap-2 flex-wrap") do
+          h3(class: "font-medium") { row.participant.display_name }
+          span(class: "badge badge-primary badge-outline badge-sm") { "you" } if row.participant == @current_participant
+          span(class: "badge badge-secondary badge-outline badge-sm") { "owner" } if row.participant.is_owner?
+        end
         span(class: "badge badge-primary badge-lg") { "#{row.total_points} pts" }
       end
       if row.teams.empty?
@@ -319,21 +368,71 @@ class Views::Leagues::Show < Views::Base
           table(class: "table table-sm") do
             thead do
               tr do
+                th(class: "w-8")
                 th { "Team" }
                 th { "Pick" }
                 th(class: "text-right") { "Points" }
               end
             end
-            tbody do
-              row.teams.each do |line|
-                tr do
-                  td { line.team.name }
-                  td(class: "font-mono opacity-60") { "##{line.pick_number}" }
-                  td(class: "text-right") { line.points.to_s }
-                end
-              end
-            end
+            row.teams.each { |line| render_team_lines(line) }
           end
+        end
+      end
+    end
+  end
+
+  EVENT_LABELS = {
+    "regular_win" => "Regular-season wins",
+    "playoff_appearance" => "Playoff appearance",
+    "divisional_appearance" => "Divisional round",
+    "conference_appearance" => "Conference championship",
+    "championship_appearance" => "Super Bowl appearance",
+    "championship_win" => "Super Bowl win"
+  }.freeze
+
+  def render_team_lines(line)
+    panel_id = "breakdown-#{line.season_team.id}"
+    tbody(data: {controller: "disclosure"}) do
+      tr do
+        td do
+          button(type: "button", class: "btn btn-ghost btn-xs",
+            aria_expanded: "false", aria_controls: panel_id,
+            data: {action: "click->disclosure#toggle"}) do
+            span(class: "inline-block transition-transform",
+              data: {disclosure_target: "icon"}) { "▸" }
+          end
+        end
+        td do
+          a(href: season_team_path(@league_season.season, slug: line.team.slug), class: "link link-hover") { line.team.name }
+        end
+        td(class: "font-mono opacity-60") do
+          plain "##{line.pick_number}"
+          if line.autopicked
+            plain " "
+            span(class: "badge badge-xs badge-warning badge-outline") { "auto" }
+          end
+        end
+        td(class: "text-right") { line.points.to_s }
+      end
+      tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
+        td(colspan: "4", class: "bg-base-200/50") do
+          render_breakdown(line)
+        end
+      end
+    end
+  end
+
+  def render_breakdown(line)
+    nonzero = line.events.reject { |_, points| points.zero? }
+    if nonzero.empty?
+      p(class: "text-sm text-base-content/60 py-2") { "No scoring yet." }
+    else
+      dl(class: "grid grid-cols-2 gap-x-4 gap-y-1 text-sm py-2") do
+        EVENT_LABELS.each do |event_type, label|
+          points = nonzero[event_type]
+          next unless points
+          dt(class: "opacity-70") { label }
+          dd(class: "text-right font-mono") { points.to_s }
         end
       end
     end

@@ -14,7 +14,7 @@ class Views::Leagues::Edit < Views::Base
           div(class: "card-body") do
             h1(class: "card-title text-2xl") { "Edit league" }
             p(class: "text-sm text-base-content/70") do
-              plain "Old URLs keep working — friendly_id history redirects #{old_slug_examples} to the new slug."
+              plain "Old URLs keep working will redirect #{old_slug_examples} to the new slug."
             end
 
             render_errors if @league.errors.any?

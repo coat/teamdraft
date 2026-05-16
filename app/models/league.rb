@@ -7,38 +7,33 @@ class League < ApplicationRecord
 
   broadcasts_refreshes
 
-  DRAFT_MODES = %w[live manual].freeze
-  DRAFT_ORDER_STYLES = %w[snake linear].freeze
-  STATUSES = %w[draft_pending drafting in_season completed].freeze
-
-  belongs_to :season
-  has_many :participants, -> { order(:draft_position) }, dependent: :destroy, inverse_of: :league
-  has_many :draft_picks, -> { order(:pick_number) }, dependent: :destroy, inverse_of: :league
+  has_many :league_seasons, dependent: :destroy, inverse_of: :league
+  has_many :participants, through: :league_seasons
+  has_many :draft_picks, through: :league_seasons
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: {case_sensitive: false}
-  validates :size, numericality: {only_integer: true, greater_than_or_equal_to: 2, less_than_or_equal_to: 8}
-  validates :draft_mode, inclusion: {in: DRAFT_MODES}
-  validates :draft_order_style, inclusion: {in: DRAFT_ORDER_STYLES}
-  validates :status, inclusion: {in: STATUSES}
-  validates :current_pick_number, numericality: {only_integer: true, greater_than_or_equal_to: 1}
-  validates :pick_clock_seconds, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
 
+  # The league's "current" per-season run. Prefer the LeagueSeason tied to
+  # the sport's active Season; otherwise fall back to the most-recent one.
+  def current_league_season
+    @current_league_season ||=
+      league_seasons.joins(:season).where(seasons: {status: "active"}).order("seasons.year DESC").first ||
+      league_seasons.joins(:season).order("seasons.year DESC").first
+  end
+
+  # Convenience: the owner participant in the current LeagueSeason.
   def owner
-    participants.find_by(is_owner: true)
+    current_league_season&.owner
   end
 
-  def picks_per_participant
-    season.season_teams.count / size
-  end
-
-  def total_picks
-    picks_per_participant * size
-  end
-
-  # Used by friendly_id when generating a slug. The custom controller path
-  # passes a haikunated string in via :slug_candidate.
-  attr_accessor :slug_candidate
+  # Transient form-only accessors. The "Create league" form (`Views::Leagues::Form`)
+  # binds these to `form_with(model: @league)` so a fresh League returned from
+  # the controller can carry default values, but they are not persisted — the
+  # controller forwards them into `Leagues::Create`, which writes them to the
+  # initial `LeagueSeason`.
+  attr_accessor :slug_candidate, :your_name, :opponent_name,
+    :draft_mode, :draft_scheduled_at, :pick_clock_seconds
 
   def should_generate_new_friendly_id?
     slug.blank? || slug_candidate.present?

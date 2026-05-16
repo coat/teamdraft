@@ -16,8 +16,8 @@ RSpec.describe Users::SignUp do
   end
 
   it "links any participants whose claim_token is in the cookie" do
-    league = create(:league, season: create_nfl_season(team_count: 2))
-    owner = create(:participant, :owner, league: league)
+    ls = create(:league_season, season: create_nfl_season(team_count: 2))
+    owner = create(:participant, :owner, league_season: ls)
 
     user = Users::SignUp.call(
       email_address: "alice@example.com",

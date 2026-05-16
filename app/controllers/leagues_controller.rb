@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LeaguesController < ApplicationController
-  before_action :load_league, only: [:show, :claim, :edit, :update]
+  before_action :load_league, only: [:show, :claim, :edit, :update, :history]
   before_action :require_account_owner, only: [:edit, :update]
 
   def index
@@ -10,7 +10,7 @@ class LeaguesController < ApplicationController
     when 0
       render Views::Pages::Home.new(league: new_league)
     when 1
-      redirect_to league_path(participants.first.league)
+      redirect_to league_path(participants.first.league_season.league)
     else
       render Views::Leagues::Index.new(participants: participants)
     end
@@ -42,8 +42,10 @@ class LeaguesController < ApplicationController
   end
 
   def show
+    @league_season = @league.current_league_season
     render Views::Leagues::Show.new(
       league: @league,
+      league_season: @league_season,
       current_participant: current_participant_for(@league)
     )
   end
@@ -66,8 +68,14 @@ class LeaguesController < ApplicationController
     end
   end
 
+  def history
+    league_seasons = @league.league_seasons.includes(:season).order("seasons.year DESC").references(:season)
+    render Views::Leagues::History.new(league: @league, league_seasons: league_seasons)
+  end
+
   def claim
-    seat = @league.participants.find(params[:seat_id])
+    league_season = @league.current_league_season
+    seat = league_season.participants.find(params[:seat_id])
     if seat.joined_at.present? || current_participant_for(@league).present?
       redirect_to league_path(@league), alert: "That seat is already claimed."
       return
@@ -75,7 +83,7 @@ class LeaguesController < ApplicationController
 
     seat.update!(joined_at: Time.current, user: current_user)
     participant_claims.add(seat.claim_token)
-    Drafts::StartIfReady.call(league: @league)
+    Drafts::StartIfReady.call(league_season: league_season)
     redirect_to league_path(@league), notice: "Welcome, #{seat.display_name}."
   end
 
@@ -92,7 +100,7 @@ class LeaguesController < ApplicationController
   def participants_for_visitor
     user_ids = current_user ? Participant.where(user_id: current_user.id).pluck(:id) : []
     token_ids = Participant.where(claim_token: participant_claims.tokens).pluck(:id)
-    Participant.where(id: (user_ids + token_ids).uniq).includes(league: :season)
+    Participant.where(id: (user_ids + token_ids).uniq).includes(league_season: [:league, :season])
   end
 
   def load_league
