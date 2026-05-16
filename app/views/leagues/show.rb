@@ -95,45 +95,30 @@ class Views::Leagues::Show < Views::Base
             plain "Share the code so they can claim seat ##{seat.draft_position}. They'll enter it after visiting the league page."
           end
         end
-        div(class: "space-y-2", data_controller: "clipboard") do
-          span(class: "text-xs uppercase tracking-wide opacity-60") { "Invite code" }
-          div(class: "join w-full") do
-            input(
-              type: "text",
-              value: @league_season.invite_code,
-              readonly: true,
-              class: "input input-bordered join-item flex-1 font-mono text-lg",
-              data_clipboard_target: "source",
-              data_action: "click->clipboard#select"
-            )
-            button(
-              type: "button",
-              class: "btn btn-primary join-item",
-              data_action: "click->clipboard#copy"
-            ) do
-              span(data_clipboard_target: "label") { "Copy code" }
-            end
-          end
-        end
-        div(class: "space-y-2", data_controller: "clipboard") do
-          span(class: "text-xs uppercase tracking-wide opacity-60") { "Or share a one-click link" }
-          div(class: "join w-full") do
-            input(
-              type: "text",
-              value: invite_url,
-              readonly: true,
-              class: "input input-bordered join-item flex-1 font-mono text-sm",
-              data_clipboard_target: "source",
-              data_action: "click->clipboard#select"
-            )
-            button(
-              type: "button",
-              class: "btn btn-ghost join-item",
-              data_action: "click->clipboard#copy"
-            ) do
-              span(data_clipboard_target: "label") { "Copy link" }
-            end
-          end
+        render_copyable_row(label: "Invite code", value: @league_season.invite_code, button_label: "Copy code")
+        render_copyable_row(label: "Or share a one-click link", value: invite_url, button_label: "Copy link")
+      end
+    end
+  end
+
+  def render_copyable_row(label:, value:, button_label:)
+    div(class: "space-y-1", data_controller: "clipboard") do
+      span(class: "text-xs uppercase tracking-wide opacity-60") { label }
+      div(class: "join w-full") do
+        input(
+          type: "text",
+          value: value,
+          readonly: true,
+          class: "input input-bordered join-item flex-1 font-mono text-sm",
+          data_clipboard_target: "source",
+          data_action: "click->clipboard#select"
+        )
+        button(
+          type: "button",
+          class: "btn btn-primary join-item",
+          data_action: "click->clipboard#copy"
+        ) do
+          span(data_clipboard_target: "label") { button_label }
         end
       end
     end
