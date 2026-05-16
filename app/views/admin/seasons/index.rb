@@ -19,7 +19,7 @@ class Views::Admin::Seasons::Index < Views::Base
         end
         div(class: "card bg-base-100 shadow") do
           div(class: "overflow-x-auto") do
-            table(class: "table table-sm") do
+            table(class: "table table-sm table-zebra") do
               thead do
                 tr do
                   th { "Sport" }
