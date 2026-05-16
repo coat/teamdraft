@@ -73,4 +73,6 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
+HEALTHCHECK --interval=1s --timeout=3s --retries=30 --start-period=10s \
+  CMD curl -f http://localhost:3000/up || exit 1
 CMD ["./bin/thrust", "./bin/rails", "server"]
