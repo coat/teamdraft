@@ -2,6 +2,25 @@
 
 class RenameLeagueIdOnParticipantsAndDraftPicks < ActiveRecord::Migration[8.0]
   def up
+    # Backfill: each existing League gets a LeagueSeason carrying its
+    # per-season state. We preserve `id` so the column rename below
+    # (league_id → league_season_id) keeps participants' and draft_picks'
+    # existing FK references valid. No-op on fresh installs.
+    if column_exists?(:leagues, :season_id) && connection.select_value("SELECT COUNT(*) FROM league_seasons").to_i.zero?
+      execute(<<~SQL)
+        INSERT INTO league_seasons (id, league_id, season_id, status, size, draft_mode,
+          draft_order_style, current_pick_number, pick_clock_seconds,
+          draft_scheduled_at, draft_started_at, draft_completed_at,
+          created_at, updated_at)
+        SELECT id, id, season_id, status, size, draft_mode,
+          draft_order_style, current_pick_number, pick_clock_seconds,
+          draft_scheduled_at, draft_started_at, draft_completed_at,
+          created_at, updated_at
+        FROM leagues
+      SQL
+      execute("SELECT setval('league_seasons_id_seq', GREATEST((SELECT MAX(id) FROM league_seasons), 1))")
+    end
+
     # Participants
     remove_foreign_key :participants, :leagues if foreign_key_exists?(:participants, :leagues)
     remove_index :participants, name: "index_participants_on_league_id" if index_exists?(:participants, :league_id, name: "index_participants_on_league_id")
