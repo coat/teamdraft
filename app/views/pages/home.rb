@@ -21,13 +21,13 @@ class Views::Pages::Home < Views::Base
 
   def render_hero
     div(class: "text-base-content space-y-3") do
-      p(class: "text-base-content/70 max-w-xl mx-auto") do
+      p(class: "text-base-content/70") do
         plain "Welcome! Team Draft is a 2-person fantasy sports league, where you draft entire sports teams - not players - and score points throughout the season based on wins and playoff appearances. The idea was taken from the "
         a(href: "https://www.espn.com/radio/play/_/id/46093555", class: "link link-primary") { "Mina Kimes Show's yearly NFL Team Draft" }
         plain ". "
       end
 
-      p(class: "text-base-content/70 max-w-xl mx-auto") do
+      p(class: "text-base-content/70") do
         plain "Get started now - no need to register an account. "
         a(href: about_path, class: "link link-primary") { "More info" }
       end
