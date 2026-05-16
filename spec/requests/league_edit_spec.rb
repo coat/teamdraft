@@ -14,7 +14,7 @@ RSpec.describe "League edit", type: :request do
     expect(response.body).to include("Sign in as the league owner")
   end
 
-  it "lets the signed-in owner rename and reslug the league" do
+  it "lets the signed-in owner rename the league and regenerates the slug" do
     create_nfl_season(team_count: 4)
     create_league_via_http(your_name: "Alice", opponent_name: "Bob")
     post registration_path, params: {
@@ -23,11 +23,12 @@ RSpec.describe "League edit", type: :request do
     league = League.last
     old_slug = league.slug
 
-    patch league_path(league), params: {league: {name: "Alice's Big Draft", slug_candidate: "renamed-thing"}}
+    patch league_path(league), params: {league: {name: "Alice's Big Draft"}}
 
     expect(response).to redirect_to(league_path(league.reload))
     expect(league.name).to eq("Alice's Big Draft")
-    expect(league.slug).to eq("renamed-thing")
+    expect(league.slug).to match(/\Aalice-s-big-draft-\d{4}\z/)
+    expect(league.slug).not_to eq(old_slug)
 
     # Old slug still resolves via friendly_id history.
     get "/leagues/#{old_slug}"

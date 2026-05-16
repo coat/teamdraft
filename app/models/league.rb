@@ -3,7 +3,7 @@
 class League < ApplicationRecord
   extend FriendlyId
 
-  friendly_id :slug_candidate, use: [:slugged, :history], slug_column: :slug
+  friendly_id :name, use: [:slugged, :history], slug_column: :slug
 
   broadcasts_refreshes
 
@@ -32,10 +32,14 @@ class League < ApplicationRecord
   # the controller can carry default values, but they are not persisted — the
   # controller forwards them into `Leagues::Create`, which writes them to the
   # initial `LeagueSeason`.
-  attr_accessor :slug_candidate, :your_name, :opponent_name,
+  attr_accessor :your_name, :opponent_name,
     :draft_mode, :draft_scheduled_at, :pick_clock_seconds
 
+  def normalize_friendly_id(value)
+    "#{value.to_s.parameterize.presence || "league"}-#{rand(1000..9999)}"
+  end
+
   def should_generate_new_friendly_id?
-    slug.blank? || slug_candidate.present?
+    name_changed? || super
   end
 end

@@ -52,10 +52,7 @@ module Leagues
     private
 
     def build_league
-      League.new(
-        name: @name,
-        slug_candidate: Haikunator.haikunate(9999)
-      )
+      League.new(name: @name)
     end
   end
 end

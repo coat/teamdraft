@@ -14,7 +14,7 @@ class Views::Leagues::Edit < Views::Base
           div(class: "card-body") do
             h1(class: "card-title text-2xl") { "Edit league" }
             p(class: "text-sm text-base-content/70") do
-              plain "Old URLs keep working will redirect #{old_slug_examples} to the new slug."
+              plain "The URL updates when you rename. Old links keep redirecting#{history_hint}."
             end
 
             render_errors if @league.errors.any?
@@ -23,12 +23,6 @@ class Views::Leagues::Edit < Views::Base
               div(class: "space-y-1") do
                 form.label :name, "Name", class: "label label-text font-medium"
                 form.text_field :name, value: @league.name, required: true,
-                  class: "input w-full"
-              end
-              div(class: "space-y-1") do
-                form.label :slug_candidate, "URL slug", class: "label label-text font-medium"
-                form.text_field :slug_candidate, value: @league.slug,
-                  placeholder: "leave blank to auto-generate", autocomplete: "off",
                   class: "input w-full"
               end
               div(class: "card-actions justify-end pt-2") do
@@ -52,9 +46,9 @@ class Views::Leagues::Edit < Views::Base
     end
   end
 
-  def old_slug_examples
+  def history_hint
     history = @league.slugs.where.not(slug: @league.slug).limit(2).pluck(:slug)
-    return "(none yet)" if history.empty?
-    history.map { |s| "/leagues/#{s}" }.join(", ")
+    return "" if history.empty?
+    " (e.g. " + history.map { |s| "/leagues/#{s}" }.join(", ") + ")"
   end
 end
