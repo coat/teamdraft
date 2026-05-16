@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     resources :draft_picks, only: [:create]
     member do
       post :claim
+      post :verify_invite
       get :history
     end
     resources :seasons, only: [:show], param: :year, controller: "league_seasons"

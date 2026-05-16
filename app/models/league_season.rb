@@ -12,6 +12,8 @@ class LeagueSeason < ApplicationRecord
 
   broadcasts_refreshes_to ->(ls) { ls.league }
 
+  before_validation :assign_invite_code, on: :create
+
   validates :season_id, uniqueness: {scope: :league_id}
   validates :size, numericality: {only_integer: true, greater_than_or_equal_to: 2, less_than_or_equal_to: 8}
   validates :draft_mode, inclusion: {in: DRAFT_MODES}
@@ -19,6 +21,19 @@ class LeagueSeason < ApplicationRecord
   validates :status, inclusion: {in: STATUSES}
   validates :current_pick_number, numericality: {only_integer: true, greater_than_or_equal_to: 1}
   validates :pick_clock_seconds, numericality: {only_integer: true, greater_than: 0}, allow_nil: true
+  validates :invite_code, presence: true, uniqueness: {case_sensitive: false}
+
+  def self.generate_unique_invite_code
+    loop do
+      candidate = Haikunator.haikunate(999)
+      return candidate unless exists?(invite_code: candidate)
+    end
+  end
+
+  # Audibly-shared codes are typo-prone; ignore case and surrounding whitespace.
+  def verify_invite!(candidate)
+    candidate.to_s.strip.casecmp(invite_code.to_s).zero?
+  end
 
   def owner
     participants.find_by(is_owner: true)
@@ -34,5 +49,11 @@ class LeagueSeason < ApplicationRecord
 
   def total_picks
     picks_per_participant * size
+  end
+
+  private
+
+  def assign_invite_code
+    self.invite_code ||= self.class.generate_unique_invite_code
   end
 end

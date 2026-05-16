@@ -8,7 +8,7 @@ RSpec.describe "Claiming a seat", type: :request do
     league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season).first
     second_seat = league.participants.find_by(draft_position: 2)
 
-    expect { post claim_league_path(league), params: {seat_id: second_seat.id} }
+    expect { claim_seat_via_http(league, second_seat) }
       .to change { second_seat.reload.joined_at }.from(nil)
     expect(response).to redirect_to(league_path(league))
   end
@@ -19,7 +19,7 @@ RSpec.describe "Claiming a seat", type: :request do
     second_seat = league.participants.find_by(draft_position: 2)
     second_seat.update!(joined_at: Time.current)
 
-    post claim_league_path(league), params: {seat_id: second_seat.id}
+    claim_seat_via_http(league, second_seat)
 
     expect(response).to redirect_to(league_path(league))
     follow_redirect!

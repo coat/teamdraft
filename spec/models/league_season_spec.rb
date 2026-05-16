@@ -32,6 +32,30 @@ RSpec.describe LeagueSeason do
     expect(dup.errors[:season_id]).to be_present
   end
 
+  describe "invite_code" do
+    it "auto-assigns a haikunator-style code on create" do
+      ls = create(:league_season, invite_code: nil)
+      expect(ls.invite_code).to match(/\A[a-z]+-[a-z]+-\d+\z/)
+    end
+
+    it "enforces uniqueness" do
+      ls = create(:league_season)
+      dup = build(:league_season, invite_code: ls.invite_code)
+      expect(dup).not_to be_valid
+      expect(dup.errors[:invite_code]).to be_present
+    end
+  end
+
+  describe "#verify_invite!" do
+    it "matches case-insensitively after trimming whitespace" do
+      ls = create(:league_season, invite_code: "frosty-otter-422")
+      expect(ls.verify_invite!("frosty-otter-422")).to be(true)
+      expect(ls.verify_invite!("  FROSTY-OTTER-422 ")).to be(true)
+      expect(ls.verify_invite!("frosty-otter-423")).to be(false)
+      expect(ls.verify_invite!("")).to be(false)
+    end
+  end
+
   describe "#picks_per_participant" do
     it "splits season teams across participants" do
       season = create_nfl_season(team_count: 32)

@@ -12,6 +12,8 @@ module LeagueRequestHelpers
   end
 
   def claim_seat_via_http(league, seat)
+    code = league.current_league_season.invite_code
+    post verify_invite_league_path(league), params: {code: code}
     post claim_league_path(league), params: {seat_id: seat.id}
   end
 end

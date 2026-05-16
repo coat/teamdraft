@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_16_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -77,12 +77,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_000001) do
     t.string "draft_order_style", default: "snake", null: false
     t.datetime "draft_scheduled_at"
     t.datetime "draft_started_at"
+    t.string "invite_code", null: false
     t.bigint "league_id", null: false
     t.integer "pick_clock_seconds"
     t.bigint "season_id", null: false
     t.integer "size", default: 2, null: false
     t.string "status", default: "draft_pending", null: false
     t.datetime "updated_at", null: false
+    t.index ["invite_code"], name: "index_league_seasons_on_invite_code", unique: true
     t.index ["league_id", "season_id"], name: "index_league_seasons_on_league_id_and_season_id", unique: true
     t.index ["league_id"], name: "index_league_seasons_on_league_id"
     t.index ["season_id"], name: "index_league_seasons_on_season_id"

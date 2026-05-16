@@ -47,13 +47,28 @@ RSpec.describe "Leagues", type: :request do
       expect(response.body).to include("Alice vs Bob")
     end
 
-    it "offers a claim prompt for visitors with no cookie" do
+    it "offers an invite-code prompt for visitors with no cookie" do
       season = create_nfl_season(team_count: 4)
       league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season).first
 
       get league_path(league)
 
-      expect(response.body).to include("Are you Bob?")
+      expect(response.body).to include("Have an invite code?")
+      expect(response.body).not_to include("Are you Bob?")
+    end
+
+    it "auto-claims the lone open seat after the visitor enters a valid invite code" do
+      season = create_nfl_season(team_count: 4)
+      league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season).first
+      code = league.current_league_season.invite_code
+      bob_seat = league.participants.find_by(draft_position: 2)
+
+      post verify_invite_league_path(league), params: {code: code}
+      follow_redirect!
+
+      expect(bob_seat.reload.joined_at).to be_present
+      expect(response.body).to include("Welcome, Bob")
+      expect(response.body).not_to include("Are you Bob?")
     end
   end
 end

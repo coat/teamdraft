@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LeaguesController < ApplicationController
-  before_action :load_league, only: [:show, :claim, :edit, :update, :history]
+  before_action :load_league, only: [:show, :claim, :edit, :update, :history, :verify_invite]
   before_action :require_account_owner, only: [:edit, :update]
 
   def index
@@ -43,10 +43,24 @@ class LeaguesController < ApplicationController
 
   def show
     @league_season = @league.current_league_season
+    if params[:invite].present?
+      if @league_season && @league_season.verify_invite!(params[:invite])
+        mark_invite_verified(@league_season)
+        claimed = auto_claim_lone_seat(@league_season)
+        if claimed
+          redirect_to league_path(@league), notice: "Welcome, #{claimed.display_name}." and return
+        else
+          redirect_to league_path(@league) and return
+        end
+      else
+        flash.now[:alert] = "That invite code didn't match."
+      end
+    end
     render Views::Leagues::Show.new(
       league: @league,
       league_season: @league_season,
-      current_participant: current_participant_for(@league)
+      current_participant: current_participant_for(@league),
+      invite_verified: invite_verified_for?(@league_season)
     )
   end
 
@@ -55,10 +69,8 @@ class LeaguesController < ApplicationController
   end
 
   def update
-    new_slug = params.dig(:league, :slug_candidate).to_s.strip.presence
     new_name = params.dig(:league, :name).to_s.strip.presence
     @league.name = new_name if new_name
-    @league.slug_candidate = new_slug if new_slug
 
     if @league.save
       redirect_to league_path(@league), notice: "League updated."
@@ -75,6 +87,11 @@ class LeaguesController < ApplicationController
 
   def claim
     league_season = @league.current_league_season
+    unless invite_verified_for?(league_season)
+      redirect_to league_path(@league), alert: "Enter the league's invite code to claim a seat."
+      return
+    end
+
     seat = league_season.participants.find(params[:seat_id])
     if seat.joined_at.present? || current_participant_for(@league).present?
       redirect_to league_path(@league), alert: "That seat is already claimed."
@@ -85,6 +102,22 @@ class LeaguesController < ApplicationController
     participant_claims.add(seat.claim_token)
     Drafts::StartIfReady.call(league_season: league_season)
     redirect_to league_path(@league), notice: "Welcome, #{seat.display_name}."
+  end
+
+  def verify_invite
+    league_season = @league.current_league_season
+    code = params[:code].to_s
+    if league_season && league_season.verify_invite!(code)
+      mark_invite_verified(league_season)
+      claimed = auto_claim_lone_seat(league_season)
+      if claimed
+        redirect_to league_path(@league), notice: "Welcome, #{claimed.display_name}."
+      else
+        redirect_to league_path(@league)
+      end
+    else
+      redirect_to league_path(@league), alert: "That invite code didn't match."
+    end
   end
 
   private
@@ -125,5 +158,31 @@ class LeaguesController < ApplicationController
 
   def render_no_season
     render plain: "No active NFL season seeded. Run bin/rails db:seed.", status: :service_unavailable
+  end
+
+  def invite_verified_for?(league_season)
+    return false unless league_season
+    session[:verified_invites].is_a?(Hash) &&
+      session[:verified_invites][league_season.id.to_s] == true
+  end
+
+  def mark_invite_verified(league_season)
+    session[:verified_invites] ||= {}
+    session[:verified_invites][league_season.id.to_s] = true
+  end
+
+  # When a verified invitee lands on a league with exactly one unclaimed seat
+  # and isn't already a participant, skip the "Are you {name}?" picker and
+  # claim it for them. Returns the claimed Participant, or nil if no claim
+  # was performed (already in, multiple open seats, or none).
+  def auto_claim_lone_seat(league_season)
+    return nil if current_participant_for(@league).present?
+    open_seats = league_season.participants.where(joined_at: nil).to_a
+    return nil unless open_seats.size == 1
+    seat = open_seats.first
+    seat.update!(joined_at: Time.current, user: current_user)
+    participant_claims.add(seat.claim_token)
+    Drafts::StartIfReady.call(league_season: league_season)
+    seat
   end
 end

@@ -6,10 +6,11 @@ class Views::Leagues::Show < Views::Base
   include Phlex::Rails::Helpers::TurboStreamFrom
   include Components::Helpers::CurrentUser
 
-  def initialize(league:, league_season:, current_participant:)
+  def initialize(league:, league_season:, current_participant:, invite_verified: false)
     @league = league
     @league_season = league_season
     @current_participant = current_participant
+    @invite_verified = invite_verified
   end
 
   def view_template
@@ -17,7 +18,8 @@ class Views::Leagues::Show < Views::Base
       turbo_stream_from @league
       main(class: "py-6 space-y-4") do
         render_header
-        render_share_card if unclaimed_seat.present?
+        render_share_card if owner_view? && unclaimed_seat.present?
+        render_invite_prompt if needs_invite_prompt?
         render_claim_prompt if needs_claim_prompt?
         render_account_upsell if needs_account_upsell?
         post_draft_with_picks = viewable? && draft_finished? && @league_season.draft_picks.any?
@@ -46,8 +48,14 @@ class Views::Leagues::Show < Views::Base
 
   def unclaimed_seat = @league_season.participants.find_by(joined_at: nil)
 
+  def owner_view? = @current_participant&.is_owner?
+
   def needs_claim_prompt?
-    !claimed? && unclaimed_seat.present?
+    !claimed? && unclaimed_seat.present? && @invite_verified
+  end
+
+  def needs_invite_prompt?
+    !claimed? && !owner_view? && unclaimed_seat.present? && !@invite_verified
   end
 
   def needs_account_upsell?
@@ -78,31 +86,69 @@ class Views::Leagues::Show < Views::Base
 
   def render_share_card
     seat = unclaimed_seat
-    div(
-      class: "card bg-primary/10 border border-primary/30 shadow-sm",
-      data_controller: "clipboard"
-    ) do
+    invite_url = league_url(@league, invite: @league_season.invite_code)
+    div(class: "card bg-primary/10 border border-primary/30 shadow-sm") do
       div(class: "card-body gap-3") do
         div do
-          h2(class: "card-title text-base") { "Share this link with #{seat.display_name}" }
-          p(class: "text-sm text-base-content/70") { "They'll claim seat ##{seat.draft_position} and the draft can begin." }
-        end
-        div(class: "join w-full") do
-          input(
-            type: "text",
-            value: league_url(@league),
-            readonly: true,
-            class: "input input-bordered join-item flex-1 font-mono text-sm",
-            data_clipboard_target: "source",
-            data_action: "click->clipboard#select"
-          )
-          button(
-            type: "button",
-            class: "btn btn-primary join-item",
-            data_action: "click->clipboard#copy"
-          ) do
-            span(data_clipboard_target: "label") { "Copy link" }
+          h2(class: "card-title text-base") { "Invite #{seat.display_name}" }
+          p(class: "text-sm text-base-content/70") do
+            plain "Share the code so they can claim seat ##{seat.draft_position}. They'll enter it after visiting the league page."
           end
+        end
+        div(class: "space-y-2", data_controller: "clipboard") do
+          span(class: "text-xs uppercase tracking-wide opacity-60") { "Invite code" }
+          div(class: "join w-full") do
+            input(
+              type: "text",
+              value: @league_season.invite_code,
+              readonly: true,
+              class: "input input-bordered join-item flex-1 font-mono text-lg",
+              data_clipboard_target: "source",
+              data_action: "click->clipboard#select"
+            )
+            button(
+              type: "button",
+              class: "btn btn-primary join-item",
+              data_action: "click->clipboard#copy"
+            ) do
+              span(data_clipboard_target: "label") { "Copy code" }
+            end
+          end
+        end
+        div(class: "space-y-2", data_controller: "clipboard") do
+          span(class: "text-xs uppercase tracking-wide opacity-60") { "Or share a one-click link" }
+          div(class: "join w-full") do
+            input(
+              type: "text",
+              value: invite_url,
+              readonly: true,
+              class: "input input-bordered join-item flex-1 font-mono text-sm",
+              data_clipboard_target: "source",
+              data_action: "click->clipboard#select"
+            )
+            button(
+              type: "button",
+              class: "btn btn-ghost join-item",
+              data_action: "click->clipboard#copy"
+            ) do
+              span(data_clipboard_target: "label") { "Copy link" }
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def render_invite_prompt
+    div(class: "card bg-base-100 shadow") do
+      div(class: "card-body") do
+        h2(class: "card-title") { "Have an invite code?" }
+        p(class: "text-sm text-base-content/70") { "The league owner can share a short code with you. Enter it to claim your seat." }
+        form_with(url: verify_invite_league_path(@league), method: :post, class: "join w-full mt-2") do |form|
+          form.text_field :code, required: true, autocomplete: "off",
+            placeholder: "e.g. frosty-otter-422",
+            class: "input input-bordered join-item flex-1 font-mono"
+          form.submit "Continue", class: "btn btn-primary join-item"
         end
       end
     end

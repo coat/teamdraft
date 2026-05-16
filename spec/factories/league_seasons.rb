@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :league_season do
     league
     season
+    sequence(:invite_code) { |n| "test-code-#{n}-#{SecureRandom.hex(2)}" }
     size { 2 }
     draft_mode { "live" }
     draft_order_style { "linear" }

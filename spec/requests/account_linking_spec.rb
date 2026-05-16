@@ -19,7 +19,7 @@ RSpec.describe "Account linking on league actions", type: :request do
     bob_seat = league.participants.find_by(draft_position: 2)
     user = sign_in_new_user("bob@example.com")
 
-    post claim_league_path(league), params: {seat_id: bob_seat.id}
+    claim_seat_via_http(league, bob_seat)
 
     expect(bob_seat.reload.user_id).to eq(user.id)
   end
