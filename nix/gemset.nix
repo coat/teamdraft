@@ -962,6 +962,18 @@
     targets = [];
     version = "0.6.3";
   };
+  pagy = {
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "0f77pkbkib8jild1wyzrp4wkw0wd3sl65gkqizqmahb87w22wgyv";
+      target = "ruby";
+      type = "gem";
+    };
+    targets = [];
+    version = "9.4.0";
+  };
   parallel = {
     groups = ["default" "development" "test"];
     platforms = [];

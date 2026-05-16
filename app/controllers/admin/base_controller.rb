@@ -4,6 +4,8 @@
 # ApplicationController so admin-specific concerns (logging, layout, csrf
 # nuances) can grow here without bleeding into the public site.
 class Admin::BaseController < ApplicationController
+  include Pagy::Backend
+
   before_action :require_authentication
   before_action :require_admin
 

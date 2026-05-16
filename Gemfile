@@ -23,6 +23,8 @@ gem "literal"
 gem "haikunator"
 # Slug routing with history so renames don't break shared URLs
 gem "friendly_id", "~> 5.5"
+# Tiny, fast pagination
+gem "pagy", "~> 9.4"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"

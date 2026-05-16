@@ -4,9 +4,9 @@ class Admin::LeaguesController < Admin::BaseController
   before_action :load_league, only: [:edit, :update, :destroy]
 
   def index
-    leagues = League.includes(league_seasons: [:season, participants: :user])
-      .order("leagues.name")
-    render Views::Admin::Leagues::Index.new(leagues: leagues)
+    query = Admin::Leagues::ListQuery.new(params)
+    pagy, leagues = pagy(query.relation)
+    render Views::Admin::Leagues::Index.new(query: query, leagues: leagues, pagy: pagy)
   end
 
   def edit
