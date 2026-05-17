@@ -111,6 +111,55 @@ RSpec.describe Leagues::DirectoryQuery do
     end
   end
 
+  describe "mid-season drafts (scoring events already exist)" do
+    it "reports any_scoring_events? true when the season has any events" do
+      ls = drafting_league_season
+      ScoringEvent.create!(season_team: ls.season.season_teams.first,
+        event_type: "regular_win", points: 1, occurred_at: Time.current)
+
+      query = Leagues::DirectoryQuery.new(league_season: ls, params: {})
+
+      expect(query.any_scoring_events?).to be(true)
+    end
+
+    it "defaults sort to points/desc while drafting when events exist" do
+      ls = drafting_league_season
+      ScoringEvent.create!(season_team: ls.season.season_teams.first,
+        event_type: "regular_win", points: 1, occurred_at: Time.current)
+
+      query = Leagues::DirectoryQuery.new(league_season: ls, params: {})
+
+      expect(query.sort_column).to eq("points")
+      expect(query.sort_dir).to eq("desc")
+    end
+
+    it "keeps default sort as rank when no events exist yet" do
+      ls = drafting_league_season
+
+      query = Leagues::DirectoryQuery.new(league_season: ls, params: {})
+
+      expect(query.any_scoring_events?).to be(false)
+      expect(query.sort_column).to eq("rank")
+    end
+
+    it "breaks points ties by team default_pick_rank (lower rank first)" do
+      # create_nfl_season assigns default_pick_rank 1..N in season_teams order.
+      ls = drafting_league_season
+      teams = ls.season.season_teams.to_a
+      # Give the 2nd and 3rd team equal points; 3rd has higher (worse) rank.
+      ScoringEvent.create!(season_team: teams[1], event_type: "regular_win",
+        points: 2, occurred_at: Time.current)
+      ScoringEvent.create!(season_team: teams[2], event_type: "regular_win",
+        points: 2, occurred_at: Time.current)
+
+      rows = Leagues::DirectoryQuery.new(league_season: ls,
+        params: {status: "", sort: "points", dir: "desc"}).rows
+
+      tied_rows = rows.select { |r| r.points == 2 }
+      expect(tied_rows.map { |r| r.team.default_pick_rank }).to eq([2, 3])
+    end
+  end
+
   def drafting_league_season
     season = create_nfl_season(team_count: 4)
     ls = create(:league_season, :with_two_participants, season: season)

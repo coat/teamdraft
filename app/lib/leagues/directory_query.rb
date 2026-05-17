@@ -72,7 +72,18 @@ module Leagues
     end
 
     def default_sort
-      drafting? ? "rank" : "points"
+      (drafting? && !any_scoring_events?) ? "rank" : "points"
+    end
+
+    # True if any team in this season already has scoring events. Used by
+    # the draft UI to decide whether to surface a Points column and bias
+    # the default sort toward points-desc — the migration-mid-season case
+    # where drafters benefit from seeing actual performance so far.
+    def any_scoring_events?
+      return @any_scoring_events if defined?(@any_scoring_events)
+      @any_scoring_events = ScoringEvent.joins(:season_team)
+        .where(season_teams: {season_id: @league_season.season_id})
+        .exists?
     end
 
     def default_dir
@@ -141,10 +152,10 @@ module Leagues
       when "points"
         # Picked rows ahead of unpicked; direction is baked into the key
         # so the picked/unpicked grouping survives a desc flip. Tiebreak
-        # by pick order so ties (common pre-scoring) read as the draft
-        # board rather than a noisy alphabetical reshuffle.
+        # by team rank so pre-scoring ties (and mid-season drafts before
+        # any pick lands) read as the rank board.
         signed_points = (sort_dir == "desc") ? -row.points.to_i : row.points.to_i
-        [row.pick ? 0 : 1, signed_points, row.pick&.pick_number || Float::INFINITY]
+        [row.pick ? 0 : 1, signed_points, rank_for(row), row.team.name.downcase]
       else # "rank"
         [rank_for(row), row.team.name.downcase]
       end

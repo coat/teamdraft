@@ -8,6 +8,7 @@ class Views::Drafts::Show < Views::Base
   include Views::Components::TeamDirectoryHelpers
 
   DRAFT_COLUMNS = 6
+  DRAFT_COLUMNS_WITH_POINTS = 7
 
   def initialize(league:, league_season:, current_participant:, directory_query: nil)
     @league = league
@@ -270,6 +271,7 @@ class Views::Drafts::Show < Views::Base
   end
 
   def render_draft_table(query, rows, on_the_clock)
+    show_points = query.any_scoring_events?
     div(class: "overflow-x-auto") do
       table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
@@ -279,21 +281,25 @@ class Views::Drafts::Show < Views::Base
             render Views::Components::SortableHeader.new(query: query, column: "rank", label: "Rank", path: league_draft_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_draft_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_draft_path(@league))
+            if show_points
+              render Views::Components::SortableHeader.new(query: query, column: "points", label: "Points", path: league_draft_path(@league))
+            end
             th(class: "text-right bg-base-100")
           end
         end
+        column_count = show_points ? DRAFT_COLUMNS_WITH_POINTS : DRAFT_COLUMNS
         if rows.empty?
-          tbody { render_empty_row(DRAFT_COLUMNS) }
+          tbody { render_empty_row(column_count) }
         else
           tbody do
-            rows.each { |row| render_draft_row(query, row, on_the_clock) }
+            rows.each { |row| render_draft_row(query, row, on_the_clock, show_points) }
           end
         end
       end
     end
   end
 
-  def render_draft_row(query, row, on_the_clock)
+  def render_draft_row(query, row, on_the_clock, show_points)
     team = row.team
     pick = row.pick
     tr do
@@ -307,6 +313,7 @@ class Views::Drafts::Show < Views::Base
       td(class: "font-mono text-sm") { team.default_pick_rank ? team.default_pick_rank.to_s : "—" }
       td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
       td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
+      td(class: "font-mono text-right") { row.points.to_s } if show_points
       th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
     end
   end
