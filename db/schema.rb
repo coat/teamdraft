@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -121,13 +121,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_000003) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["claim_token"], name: "index_participants_on_claim_token", unique: true
-    t.index ["league_season_id", "draft_position"], name: "index_participants_on_league_season_id_and_draft_position", unique: true
     t.index ["league_season_id"], name: "index_participants_on_league_season_id"
     t.index ["league_season_id"], name: "index_participants_one_owner_per_league_season", unique: true, where: "is_owner"
     t.index ["user_id"], name: "index_participants_on_user_id"
     t.check_constraint "char_length(claim_token::text) >= 24", name: "participants_claim_token_length"
     t.check_constraint "char_length(display_name::text) > 0", name: "participants_display_name_not_blank"
     t.check_constraint "draft_position >= 1 AND draft_position <= 8", name: "participants_draft_position_range"
+    t.unique_constraint ["league_season_id", "draft_position"], deferrable: :immediate, name: "participants_league_season_id_draft_position_unique"
   end
 
   create_table "scoring_events", force: :cascade do |t|

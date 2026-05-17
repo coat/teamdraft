@@ -83,7 +83,9 @@ class Views::Admin::Teams::Index < Views::Base
       td { team.external_id.presence || span(class: "opacity-50") { "—" } }
       td { team.default_pick_rank&.to_s || span(class: "opacity-50") { "—" } }
       td(class: "w-4 text-center") do
-        if team.default_pick_rank && !@top_ids.include?(team.id)
+        if team.default_pick_rank.nil? || @top_ids.include?(team.id)
+          span(class: "btn btn-ghost btn-xs btn-disabled px-0.5", aria_hidden: "true") { "▲" }
+        else
           button_to "▲", move_up_admin_team_path(team), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs px-0.5",
@@ -91,7 +93,9 @@ class Views::Admin::Teams::Index < Views::Base
         end
       end
       td(class: "w-4 text-center") do
-        if team.default_pick_rank && !@bottom_ids.include?(team.id)
+        if team.default_pick_rank.nil? || @bottom_ids.include?(team.id)
+          span(class: "btn btn-ghost btn-xs btn-disabled px-0.5", aria_hidden: "true") { "▼" }
+        else
           button_to "▼", move_down_admin_team_path(team), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs px-0.5",

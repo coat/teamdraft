@@ -21,6 +21,12 @@ Rails.application.routes.draw do
   root "leagues#index"
   resources :leagues, only: [:index, :new, :create, :show, :edit, :update], param: :id do
     resources :draft_picks, only: [:create]
+    resources :participants, only: [] do
+      member do
+        patch :move_up
+        patch :move_down
+      end
+    end
     member do
       post :claim
       post :verify_invite
