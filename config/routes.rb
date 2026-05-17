@@ -34,7 +34,12 @@ Rails.application.routes.draw do
     resources :seasons, only: [:index, :new, :create, :edit, :update] do
       member { post :activate }
     end
-    resources :teams, only: [:index, :edit, :update]
+    resources :teams, only: [:index, :edit, :update] do
+      member do
+        patch :move_up
+        patch :move_down
+      end
+    end
     resources :games, only: [:index, :edit, :update]
     resources :leagues, only: [:index, :edit, :update, :destroy]
     resources :syncs, only: [:create]

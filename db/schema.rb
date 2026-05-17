@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_16_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -350,7 +350,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_000002) do
     t.bigint "sport_id", null: false
     t.datetime "updated_at", null: false
     t.index ["sport_id", "abbreviation"], name: "index_teams_on_sport_id_and_abbreviation", unique: true
-    t.index ["sport_id", "default_pick_rank"], name: "index_teams_on_sport_id_and_default_pick_rank"
+    t.index ["sport_id", "default_pick_rank"], name: "index_teams_on_sport_id_and_default_pick_rank", unique: true
     t.index ["sport_id", "external_id"], name: "index_teams_on_sport_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["sport_id", "slug"], name: "index_teams_on_sport_id_and_slug", unique: true
     t.index ["sport_id"], name: "index_teams_on_sport_id"
