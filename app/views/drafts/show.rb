@@ -62,7 +62,7 @@ class Views::Drafts::Show < Views::Base
       div(class: "card-body") do
         case @league_season.status
         when "draft_pending"
-          render_pending_notice
+          render_pending_state
         when "drafting"
           render_drafting_state
         else
@@ -70,6 +70,11 @@ class Views::Drafts::Show < Views::Base
         end
       end
     end
+  end
+
+  def render_pending_state
+    render_pending_notice
+    render_team_directory(nil)
   end
 
   # When the final pick lands (manual or autopick), the broadcast refresh
@@ -154,6 +159,7 @@ class Views::Drafts::Show < Views::Base
 
   def can_pick?(on_the_clock)
     return false unless @current_participant
+    return false unless @league_season.status == "drafting"
     case @league_season.draft_mode
     when "manual" then @current_participant.is_owner?
     when "live" then on_the_clock && @current_participant.id == on_the_clock.id
