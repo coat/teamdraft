@@ -3,15 +3,14 @@
 require "rails_helper"
 
 RSpec.describe "League edit", type: :request do
-  it "redirects cookie-only owners to a sign-up CTA" do
+  it "lets a cookie-only owner reach the edit form" do
     create_nfl_season(team_count: 4)
     league = create_league_via_http(your_name: "Alice", opponent_name: "Bob")
 
     get edit_league_path(league)
 
-    expect(response).to redirect_to(league_path(league))
-    follow_redirect!
-    expect(response.body).to include("Sign in as the league owner")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Edit league")
   end
 
   it "lets the signed-in owner rename the league and regenerates the slug" do

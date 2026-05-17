@@ -44,9 +44,16 @@ class Views::Leagues::Form < Views::Base
   end
 
   def render_datetime_field(form, field, label)
-    div(class: "space-y-1") do
+    div(class: "space-y-1", data: {controller: "local-datetime-field"}) do
       form.label field, label, class: "label label-text font-medium"
-      form.datetime_local_field field, class: "input w-full"
+      form.datetime_local_field field,
+        include_seconds: false, step: 60,
+        class: "input w-full",
+        data: {local_datetime_field_target: "input", action: "change->local-datetime-field#update"}
+      input(type: "hidden", name: "league[time_zone]",
+        data: {local_datetime_field_target: "timezone"})
+      span(class: "label-text-alt text-xs opacity-60",
+        data: {local_datetime_field_target: "hint"}) { "Detecting your timezone…" }
     end
   end
 

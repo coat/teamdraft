@@ -1,5 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
+// `M:SS` once we have at least a minute left, then `SSs` under a minute.
+// Shorter remaining strings are easier to scan when the clock is critical.
+function formatRemaining(seconds) {
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+  const rem = seconds % 60
+  return `${minutes}:${rem.toString().padStart(2, "0")}`
+}
+
 // Renders a countdown to the deadline. The server is the source of truth;
 // when the clock hits zero, PickClockJob has already fired (or is about to)
 // and a Turbo refresh will replace this element with the new draft state.
@@ -53,7 +62,7 @@ export default class extends Controller {
       clearInterval(this.interval)
       return
     }
-    this.displayTarget.textContent = `${remaining}s`
+    this.displayTarget.textContent = formatRemaining(remaining)
     if (remaining <= this.warnAtValue) {
       this.element.classList.add("draft-clock--warning")
       this.autopickTargets.forEach((el) => el.classList.remove("hidden"))

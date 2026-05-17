@@ -102,13 +102,19 @@ class Views::Leagues::Edit < Views::Base
   end
 
   def render_datetime_field
-    div(class: "space-y-1") do
+    div(class: "space-y-1", data: {controller: "local-datetime-field"}) do
       label(for: "league_season_draft_scheduled_at", class: "label label-text font-medium") { "Draft date" }
       input(type: "datetime-local",
         name: "league_season[draft_scheduled_at]",
         id: "league_season_draft_scheduled_at",
         value: @league_season.draft_scheduled_at&.strftime("%Y-%m-%dT%H:%M"),
-        class: "input w-full")
+        step: 60,
+        class: "input w-full",
+        data: {local_datetime_field_target: "input", action: "change->local-datetime-field#update"})
+      input(type: "hidden", name: "league_season[time_zone]",
+        data: {local_datetime_field_target: "timezone"})
+      span(class: "label-text-alt text-xs opacity-60",
+        data: {local_datetime_field_target: "hint"}) { "Detecting your timezone…" }
     end
   end
 
