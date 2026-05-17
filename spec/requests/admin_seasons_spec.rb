@@ -15,9 +15,11 @@ RSpec.describe "Admin seasons", type: :request do
     expect(response.body).to include("upcoming")
   end
 
-  it "creates a season" do
+  it "creates a season and attaches a SeasonTeam for every team in the sport" do
     sign_in_admin
     sport = create(:sport, :nfl)
+    create(:team, sport: sport)
+    create(:team, sport: sport)
 
     post admin_seasons_path, params: {
       season: {
@@ -27,7 +29,9 @@ RSpec.describe "Admin seasons", type: :request do
     }
 
     expect(response).to redirect_to(admin_seasons_path)
-    expect(Season.find_by(year: 2027, sport_id: sport.id)).to be_present
+    season = Season.find_by(year: 2027, sport_id: sport.id)
+    expect(season).to be_present
+    expect(season.season_teams.count).to eq(2)
   end
 
   it "updates external_id" do

@@ -20,6 +20,7 @@ class Admin::SeasonsController < Admin::BaseController
   def create
     season = Season.new(season_params)
     if season.save
+      Seasons::PopulateTeams.call(season: season)
       redirect_to admin_seasons_path, notice: "Created #{season.label}."
     else
       render Views::Admin::Seasons::New.new(season: season, sports: sports_options),
