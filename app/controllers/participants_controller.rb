@@ -11,9 +11,9 @@ class ParticipantsController < ApplicationController
     swap_with = adjacent_seat(:above)
     if swap_with
       swap_positions(@participant, swap_with)
-      redirect_to edit_league_path(@league), notice: "Moved #{@participant.display_name} up."
+      redirect_to edit_league_draft_path(@league), notice: "Moved #{@participant.display_name} up."
     else
-      redirect_to edit_league_path(@league), alert: "#{@participant.display_name} is already first."
+      redirect_to edit_league_draft_path(@league), alert: "#{@participant.display_name} is already first."
     end
   end
 
@@ -23,9 +23,9 @@ class ParticipantsController < ApplicationController
     swap_with = adjacent_seat(:below)
     if swap_with
       swap_positions(@participant, swap_with)
-      redirect_to edit_league_path(@league), notice: "Moved #{@participant.display_name} down."
+      redirect_to edit_league_draft_path(@league), notice: "Moved #{@participant.display_name} down."
     else
-      redirect_to edit_league_path(@league), alert: "#{@participant.display_name} is already last."
+      redirect_to edit_league_draft_path(@league), alert: "#{@participant.display_name} is already last."
     end
   end
 
@@ -53,7 +53,7 @@ class ParticipantsController < ApplicationController
   end
 
   def redirect_locked
-    redirect_to edit_league_path(@league),
+    redirect_to edit_league_draft_path(@league),
       alert: "Draft has started — the order is locked."
   end
 
