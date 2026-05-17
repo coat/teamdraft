@@ -195,12 +195,33 @@ class Views::Leagues::Show < Views::Base
   def render_draft_cta
     div(class: "card bg-base-100 shadow") do
       div(class: "card-body") do
-        h2(class: "card-title") { "Draft is in progress" }
+        h2(class: "card-title") { draft_cta_title }
+        p(class: "text-base-content/70") { draft_cta_subtitle } if draft_cta_subtitle
         div(class: "card-actions") do
-          a(href: league_draft_path(@league), class: "btn btn-primary") { "Go to the draft room →" }
+          a(href: league_draft_path(@league), class: "btn btn-primary") { draft_cta_button_label }
         end
       end
     end
+  end
+
+  def draft_cta_title
+    return "Draft is in progress" if @league_season.status == "drafting"
+    starts_at = @league_season.draft_scheduled_at
+    return "Draft scheduled" if starts_at.present? && starts_at > Time.current
+    "Draft hasn't started yet"
+  end
+
+  def draft_cta_subtitle
+    return nil unless @league_season.status == "draft_pending"
+    if @league_season.participants.where(joined_at: nil).any?
+      "Waiting for the other player to claim their seat."
+    elsif (starts_at = @league_season.draft_scheduled_at).present? && starts_at > Time.current
+      "Starts #{starts_at.strftime("%a %b %-d at %-l:%M %p %Z")}."
+    end
+  end
+
+  def draft_cta_button_label
+    (@league_season.status == "drafting") ? "Go to the draft room →" : "Open the draft room →"
   end
 
   def render_post_draft_directory
