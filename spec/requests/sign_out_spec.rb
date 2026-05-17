@@ -14,7 +14,7 @@ RSpec.describe "Signing out", type: :request do
 
     get root_path
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Draft a season with a friend")
+    expect(response.body).to include("Start a draft")
   end
 
   it "drops claim tokens after sign-in for a returning user with a cookie-only seat" do
@@ -27,6 +27,6 @@ RSpec.describe "Signing out", type: :request do
 
     get root_path
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Draft a season with a friend")
+    expect(response.body).to include("Start a draft")
   end
 end

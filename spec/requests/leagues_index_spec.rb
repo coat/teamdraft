@@ -8,7 +8,7 @@ RSpec.describe "Leagues index (home)", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Draft a season with a friend")
+      expect(response.body).to include("Start a draft")
       expect(response.body).to include("league[your_name]")
     end
   end

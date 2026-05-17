@@ -8,7 +8,7 @@ RSpec.describe "Leagues", type: :request do
       get "/"
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Draft a season with a friend")
+      expect(response.body).to include("Start a draft")
     end
   end
 

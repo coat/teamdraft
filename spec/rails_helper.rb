@@ -45,6 +45,13 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # FactoryBot sequences accumulate across the whole suite, so without a
+  # rewind a `sequence(:year) { 2000 + n }` eventually pushes past the
+  # Season model's `year <= 2100` validation and topples unrelated specs
+  # that build seasons later in the run. Rewinding before each example
+  # keeps factory output bounded and seed-independent.
+  config.before(:each) { FactoryBot.rewind_sequences }
+
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 
