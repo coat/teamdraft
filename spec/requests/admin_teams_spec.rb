@@ -59,6 +59,75 @@ RSpec.describe "Admin teams", type: :request do
     expect(team.default_pick_rank).to eq(2)
   end
 
+  describe "filtering and sorting" do
+    before do
+      sign_in_admin
+      @nfl = create(:sport, :nfl)
+      @nba = create(:sport, key: "nba", name: "NBA")
+      create(:team, sport: @nfl, name: "Kansas City Chiefs", abbreviation: "KC", slug: "chiefs", default_pick_rank: 1)
+      create(:team, sport: @nfl, name: "Seattle Seahawks", abbreviation: "SEA", slug: "seahawks", default_pick_rank: 10)
+      create(:team, sport: @nba, name: "Los Angeles Lakers", abbreviation: "LAL", slug: "lakers", default_pick_rank: 5)
+    end
+
+    it "shows all teams from all sports by default" do
+      get admin_teams_path
+
+      expect(response.body).to include("Kansas City Chiefs")
+      expect(response.body).to include("Seattle Seahawks")
+      expect(response.body).to include("Los Angeles Lakers")
+    end
+
+    it "filters by sport" do
+      get admin_teams_path, params: {sport_id: @nfl.id}
+
+      expect(response.body).to include("Kansas City Chiefs")
+      expect(response.body).to include("Seattle Seahawks")
+      expect(response.body).not_to include("Los Angeles Lakers")
+    end
+
+    it "searches by team name" do
+      get admin_teams_path, params: {q: "Seahawks"}
+
+      expect(response.body).to include("Seattle Seahawks")
+      expect(response.body).not_to include("Kansas City Chiefs")
+      expect(response.body).not_to include("Los Angeles Lakers")
+    end
+
+    it "combines sport filter with name search" do
+      get admin_teams_path, params: {sport_id: @nfl.id, q: "Chiefs"}
+
+      expect(response.body).to include("Kansas City Chiefs")
+      expect(response.body).not_to include("Seattle Seahawks")
+    end
+
+    it "sorts by name ascending" do
+      get admin_teams_path, params: {sort: "name", dir: "asc"}
+
+      expect(response.body).to match(/Kansas City Chiefs.*Seattle Seahawks/m)
+    end
+
+    it "sorts by name descending" do
+      get admin_teams_path, params: {sort: "name", dir: "desc"}
+
+      expect(response.body).to match(/Seattle Seahawks.*Kansas City Chiefs/m)
+    end
+
+    it "defaults to sorting by rank ascending" do
+      get admin_teams_path
+
+      # Rank 1 (Chiefs) before rank 10 (Seahawks)
+      expect(response.body).to match(/Kansas City Chiefs.*Seattle Seahawks/m)
+    end
+
+    it "puts nil ranks last when sorting by rank ascending" do
+      create(:team, sport: @nfl, name: "No Rank Team", abbreviation: "NRT", slug: "no-rank", default_pick_rank: nil)
+
+      get admin_teams_path, params: {sort: "rank", dir: "asc"}
+
+      expect(response.body).to match(/Seattle Seahawks.*No Rank Team/m)
+    end
+  end
+
   describe "move_up" do
     it "swaps rank with the team above" do
       sign_in_admin
