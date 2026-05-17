@@ -31,7 +31,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root "dashboard#show"
-    resources :seasons, only: [:index, :new, :create, :edit, :update] do
+    resources :seasons, only: [:index, :show, :new, :create, :edit, :update] do
       member { post :activate }
     end
     resources :teams, only: [:index, :edit, :update] do

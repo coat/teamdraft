@@ -51,31 +51,11 @@ class Views::Admin::Dashboard::Show < Views::Base
           p(class: "text-base-content/60") { "No active seasons." }
         else
           div(class: "space-y-3") do
-            @stats[:active_seasons].each { |season| render_season_actions(season) }
+            @stats[:active_seasons].each do |season|
+              render Views::Components::Admin::SyncActions.new(season: season, back_path: admin_root_path)
+            end
           end
         end
-      end
-    end
-  end
-
-  def render_season_actions(season)
-    div(class: "border border-base-300 rounded-lg p-3 space-y-2") do
-      h3(class: "font-medium") { season.label }
-      div(class: "flex flex-wrap gap-2 items-center") do
-        form_with(url: admin_syncs_path, method: :post, class: "inline-flex gap-2 items-center") do |form|
-          form.hidden_field :kind, value: "games"
-          form.hidden_field :season_id, value: season.id
-          form.select :round,
-            [["All rounds", ""]] + SportsData::TheSportsDbProvider::ROUND_LABELS.map { |k, v| [v, k] },
-            {},
-            class: "select select-sm select-bordered"
-          form.submit "Pull games from #{season.external_provider.presence || "thesportsdb"}",
-            class: "btn btn-sm"
-        end
-        button_to "Recompute scoring",
-          admin_syncs_path,
-          params: {kind: "scoring", season_id: season.id},
-          form: {class: "inline"}, class: "btn btn-sm"
       end
     end
   end

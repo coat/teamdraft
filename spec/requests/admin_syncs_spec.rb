@@ -31,4 +31,26 @@ RSpec.describe "Admin syncs", type: :request do
     follow_redirect!
     expect(response.body).to include("Unknown sync kind")
   end
+
+  it "redirects to the provided /admin path when given one" do
+    sign_in_admin
+    season = create_nfl_season(team_count: 2)
+
+    post admin_syncs_path, params: {
+      kind: "scoring", season_id: season.id, redirect_to: admin_season_path(season)
+    }
+
+    expect(response).to redirect_to(admin_season_path(season))
+  end
+
+  it "ignores non-admin redirect targets to prevent open redirects" do
+    sign_in_admin
+    season = create_nfl_season(team_count: 2)
+
+    post admin_syncs_path, params: {
+      kind: "scoring", season_id: season.id, redirect_to: "https://evil.example"
+    }
+
+    expect(response).to redirect_to(admin_root_path)
+  end
 end

@@ -56,6 +56,20 @@ RSpec.describe "Admin seasons", type: :request do
     expect(previous.reload.status).to eq("completed")
   end
 
+  it "shows a season detail page with the sync panel" do
+    sign_in_admin
+    sport = create(:sport, :nfl)
+    season = create(:season, sport: sport, year: 2024, label: "NFL 2024", status: "completed")
+
+    get admin_season_path(season)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("NFL 2024")
+    expect(response.body).to include("Sync")
+    expect(response.body).to include("Recompute scoring")
+    expect(response.body).to include(%(value="#{admin_season_path(season)}"))
+  end
+
   it "requires admin to access" do
     sport = create(:sport, :nfl)
     create(:season, sport: sport)

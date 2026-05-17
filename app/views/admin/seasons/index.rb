@@ -47,7 +47,9 @@ class Views::Admin::Seasons::Index < Views::Base
     tr(class: season.external_id.blank? ? "bg-warning/10" : nil) do
       td { season.sport.key }
       td(class: "font-mono") { season.year.to_s }
-      td(class: "font-medium") { season.label }
+      td(class: "font-medium") do
+        a(href: admin_season_path(season), class: "link link-hover") { season.label }
+      end
       td { render_status(season.status) }
       td { date_range(season) }
       td(class: "text-sm") do
