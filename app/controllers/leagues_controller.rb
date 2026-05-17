@@ -2,7 +2,7 @@
 
 class LeaguesController < ApplicationController
   before_action :load_league, only: [:show, :claim, :edit, :update, :history, :verify_invite]
-  before_action :require_account_owner, only: [:edit, :update]
+  before_action :require_owner, only: [:edit, :update]
 
   def index
     participants = participants_for_visitor
@@ -28,7 +28,10 @@ class LeaguesController < ApplicationController
       your_name: params.dig(:league, :your_name),
       opponent_name: params.dig(:league, :opponent_name),
       season:,
-      draft_scheduled_at: params.dig(:league, :draft_scheduled_at).presence,
+      draft_scheduled_at: parsed_local_datetime(
+        params.dig(:league, :draft_scheduled_at),
+        params.dig(:league, :time_zone)
+      ),
       draft_mode: params.dig(:league, :draft_mode).presence || "live",
       pick_clock_seconds: params.dig(:league, :pick_clock_seconds).presence,
       owner_user: current_user
@@ -43,6 +46,13 @@ class LeaguesController < ApplicationController
 
   def show
     @league_season = @league.current_league_season
+    # Self-heal a draft whose scheduled start time has passed but whose
+    # StartDraftJob never ran (dev :async loses jobs on process restart;
+    # prod is fine but the guard costs nothing). StartIfReady is idempotent.
+    if @league_season&.status == "draft_pending"
+      Drafts::StartIfReady.call(league_season: @league_season)
+      @league_season.reload
+    end
     if params[:invite].present?
       if @league_season && @league_season.verify_invite!(params[:invite])
         mark_invite_verified(@league_season)
@@ -60,7 +70,8 @@ class LeaguesController < ApplicationController
       league: @league,
       league_season: @league_season,
       current_participant: current_participant_for(@league),
-      invite_verified: invite_verified_for?(@league_season)
+      invite_verified: invite_verified_for?(@league_season),
+      directory_query: build_directory_query
     )
   end
 
@@ -74,7 +85,14 @@ class LeaguesController < ApplicationController
     ApplicationRecord.transaction do
       @league.update!(league_params) if params[:league].present?
       if params[:league_season].present? && @league_season && @league_season.draft_picks.none?
-        @league_season.assign_attributes(league_season_params)
+        attrs = league_season_params.to_h
+        if attrs[:draft_scheduled_at].present?
+          attrs[:draft_scheduled_at] = parsed_local_datetime(
+            attrs[:draft_scheduled_at],
+            params.dig(:league_season, :time_zone)
+          )
+        end
+        @league_season.assign_attributes(attrs)
         normalize_draft_mode_switch(@league_season)
         @league_season.save!
       end
@@ -148,11 +166,11 @@ class LeaguesController < ApplicationController
     redirect_to league_path(@league), status: :moved_permanently
   end
 
-  def require_account_owner
+  def require_owner
     participant = current_participant_for(@league)
-    unless participant&.is_owner? && participant.user_id.present?
+    unless participant&.is_owner?
       redirect_to league_path(@league),
-        alert: "Sign in as the league owner to rename this league."
+        alert: "Only the league owner can edit this league."
     end
   end
 
@@ -180,8 +198,28 @@ class LeaguesController < ApplicationController
     end
   end
 
+  # Parse a "YYYY-MM-DDTHH:MM" string from a datetime-local input using the
+  # browser-provided IANA timezone. Without a zone, falls through to the
+  # Rails default zone (UTC), matching the legacy behavior.
+  def parsed_local_datetime(value, zone)
+    return nil if value.blank?
+    if zone.present?
+      ActiveSupport::TimeZone[zone]&.parse(value) || value
+    else
+      value
+    end
+  end
+
   def render_no_season
     render plain: "No active NFL season seeded. Run bin/rails db:seed.", status: :service_unavailable
+  end
+
+  def build_directory_query
+    return nil unless @league_season
+    Leagues::DirectoryQuery.new(
+      league_season: @league_season,
+      params: params.permit(:sort, :dir, :status, :division)
+    )
   end
 
   def invite_verified_for?(league_season)

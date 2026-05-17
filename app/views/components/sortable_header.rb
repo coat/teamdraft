@@ -2,8 +2,10 @@
 
 # A <th> with a link that toggles sort direction for the given column.
 # Reads current sort state from a ListQuery-like object that responds to
-# `sort_column`, `sort_dir`, and `to_url_params(overrides)`.
-class Views::Components::Admin::SortableHeader < Views::Base
+# `sort_column`, `sort_dir`, and `to_url_params(overrides)`. Used by both
+# the admin index pages and the in-app team directory; lives outside the
+# Admin namespace because nothing about it is admin-specific.
+class Views::Components::SortableHeader < Views::Base
   def initialize(query:, column:, label:, path:)
     @query = query
     @column = column.to_s
@@ -13,7 +15,13 @@ class Views::Components::Admin::SortableHeader < Views::Base
 
   def view_template
     th do
-      a(href: link_href, class: "link link-hover inline-flex items-center gap-1") do
+      # data-turbo-action="advance" pushes the new URL to the address bar
+      # when this link updates a surrounding turbo-frame. Without it, the
+      # frame updates but `window.location.href` stays stale — so a
+      # subsequent Turbo refresh (e.g. from a Cable broadcast) re-fetches
+      # the old URL and the user loses their sort state.
+      a(href: link_href, class: "link link-hover inline-flex items-center gap-1",
+        data: {turbo_action: "advance"}) do
         plain @label
         span(class: "text-xs opacity-60") { arrow }
       end

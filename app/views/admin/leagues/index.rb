@@ -68,12 +68,12 @@ class Views::Admin::Leagues::Index < Views::Base
         table(class: "table table-sm table-zebra") do
           thead do
             tr do
-              render Views::Components::Admin::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_leagues_path)
+              render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_leagues_path)
               th { "Current season" }
               th { "Status" }
               th { "Owner" }
               th { "Users" }
-              render Views::Components::Admin::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_leagues_path)
+              render Views::Components::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_leagues_path)
               th
             end
           end

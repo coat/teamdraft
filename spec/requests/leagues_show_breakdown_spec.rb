@@ -72,7 +72,7 @@ RSpec.describe "League show scoring breakdown", type: :request do
     expect(response.body).to include("owner")
   end
 
-  it "shows 'No scoring yet.' when a drafted team has no events" do
+  it "still renders the breakdown toggle (with 'No scoring yet.') for picked teams at zero points" do
     season = create_nfl_season(team_count: 2)
     ls = create(:league_season, season: season, status: "in_season")
     alice = create(:participant, :owner, league_season: ls, display_name: "Alice", draft_position: 1)
@@ -83,6 +83,7 @@ RSpec.describe "League show scoring breakdown", type: :request do
     get league_path(ls.league)
 
     expect(response).to have_http_status(:ok)
+    expect(response.body).to include("breakdown-#{alice_team.id}")
     expect(response.body).to include("No scoring yet.")
   end
 end

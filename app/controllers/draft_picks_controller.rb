@@ -7,9 +7,10 @@ class DraftPicksController < ApplicationController
   def create
     season_team = @league_season.season.season_teams.find(params[:season_team_id])
     Drafts::SubmitPick.call(league_season: @league_season, season_team:)
-    redirect_to league_path(@league)
+    redirect_to league_path(@league, **directory_url_params)
   rescue ActiveRecord::RecordInvalid => e
-    redirect_to league_path(@league), alert: e.record.errors.full_messages.to_sentence
+    redirect_to league_path(@league, **directory_url_params),
+      alert: e.record.errors.full_messages.to_sentence
   end
 
   private
@@ -43,6 +44,10 @@ class DraftPicksController < ApplicationController
   end
 
   def unauthorized!(message)
-    redirect_to league_path(@league), alert: message
+    redirect_to league_path(@league, **directory_url_params), alert: message
+  end
+
+  def directory_url_params
+    params.permit(:sort, :dir, :status, :division).to_h.compact_blank.symbolize_keys
   end
 end

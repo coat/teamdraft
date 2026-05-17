@@ -3,14 +3,16 @@
 class Views::Leagues::Show < Views::Base
   include Phlex::Rails::Helpers::FormWith
   include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::TurboFrameTag
   include Phlex::Rails::Helpers::TurboStreamFrom
   include Components::Helpers::CurrentUser
 
-  def initialize(league:, league_season:, current_participant:, invite_verified: false)
+  def initialize(league:, league_season:, current_participant:, invite_verified: false, directory_query: nil)
     @league = league
     @league_season = league_season
     @current_participant = current_participant
     @invite_verified = invite_verified
+    @directory_query = directory_query
   end
 
   def view_template
@@ -26,7 +28,7 @@ class Views::Leagues::Show < Views::Base
         render_leaderboard(standings_rows) if post_draft_with_picks
         render_participants unless post_draft_with_picks
         if viewable? && draft_finished?
-          render_standings(standings_rows) if @league_season.draft_picks.any?
+          render_post_draft_directory if @league_season.draft_picks.any?
         elsif viewable?
           render_draft_section
         end
@@ -72,7 +74,7 @@ class Views::Leagues::Show < Views::Base
         if @league.league_seasons.count > 1
           a(href: history_league_path(@league), class: "btn btn-ghost btn-sm") { "History" }
         end
-        if @current_participant&.is_owner? && @current_participant.user_id.present?
+        if @current_participant&.is_owner?
           a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
         end
       end
@@ -190,7 +192,7 @@ class Views::Leagues::Show < Views::Base
         case @league_season.status
         when "in_season", "completed"
           p { "Draft complete (#{@league_season.draft_picks.count} of #{@league_season.total_picks} picks)." }
-          render_pick_history
+          render_team_directory(nil)
         when "draft_pending"
           render_pending_notice
         else
@@ -212,8 +214,7 @@ class Views::Leagues::Show < Views::Base
       end
     end
     render_clock if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
-    render_pick_form if can_pick?(on_the_clock)
-    render_pick_history if @league_season.draft_picks.any?
+    render_team_directory(on_the_clock)
   end
 
   def render_pending_notice
@@ -243,7 +244,11 @@ class Views::Leagues::Show < Views::Base
     else
       p do
         plain "Draft starts "
-        time(datetime: starts_at.iso8601, class: "font-medium") {
+        # The Stimulus `local-time` controller swaps this to the visitor's
+        # local timezone; fall back to server-time strftime if JS is off.
+        time(datetime: starts_at.iso8601,
+          data_controller: "local-time",
+          class: "font-medium") {
           starts_at.strftime("%a %b %-d at %-l:%M %p %Z")
         }
         plain "."
@@ -305,39 +310,260 @@ class Views::Leagues::Show < Views::Base
     @league_season.participants.find_by(draft_position: pos)
   end
 
-  def available_season_teams
-    drafted = @league_season.draft_picks.pluck(:season_team_id)
-    @league_season.season.season_teams.includes(:team).where.not(id: drafted)
-  end
+  def render_team_directory(on_the_clock)
+    query = directory_query
+    rows = query.rows
+    divisions = all_division_labels
 
-  def render_pick_form
-    form_with(url: league_draft_picks_path(@league), method: :post, class: "space-y-3") do |form|
-      div(class: "space-y-1") do
-        form.label :season_team_id, "Pick a team", class: "label label-text font-medium"
-        form.select :season_team_id,
-          available_season_teams.map { |st| ["#{st.team.name} (#{st.team.abbreviation})", st.id] },
-          {include_blank: "— choose —"},
-          required: true, class: "select w-full"
-      end
-      form.submit "Record pick", class: "btn btn-primary"
+    # The whole picker is one Turbo frame. Sort-header links + the filter
+    # form swap just this frame; clock countdown and the rest of the page
+    # stay untouched. broadcasts_refreshes_to refreshes the current URL,
+    # which already carries the viewer's sort/filter, so each viewer keeps
+    # their chosen view across other people's picks.
+    turbo_frame_tag "team_directory", class: "space-y-3 mt-4 block" do
+      render_directory_filters(query, divisions)
+      render_directory_table(query, rows, on_the_clock)
     end
   end
 
-  def render_pick_history
-    div(class: "mt-4") do
-      h3(class: "font-medium mb-2") { "Picks" }
-      ol(class: "space-y-1") do
-        @league_season.draft_picks.includes(:participant, season_team: :team).each do |pick|
-          li(class: "flex items-baseline gap-2 text-sm") do
-            span(class: "badge badge-ghost font-mono") { "##{pick.pick_number}" }
-            strong { pick.participant.display_name }
-            span(class: "opacity-60") { "→" }
-            span { "#{pick.team.name} (#{pick.team.abbreviation})" }
-            span(class: "badge badge-sm badge-warning badge-outline") { "auto" } if pick.autopicked
+  def render_post_draft_directory
+    div(class: "card bg-base-100 shadow") do
+      div(class: "card-body") do
+        h2(class: "card-title") { "Standings" }
+        render_team_directory(nil)
+      end
+    end
+  end
+
+  def directory_query
+    @directory_query ||= Leagues::DirectoryQuery.new(league_season: @league_season, params: {})
+  end
+
+  def all_division_labels
+    @league_season.season.season_teams.includes(:team).map { |st| division_label(st.team) }.compact.uniq.sort
+  end
+
+  def render_directory_filters(query, divisions)
+    form(action: league_path(@league), method: "get", class: "flex flex-wrap items-end gap-3",
+      data: {controller: "auto-submit", turbo_action: "advance"}) do
+      div(class: "space-y-1") do
+        label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+          for: "team-directory-status") { "Status" }
+        select(
+          id: "team-directory-status",
+          name: "status",
+          class: "select select-bordered select-sm",
+          data: {action: "change->auto-submit#submit"}
+        ) do
+          status_option("", "All teams", query.status)
+          status_option("available", "Available", query.status) if @league_season.status == "drafting"
+          @league_season.participants.each do |p|
+            status_option(query.status_token_for(p), "Picked by #{p.display_name}", query.status)
+          end
+        end
+      end
+      if divisions.any?
+        div(class: "space-y-1") do
+          label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+            for: "team-directory-division") { "Division" }
+          select(
+            id: "team-directory-division",
+            name: "division",
+            class: "select select-bordered select-sm",
+            data: {action: "change->auto-submit#submit"}
+          ) do
+            division_option("", "All divisions", query.division)
+            divisions.each { |d| division_option(d, d, query.division) }
+          end
+        end
+      end
+      # Preserve current sort across filter submits.
+      input(type: "hidden", name: "sort", value: query.sort_column)
+      input(type: "hidden", name: "dir", value: query.sort_dir)
+    end
+  end
+
+  def status_option(value, label_text, current)
+    option(value: value, selected: (value == current)) { label_text }
+  end
+
+  def division_option(value, label_text, current)
+    option(value: value, selected: (value == current)) { label_text }
+  end
+
+  # Two phases, one filter card + Turbo frame. Each phase owns its column
+  # set since draft and standings answer different questions: drafting is
+  # "what can I pick next?" (rank matters, points don't exist), standings
+  # is "how did each pick perform?" (points + breakdown matter, rank is
+  # noise once the pick is locked in).
+  def render_directory_table(query, rows, on_the_clock)
+    if draft_finished?
+      render_standings_table(query, rows)
+    else
+      render_draft_table(query, rows, on_the_clock)
+    end
+  end
+
+  DRAFT_COLUMNS = 6
+  STANDINGS_COLUMNS = 7
+
+  def render_draft_table(query, rows, on_the_clock)
+    div(class: "overflow-x-auto") do
+      table(class: "table table-sm table-zebra") do
+        thead do
+          tr do
+            th(class: "w-10")
+            render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "rank", label: "Rank", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
+            th(class: "text-right")
+          end
+        end
+        if rows.empty?
+          tbody { render_empty_row(DRAFT_COLUMNS) }
+        else
+          tbody do
+            rows.each { |row| render_draft_row(query, row, on_the_clock) }
           end
         end
       end
     end
+  end
+
+  def render_draft_row(query, row, on_the_clock)
+    team = row.team
+    pick = row.pick
+    tr do
+      td { render_team_swatch(team) }
+      td do
+        div(class: "flex flex-col") do
+          span(class: "font-medium") { team.name }
+          span(class: "text-xs opacity-60") { team.abbreviation }
+        end
+      end
+      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
+      td(class: "font-mono text-sm") { team.default_pick_rank ? team.default_pick_rank.to_s : "—" }
+      td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
+      td(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
+    end
+  end
+
+  def render_standings_table(query, rows)
+    div(class: "overflow-x-auto") do
+      table(class: "table table-sm table-zebra") do
+        thead do
+          tr do
+            th(class: "w-8")
+            th(class: "w-10")
+            render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "points", label: "Points", path: league_path(@league))
+            th
+          end
+        end
+        if rows.empty?
+          tbody { render_empty_row(STANDINGS_COLUMNS) }
+        else
+          rows.each { |row| render_standings_row(row) }
+        end
+      end
+    end
+  end
+
+  def render_standings_row(row)
+    team = row.team
+    pick = row.pick
+    panel_id = "breakdown-#{row.season_team.id}"
+
+    # Every picked team gets a toggle, even with zero scoring — the panel
+    # renders the breakdown or "No scoring yet." It's a persistent visual
+    # affordance, not a "this row happens to have data" cue.
+    tbody(data: pick ? {controller: "disclosure"} : nil) do
+      tr do
+        td(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
+        td { render_team_swatch(team) }
+        td do
+          div(class: "flex flex-col") do
+            a(href: season_team_path(@league_season.season, slug: team.slug),
+              class: "link link-hover font-medium") { team.name }
+            span(class: "text-xs opacity-60") { team.abbreviation }
+          end
+        end
+        td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
+        td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
+        td(class: "font-mono text-right") { row.points.to_s }
+        td
+      end
+      if pick
+        tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
+          td(colspan: STANDINGS_COLUMNS.to_s, class: "bg-base-200/50") do
+            render_breakdown(row.events)
+          end
+        end
+      end
+    end
+  end
+
+  def render_empty_row(colspan)
+    tr { td(colspan: colspan.to_s) { div(class: "alert alert-info my-2") { span { "No teams match these filters." } } } }
+  end
+
+  def render_breakdown_toggle(expandable, panel_id)
+    return unless expandable
+    button(type: "button", class: "btn btn-ghost btn-xs",
+      aria_expanded: "false", aria_controls: panel_id,
+      title: "Show scoring breakdown",
+      data: {action: "click->disclosure#toggle"}) do
+      span(class: "inline-block transition-transform",
+        data: {disclosure_target: "icon"}) { "▸" }
+    end
+  end
+
+  def render_directory_pick_cell(pick)
+    if pick.nil?
+      span(class: "opacity-50") { "—" }
+    else
+      span(class: "font-mono mr-1") { "##{pick.pick_number}" }
+      span { pick.participant.display_name }
+      if pick.autopicked
+        span(class: "badge badge-xs badge-warning badge-outline ml-1") { "auto" }
+      end
+    end
+  end
+
+  def render_directory_action_cell(query, season_team, pick, on_the_clock)
+    return if pick
+    return unless can_pick?(on_the_clock)
+    # Carry current sort/filter in the POST URL so the post-pick redirect
+    # can preserve them (DraftPicksController#create reads them back out).
+    # turbo-frame="_top" breaks out of the surrounding team_directory frame
+    # so the response is treated as a full page swap. Needed because the
+    # final pick flips status to in_season and the response no longer
+    # contains the team_directory frame (it shows Standings instead).
+    button_to "Pick", league_draft_picks_path(@league, **query.to_url_params),
+      method: :post,
+      params: {season_team_id: season_team.id},
+      form: {class: "inline", data: {turbo_frame: "_top"}},
+      class: "btn btn-primary btn-sm"
+  end
+
+  def render_team_swatch(team)
+    if team.logo_url.present?
+      img(src: team.logo_url, alt: "#{team.name} logo", width: 28, height: 28, class: "inline-block")
+    else
+      style = team.primary_color.present? ? "background-color: #{team.primary_color}" : nil
+      span(
+        class: "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-neutral-content bg-neutral",
+        style: style
+      ) { team.abbreviation.to_s[0, 3] }
+    end
+  end
+
+  def division_label(team)
+    parts = [team.conference, team.division].compact_blank
+    parts.empty? ? nil : parts.join(" ")
   end
 
   def standings_rows
@@ -371,47 +597,6 @@ class Views::Leagues::Show < Views::Base
     end
   end
 
-  def render_standings(rows)
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
-        h2(class: "card-title") { "Standings" }
-        div(class: "space-y-4") do
-          rows.each { |row| render_standings_row(row) }
-        end
-      end
-    end
-  end
-
-  def render_standings_row(row)
-    div do
-      div(class: "flex items-baseline justify-between mb-2 gap-2") do
-        div(class: "flex items-baseline gap-2 flex-wrap") do
-          h3(class: "font-medium") { row.participant.display_name }
-          span(class: "badge badge-primary badge-outline badge-sm") { "you" } if row.participant == @current_participant
-          span(class: "badge badge-secondary badge-outline badge-sm") { "owner" } if row.participant.is_owner?
-        end
-        span(class: "badge badge-primary badge-lg") { "#{row.total_points} pts" }
-      end
-      if row.teams.empty?
-        p(class: "text-sm text-base-content/60") { "No teams drafted yet." }
-      else
-        div(class: "overflow-x-auto") do
-          table(class: "table table-sm") do
-            thead do
-              tr do
-                th(class: "w-8")
-                th { "Team" }
-                th { "Pick" }
-                th(class: "text-right") { "Points" }
-              end
-            end
-            row.teams.each { |line| render_team_lines(line) }
-          end
-        end
-      end
-    end
-  end
-
   EVENT_LABELS = {
     "regular_win" => "Regular-season wins",
     "playoff_appearance" => "Playoff appearance",
@@ -421,40 +606,8 @@ class Views::Leagues::Show < Views::Base
     "championship_win" => "Super Bowl win"
   }.freeze
 
-  def render_team_lines(line)
-    panel_id = "breakdown-#{line.season_team.id}"
-    tbody(data: {controller: "disclosure"}) do
-      tr do
-        td do
-          button(type: "button", class: "btn btn-ghost btn-xs",
-            aria_expanded: "false", aria_controls: panel_id,
-            data: {action: "click->disclosure#toggle"}) do
-            span(class: "inline-block transition-transform",
-              data: {disclosure_target: "icon"}) { "▸" }
-          end
-        end
-        td do
-          a(href: season_team_path(@league_season.season, slug: line.team.slug), class: "link link-hover") { line.team.name }
-        end
-        td(class: "font-mono opacity-60") do
-          plain "##{line.pick_number}"
-          if line.autopicked
-            plain " "
-            span(class: "badge badge-xs badge-warning badge-outline") { "auto" }
-          end
-        end
-        td(class: "text-right") { line.points.to_s }
-      end
-      tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
-        td(colspan: "4", class: "bg-base-200/50") do
-          render_breakdown(line)
-        end
-      end
-    end
-  end
-
-  def render_breakdown(line)
-    nonzero = line.events.reject { |_, points| points.zero? }
+  def render_breakdown(events)
+    nonzero = events.reject { |_, points| points.zero? }
     if nonzero.empty?
       p(class: "text-sm text-base-content/60 py-2") { "No scoring yet." }
     else
