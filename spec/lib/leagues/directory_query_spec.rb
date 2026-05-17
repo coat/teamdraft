@@ -14,14 +14,14 @@ RSpec.describe Leagues::DirectoryQuery do
       expect(query.status).to eq("available")
     end
 
-    it "defaults to pick/asc + all teams when the draft is finished" do
+    it "defaults to points/desc + all teams when the draft is finished" do
       ls = drafting_league_season
       ls.update!(status: "in_season")
 
       query = described_class.new(league_season: ls, params: {})
 
-      expect(query.sort_column).to eq("pick")
-      expect(query.sort_dir).to eq("asc")
+      expect(query.sort_column).to eq("points")
+      expect(query.sort_dir).to eq("desc")
       expect(query.status).to eq("")
     end
 

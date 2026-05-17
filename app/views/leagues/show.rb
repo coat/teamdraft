@@ -405,19 +405,23 @@ class Views::Leagues::Show < Views::Base
   end
 
   DRAFT_COLUMNS = 6
-  STANDINGS_COLUMNS = 7
+  STANDINGS_COLUMNS = 6
 
+  # daisyUI's `table-pin-cols` pins the first and last <th> in every row,
+  # so the cell types matter: logo + action are <th>, the middle cells
+  # remain <td>. The table-zebra background carries through to the
+  # pinned cells so scrolled content doesn't bleed underneath.
   def render_draft_table(query, rows, on_the_clock)
     div(class: "overflow-x-auto") do
-      table(class: "table table-sm table-zebra") do
+      table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
           tr do
-            th(class: "w-10")
+            th(class: "w-10 bg-base-100")
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
-            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "rank", label: "Rank", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
-            th(class: "text-right")
+            th(class: "text-right bg-base-100")
           end
         end
         if rows.empty?
@@ -435,32 +439,31 @@ class Views::Leagues::Show < Views::Base
     team = row.team
     pick = row.pick
     tr do
-      td { render_team_swatch(team) }
+      th { render_team_swatch(team) }
       td do
         div(class: "flex flex-col") do
           span(class: "font-medium") { team.name }
           span(class: "text-xs opacity-60") { team.abbreviation }
         end
       end
-      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
       td(class: "font-mono text-sm") { team.default_pick_rank ? team.default_pick_rank.to_s : "—" }
+      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
       td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
-      td(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
+      th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
     end
   end
 
   def render_standings_table(query, rows)
     div(class: "overflow-x-auto") do
-      table(class: "table table-sm table-zebra") do
+      table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
           tr do
-            th(class: "w-8")
+            th(class: "w-8 bg-base-100")
             th(class: "w-10")
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
-            render Views::Components::SortableHeader.new(query: query, column: "points", label: "Points", path: league_path(@league))
-            th
+            th(class: "text-right bg-base-100") { render_points_header(query) }
           end
         end
         if rows.empty?
@@ -469,6 +472,22 @@ class Views::Leagues::Show < Views::Base
           rows.each { |row| render_standings_row(row) }
         end
       end
+    end
+  end
+
+  def render_points_header(query)
+    next_dir = (query.sort_column == "points" && query.sort_dir == "asc") ? "desc" : "asc"
+    arrow = if query.sort_column == "points"
+      (query.sort_dir == "asc") ? "▲" : "▼"
+    else
+      "↕"
+    end
+    href_params = query.to_url_params(sort: "points", dir: next_dir)
+    a(href: "#{league_path(@league)}?#{href_params.to_query}",
+      class: "link link-hover inline-flex items-center gap-1",
+      data: {turbo_action: "advance"}) do
+      plain "Points"
+      span(class: "text-xs opacity-60") { arrow }
     end
   end
 
@@ -482,8 +501,8 @@ class Views::Leagues::Show < Views::Base
     # affordance, not a "this row happens to have data" cue.
     tbody(data: pick ? {controller: "disclosure"} : nil) do
       tr do
-        td(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
-        td { render_team_swatch(team) }
+        th(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
+        th { render_team_swatch(team) }
         td do
           div(class: "flex flex-col") do
             a(href: season_team_path(@league_season.season, slug: team.slug),
@@ -493,8 +512,7 @@ class Views::Leagues::Show < Views::Base
         end
         td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
         td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
-        td(class: "font-mono text-right") { row.points.to_s }
-        td
+        th(class: "font-mono text-right") { row.points.to_s }
       end
       if pick
         tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do

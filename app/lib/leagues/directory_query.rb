@@ -24,9 +24,12 @@ module Leagues
 
     def rows
       filtered = apply_filters(load_rows)
-      filtered.sort_by.with_index { |row, i| [sort_key(row), i] }.tap do |sorted|
-        sorted.reverse! if sort_dir == "desc"
-      end
+      sorted = filtered.sort_by.with_index { |row, i| [sort_key(row), i] }
+      # The points sort bakes direction into the key so picked rows always
+      # stay above unpicked ones regardless of dir; reversing here would
+      # flip that grouping.
+      sorted.reverse! if sort_dir == "desc" && sort_column != "points"
+      sorted
     end
 
     def status
@@ -54,7 +57,9 @@ module Leagues
     end
 
     def sort_dir
-      (params[:dir].to_s == "desc") ? "desc" : "asc"
+      explicit = params[:dir].to_s
+      return explicit if %w[asc desc].include?(explicit)
+      default_dir
     end
 
     def to_url_params(overrides = {})
@@ -67,7 +72,11 @@ module Leagues
     end
 
     def default_sort
-      drafting? ? "rank" : "pick"
+      drafting? ? "rank" : "points"
+    end
+
+    def default_dir
+      (sort_column == "points") ? "desc" : "asc"
     end
 
     def default_status
@@ -130,9 +139,11 @@ module Leagues
         # Picked rows ascend by pick_number; available rows trail.
         [row.pick ? 0 : 1, row.pick&.pick_number || Float::INFINITY, row.team.name.downcase]
       when "points"
-        # Picked rows ahead of unpicked; tiebreak by team name so a stable
-        # secondary order makes the table easy to scan.
-        [row.pick ? 0 : 1, -row.points.to_i, row.team.name.downcase]
+        # Picked rows ahead of unpicked; direction is baked into the key
+        # so the picked/unpicked grouping survives a desc flip. Tiebreak
+        # by team name so a stable secondary order makes scanning easy.
+        signed_points = (sort_dir == "desc") ? -row.points.to_i : row.points.to_i
+        [row.pick ? 0 : 1, signed_points, row.team.name.downcase]
       else # "rank"
         [rank_for(row), row.team.name.downcase]
       end
