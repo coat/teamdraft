@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Views::Leagues::New < Views::Base
-  def initialize(league:, errors: [])
+  def initialize(league:, seasons:, errors: [])
     @league = league
+    @seasons = seasons
     @errors = errors
   end
 
@@ -14,7 +15,7 @@ class Views::Leagues::New < Views::Base
             h1(class: "card-title text-3xl") { "Start a Team Draft" }
             p(class: "text-base-content/70") { "Two friends. One season. Pick your teams." }
 
-            render Views::Leagues::Form.new(league: @league, errors: @errors)
+            render Views::Leagues::Form.new(league: @league, seasons: @seasons, errors: @errors)
           end
         end
       end

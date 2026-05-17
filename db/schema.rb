@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -64,7 +64,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
     t.index ["season_id", "external_id"], name: "index_games_on_season_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["season_id"], name: "index_games_on_season_id"
     t.check_constraint "home_season_team_id <> away_season_team_id", name: "games_distinct_teams"
-    t.check_constraint "round::text = ANY (ARRAY['regular_season'::character varying::text, 'wildcard'::character varying::text, 'divisional'::character varying::text, 'conference'::character varying::text, 'championship'::character varying::text])", name: "games_round_valid"
     t.check_constraint "status::text <> 'final'::text OR home_score IS NOT NULL AND away_score IS NOT NULL", name: "games_final_has_scores"
     t.check_constraint "status::text = ANY (ARRAY['scheduled'::character varying::text, 'in_progress'::character varying::text, 'final'::character varying::text, 'postponed'::character varying::text])", name: "games_status_valid"
   end
@@ -142,8 +141,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
     t.index ["season_team_id", "game_id", "event_type"], name: "index_scoring_events_unique_per_team_game_type", unique: true
     t.index ["season_team_id", "occurred_at"], name: "index_scoring_events_on_season_team_id_and_occurred_at"
     t.index ["season_team_id"], name: "index_scoring_events_on_season_team_id"
-    t.check_constraint "event_type::text = ANY (ARRAY['regular_win'::character varying::text, 'playoff_appearance'::character varying::text, 'divisional_appearance'::character varying::text, 'conference_appearance'::character varying::text, 'championship_appearance'::character varying::text, 'championship_win'::character varying::text])", name: "scoring_events_event_type_valid"
     t.check_constraint "points >= 0", name: "scoring_events_points_non_negative"
+  end
+
+  create_table "scoring_rules", force: :cascade do |t|
+    t.boolean "bye_backfill", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "display_order", default: 0, null: false
+    t.string "event_type", null: false
+    t.string "kind", null: false
+    t.string "label", null: false
+    t.integer "points", default: 0, null: false
+    t.string "round_key"
+    t.string "short_label", null: false
+    t.bigint "sport_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sport_id", "event_type"], name: "index_scoring_rules_unique_event_per_sport", unique: true
+    t.index ["sport_id", "round_key"], name: "index_scoring_rules_unique_round_per_sport", unique: true, where: "(round_key IS NOT NULL)"
+    t.index ["sport_id"], name: "index_scoring_rules_on_sport_id"
+    t.check_constraint "kind::text = ANY (ARRAY['regular_win'::character varying::text, 'playoff_appearance'::character varying::text, 'championship_win'::character varying::text])", name: "scoring_rules_kind_valid"
+    t.check_constraint "points >= 0", name: "scoring_rules_points_non_negative"
   end
 
   create_table "season_teams", force: :cascade do |t|
@@ -326,11 +343,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
   end
 
   create_table "sports", force: :cascade do |t|
+    t.text "about_blurb"
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.citext "key", null: false
     t.string "name", null: false
-    t.jsonb "scoring_rules", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_sports_on_key", unique: true
     t.check_constraint "char_length(name::text) > 0", name: "sports_name_not_blank"
@@ -382,6 +399,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000001) do
   add_foreign_key "participants", "users", on_delete: :nullify
   add_foreign_key "scoring_events", "games", on_delete: :cascade
   add_foreign_key "scoring_events", "season_teams", on_delete: :cascade
+  add_foreign_key "scoring_rules", "sports", on_delete: :cascade
   add_foreign_key "season_teams", "seasons", on_delete: :cascade
   add_foreign_key "season_teams", "teams", on_delete: :restrict
   add_foreign_key "seasons", "sports", on_delete: :restrict

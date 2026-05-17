@@ -7,8 +7,9 @@
 class Views::Leagues::Form < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
-  def initialize(league:, errors: [], submit_label: "Create league")
+  def initialize(league:, seasons:, errors: [], submit_label: "Create league")
     @league = league
+    @seasons = seasons
     @errors = errors
     @submit_label = submit_label
   end
@@ -18,6 +19,7 @@ class Views::Leagues::Form < Views::Base
 
     form_with(model: @league, url: leagues_path, method: :post, scope: :league,
       class: "space-y-4", data: {controller: "draft-mode"}) do |form|
+      render_season_field(form)
       render_text_field(form, :your_name, "Your name", autocomplete: "given-name")
       render_text_field(form, :opponent_name, "Opponent's name")
       render_mode_fieldset(form)
@@ -35,6 +37,17 @@ class Views::Leagues::Form < Views::Base
   end
 
   private
+
+  def render_season_field(form)
+    return if @seasons.blank?
+    div(class: "space-y-1") do
+      form.label :season_id, "Season", class: "label label-text font-medium"
+      form.select :season_id,
+        @seasons.map { |s| [s.label, s.id] },
+        {include_blank: false, selected: @league.season_id},
+        class: "select select-bordered w-full"
+    end
+  end
 
   def render_text_field(form, field, label, **opts)
     div(class: "space-y-1") do

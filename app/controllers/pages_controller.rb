@@ -5,7 +5,9 @@
 # and create app/views/pages/<name>.rb.
 class PagesController < ApplicationController
   def about
-    render Views::Pages::About.new
+    sports = Sport.active.order(:name)
+    active = sports.find { |s| s.key == params[:sport] } || sports.first
+    render Views::Pages::About.new(sports: sports, active_sport: active)
   end
 
   def privacy

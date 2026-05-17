@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Game < ApplicationRecord
-  ROUNDS = %w[regular_season wildcard divisional conference championship].freeze
+  REGULAR_SEASON = "regular_season"
   STATUSES = %w[scheduled in_progress final postponed].freeze
 
   belongs_to :season
@@ -9,16 +9,16 @@ class Game < ApplicationRecord
   belongs_to :away_season_team, class_name: "SeasonTeam"
   has_many :scoring_events, dependent: :destroy
 
-  validates :round, inclusion: {in: ROUNDS}
   validates :status, inclusion: {in: STATUSES}
   validates :kickoff_at, presence: true
   validates :external_id, uniqueness: {scope: :season_id, allow_nil: true}
+  validate :round_is_known_for_sport
   validate :distinct_teams
   validate :final_games_have_scores
 
   scope :final, -> { where(status: "final") }
-  scope :playoff, -> { where.not(round: "regular_season") }
-  scope :regular_season, -> { where(round: "regular_season") }
+  scope :playoff, -> { where.not(round: REGULAR_SEASON) }
+  scope :regular_season, -> { where(round: REGULAR_SEASON) }
 
   def final?
     status == "final"
@@ -41,6 +41,14 @@ class Game < ApplicationRecord
   end
 
   private
+
+  def round_is_known_for_sport
+    return if round.blank?
+    return if round == REGULAR_SEASON
+    return if season.blank?
+    return if season.sport.scoring_rules.where(round_key: round).exists?
+    errors.add(:round, "is not a defined round for #{season.sport.name}")
+  end
 
   def distinct_teams
     return if home_season_team_id.blank? || away_season_team_id.blank?

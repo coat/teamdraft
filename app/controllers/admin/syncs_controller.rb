@@ -7,11 +7,12 @@ class Admin::SyncsController < Admin::BaseController
     case params[:kind]
     when "games"
       round = params[:round].presence
-      if round && !SportsData::TheSportsDbProvider::ROUND_NUMBERS.include?(round)
+      sport_key = season.sport.key
+      if round && !SportsData::TheSportsDbProvider.round_numbers_for(sport_key).include?(round)
         return redirect_to back, alert: "Unknown round: #{round}"
       end
       Sync::GamesJob.perform_later(season.id, rounds: round && [round])
-      label = round ? SportsData::TheSportsDbProvider::ROUND_LABELS.fetch(round) : "all rounds"
+      label = round ? SportsData::TheSportsDbProvider.round_labels_for(sport_key).fetch(round) : "all rounds"
       redirect_to back, notice: "Games sync queued for #{season.label} (#{label})."
     when "scoring"
       Scoring::RecomputeJob.perform_later(season.id)

@@ -32,7 +32,7 @@ class League < ApplicationRecord
   # the controller can carry default values, but they are not persisted — the
   # controller forwards them into `Leagues::Create`, which writes them to the
   # initial `LeagueSeason`.
-  attr_accessor :your_name, :opponent_name,
+  attr_accessor :your_name, :opponent_name, :season_id,
     :draft_mode, :draft_scheduled_at, :pick_clock_seconds
 
   def normalize_friendly_id(value)

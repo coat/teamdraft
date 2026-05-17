@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Views::Pages::Home < Views::Base
-  def initialize(league:)
+  def initialize(league:, seasons:)
     @league = league
+    @seasons = seasons
   end
 
   def view_template
@@ -39,7 +40,7 @@ class Views::Pages::Home < Views::Base
       div(class: "card-body") do
         h2(class: "card-title") { "Start a draft" }
 
-        render Views::Leagues::Form.new(league: @league, submit_label: "Start drafting")
+        render Views::Leagues::Form.new(league: @league, seasons: @seasons, submit_label: "Start drafting")
       end
     end
   end

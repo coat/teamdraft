@@ -9,7 +9,7 @@ RSpec.describe Sync::GamesJob do
     home.update!(external_id: "T1")
     away.update!(external_id: "T2")
 
-    SportsData::TheSportsDbProvider::ROUND_NUMBERS.each do |round|
+    SportsData::TheSportsDbProvider.round_numbers_for("nfl").each do |round|
       events = (round == "1") ? [
         {"idEvent" => "G-1", "idHomeTeam" => "T1", "idAwayTeam" => "T2",
          "intHomeScore" => "24", "intAwayScore" => "10",

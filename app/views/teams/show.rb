@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
 class Views::Teams::Show < Views::Base
-  ROUND_LABELS = {
-    "wildcard" => "Wild Card",
-    "divisional" => "Divisional",
-    "conference" => "Conference",
-    "championship" => "Super Bowl"
-  }.freeze
-
   def initialize(season:, season_team:, games:)
     @season = season
     @season_team = season_team
     @team = season_team.team
     @games = games
+  end
+
+  def round_labels
+    @round_labels ||= @season.sport.scoring_rules
+      .where.not(round_key: nil)
+      .pluck(:round_key, :short_label).to_h
   end
 
   def view_template
@@ -79,7 +78,7 @@ class Views::Teams::Show < Views::Base
 
   def week_label(game)
     return game.week.to_s if game.round == "regular_season" && game.week
-    ROUND_LABELS[game.round] || game.round.to_s.humanize
+    round_labels[game.round] || game.round.to_s.humanize
   end
 
   def opponent_label(game)

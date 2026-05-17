@@ -7,38 +7,56 @@ module SportsData
   # TheSportsDB v1 JSON API. Free tier uses API key "123" (rate-limited).
   # https://www.thesportsdb.com/free_api.php
   #
-  # Notes:
-  # - NFL idLeague is 4391; future sports will need their own mapping.
-  # - Their `strSeason` for NFL is "2025-2026" style (across calendar years).
-  # - Round numbering: 1..18 = regular season weeks; 160 = Wild Card,
-  #   125 = Divisional, 150 = Conference, 200 = Super Bowl. (500 =
-  #   preseason and other ints for pro bowl etc are filtered out.)
+  # Each supported sport supplies its TheSportsDB league id, the set of
+  # regular-season "intRound" values to fetch, a map of playoff intRound
+  # codes to our generic round_key strings, and a lambda that formats the
+  # season's year into TheSportsDB's `strSeason` (NFL uses "2025", NBA uses
+  # "2025-2026", etc.).
   class TheSportsDbProvider < Provider
     BASE_URL = "https://www.thesportsdb.com/api/v1/json"
     DEFAULT_KEY = "123"
 
-    SPORT_LEAGUE_ID = {
-      "nfl" => "4391"
+    SportConfig = Struct.new(:league_id, :regular_rounds, :playoff_rounds, :season_format, keyword_init: true) do
+      def all_rounds
+        regular_rounds + playoff_rounds.keys
+      end
+
+      def regular_round?(int_round)
+        regular_rounds.include?(int_round.to_s)
+      end
+    end
+
+    SPORT_CONFIG = {
+      "nfl" => SportConfig.new(
+        league_id: "4391",
+        regular_rounds: (1..18).map(&:to_s),
+        playoff_rounds: {
+          "160" => "wildcard",
+          "125" => "divisional",
+          "150" => "conference",
+          "200" => "championship"
+        },
+        season_format: ->(year) { year.to_s }
+      ),
+      # NBA: regular-season games are returned under intRound="0" (verified
+      # against 2024-2025 via eventsround.php). The free TheSportsDB tier
+      # caps that response at 50 events per request, so a regular-season
+      # sync built only on eventsround will undercount; the proper fix is
+      # to switch NBA regular-season ingestion to eventsday.php in a future
+      # iteration. Playoff codes were verified live on 2026-05-17.
+      "nba" => SportConfig.new(
+        league_id: "4387",
+        regular_rounds: ["0"],
+        playoff_rounds: {
+          "400" => "play_in",
+          "160" => "first_round",
+          "125" => "conf_semis",
+          "150" => "conf_finals",
+          "180" => "finals"
+        },
+        season_format: ->(year) { "#{year}-#{year + 1}" }
+      )
     }.freeze
-
-    PLAYOFF_ROUNDS = {
-      "160" => "wildcard",
-      "125" => "divisional",
-      "150" => "conference",
-      "200" => "championship"
-    }.freeze
-
-    # eventsseason.php on the free key only returns a small preseason sample,
-    # so we fetch each round individually to capture every regular-season +
-    # playoff game. Preseason (500) and pro bowl rounds are never requested.
-    ROUND_NUMBERS = ((1..18).map(&:to_s) + PLAYOFF_ROUNDS.keys).freeze
-
-    ROUND_LABELS = (1..18).each_with_object({}) { |n, h| h[n.to_s] = "Week #{n}" }.merge(
-      "160" => "Wild Card",
-      "125" => "Divisional",
-      "150" => "Conference",
-      "200" => "Super Bowl"
-    ).freeze
 
     def initialize(season:, api_key: ENV.fetch("THESPORTSDB_KEY", DEFAULT_KEY), http: Net::HTTP)
       super(season:)
@@ -49,31 +67,41 @@ module SportsData
     def fetch_games(rounds: nil)
       rounds_to_fetch = rounds_to_fetch_for(rounds)
       rounds_to_fetch.flat_map do |round|
-        payload = request("eventsround.php", id: league_id, r: round, s: season_string)
+        payload = request("eventsround.php", id: sport_config.league_id, r: round, s: season_string)
         Array(payload["events"]).filter_map { |e| parse_event(e) }
       end
     end
 
+    def self.round_numbers_for(sport_key)
+      cfg = SPORT_CONFIG.fetch(sport_key) { return [] }
+      cfg.all_rounds
+    end
+
+    def self.round_labels_for(sport_key)
+      cfg = SPORT_CONFIG.fetch(sport_key) { return {} }
+      labels = cfg.regular_rounds.each_with_object({}) { |n, h| h[n] = "Week #{n}" }
+      cfg.playoff_rounds.each { |code, key| labels[code] = key.tr("_", " ").split.map(&:capitalize).join(" ") }
+      labels
+    end
+
     private
 
+    def sport_config
+      SPORT_CONFIG.fetch(@season.sport.key) {
+        raise FetchFailed, "no TheSportsDB config mapped for sport #{@season.sport.key.inspect}"
+      }
+    end
+
     def rounds_to_fetch_for(rounds)
-      return ROUND_NUMBERS if rounds.nil?
+      return sport_config.all_rounds if rounds.nil?
       requested = Array(rounds).map(&:to_s)
-      unknown = requested - ROUND_NUMBERS
+      unknown = requested - sport_config.all_rounds
       raise FetchFailed, "unknown round(s): #{unknown.inspect}" if unknown.any?
       requested
     end
 
-    def league_id
-      SPORT_LEAGUE_ID.fetch(@season.sport.key) {
-        raise FetchFailed, "no TheSportsDB league id mapped for sport #{@season.sport.key.inspect}"
-      }
-    end
-
-    # NFL season uses just "2025"; format seems to differ for other sports,
-    # like 2025-2026 in the future
     def season_string
-      @season.year.to_s
+      sport_config.season_format.call(@season.year)
     end
 
     def request(path, **params)
@@ -106,9 +134,8 @@ module SportsData
     def round_for(int_round)
       return nil if int_round.blank?
       str = int_round.to_s
-      return PLAYOFF_ROUNDS[str] if PLAYOFF_ROUNDS.key?(str)
-      n = Integer(str, exception: false)
-      return "regular_season" if n && (1..22).cover?(n) && PLAYOFF_ROUNDS.exclude?(str) && n <= 18
+      return sport_config.playoff_rounds[str] if sport_config.playoff_rounds.key?(str)
+      return "regular_season" if sport_config.regular_round?(str)
       nil
     end
 

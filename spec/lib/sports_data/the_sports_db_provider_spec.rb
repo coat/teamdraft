@@ -68,7 +68,7 @@ RSpec.describe SportsData::TheSportsDbProvider do
     games = provider.fetch_games(rounds: ["1"])
 
     expect(games.map(&:external_id)).to eq(["2001"])
-    SportsData::TheSportsDbProvider::ROUND_NUMBERS.reject { |r| r == "1" }.each do |round|
+    SportsData::TheSportsDbProvider.round_numbers_for("nfl").reject { |r| r == "1" }.each do |round|
       expect(WebMock).not_to have_requested(:get, round_url(season, round))
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe SportsData::TheSportsDbProvider do
   end
 
   def stub_all_rounds(season, events_by_round:)
-    SportsData::TheSportsDbProvider::ROUND_NUMBERS.each do |round|
+    SportsData::TheSportsDbProvider.round_numbers_for("nfl").each do |round|
       stub_request(:get, round_url(season, round)).to_return(
         status: 200,
         body: {"events" => events_by_round.fetch(round, [])}.to_json,

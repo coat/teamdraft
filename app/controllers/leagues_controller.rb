@@ -8,7 +8,7 @@ class LeaguesController < ApplicationController
     participants = participants_for_visitor
     case participants.size
     when 0
-      render Views::Pages::Home.new(league: new_league)
+      render Views::Pages::Home.new(league: new_league, seasons: selectable_seasons)
     when 1
       redirect_to league_path(participants.first.league_season.league)
     else
@@ -21,7 +21,7 @@ class LeaguesController < ApplicationController
   end
 
   def create
-    season = default_season
+    season = chosen_season
     return render_no_season unless season
 
     league, owner = Leagues::Create.call(
@@ -41,7 +41,7 @@ class LeaguesController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     @league = e.record.is_a?(League) ? e.record : League.new
     @errors = e.record.errors.full_messages
-    render Views::Leagues::New.new(league: @league, errors: @errors), status: :unprocessable_entity
+    render Views::Leagues::New.new(league: @league, seasons: selectable_seasons, errors: @errors), status: :unprocessable_entity
   end
 
   def show
@@ -139,11 +139,15 @@ class LeaguesController < ApplicationController
   private
 
   def render_new_form
-    render Views::Leagues::New.new(league: new_league)
+    render Views::Leagues::New.new(league: new_league, seasons: selectable_seasons)
   end
 
   def new_league
-    League.new(draft_scheduled_at: 5.minutes.from_now, draft_mode: "manual")
+    League.new(
+      draft_scheduled_at: 5.minutes.from_now,
+      draft_mode: "manual",
+      season_id: default_season&.id
+    )
   end
 
   def participants_for_visitor
@@ -167,9 +171,25 @@ class LeaguesController < ApplicationController
     end
   end
 
+  # Seasons offered in the league-creation dropdown: every upcoming + active
+  # season across every sport, soonest first.
+  def selectable_seasons
+    Season.where(status: %w[upcoming active])
+      .includes(:sport).joins(:sport)
+      .order("seasons.starts_on, sports.name")
+  end
+  helper_method :selectable_seasons
+
+  def chosen_season
+    id = params.dig(:league, :season_id).presence
+    return selectable_seasons.find_by(id: id) if id
+    default_season
+  end
+
+  # Fallback when no season was chosen on the form (e.g. first render).
+  # Prefer an active season, falling back to the soonest upcoming.
   def default_season
-    Season.where(status: "active").joins(:sport).find_by(sports: {key: "nfl"}) ||
-      Season.joins(:sport).where(sports: {key: "nfl"}).order(year: :desc).first
+    selectable_seasons.where(status: "active").first || selectable_seasons.first
   end
 
   def league_params
@@ -189,7 +209,7 @@ class LeaguesController < ApplicationController
   end
 
   def render_no_season
-    render plain: "No active NFL season seeded. Run bin/rails db:seed.", status: :service_unavailable
+    render plain: "No upcoming or active seasons are seeded. Run bin/rails db:seed.", status: :service_unavailable
   end
 
   def build_directory_query

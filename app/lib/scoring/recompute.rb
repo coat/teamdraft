@@ -5,13 +5,15 @@ module Scoring
   # (season_team_id, game_id, event_type) unique index makes this idempotent:
   # repeated calls converge on the same set of events without duplicates.
   #
-  # Scoring shape (NFL default):
+  # Scoring shape is driven entirely by the season's sport's scoring_rules:
   #   - regular season: each game winner gets one regular_win event.
-  #   - playoffs: each *participant* of a playoff game gets the corresponding
-  #     appearance event (playoff/divisional/conference/championship). Points
-  #     stack as a team advances. Bye teams pick up playoff_appearance via
-  #     their divisional game (no wildcard game exists for them).
-  #   - championship: the winner additionally gets championship_win.
+  #   - playoffs: each *participant* of a playoff game gets the appearance
+  #     event for that round (if the sport defines one). Points stack as a
+  #     team advances.
+  #   - championship: the winner additionally gets the championship_win event.
+  #   - bye backfill: if a sport flags a playoff rule with bye_backfill=true
+  #     (e.g. NFL's playoff_appearance), participants in the round immediately
+  #     after pick up that appearance event if they didn't already have one.
   class Recompute
     def self.call(...) = new(...).call
 
@@ -23,7 +25,7 @@ module Scoring
     def call
       ApplicationRecord.transaction do
         @season.games.final.includes(:home_season_team, :away_season_team).find_each do |game|
-          if game.round == "regular_season"
+          if game.round == Game::REGULAR_SEASON
             score_regular_season(game)
           else
             score_playoff_game(game)
@@ -35,54 +37,73 @@ module Scoring
     private
 
     def score_regular_season(game)
+      event_type = @rules.regular_win_event
+      return unless event_type
       winner = game.winner_season_team
       return unless winner
       upsert_event(
         season_team: winner,
         game:,
-        event_type: "regular_win",
-        points: @rules.points_for("regular_win"),
+        event_type:,
+        points: @rules.points_for(event_type),
         occurred_at: occurred_at(game)
       )
     end
 
     def score_playoff_game(game)
       appearance = @rules.appearance_event_for_round(game.round)
-      points = @rules.points_for(appearance)
       occurred = occurred_at(game)
 
-      game.participants.compact.each do |season_team|
-        upsert_event(season_team:, game:, event_type: appearance, points:, occurred_at: occurred) if points.positive?
-
-        # Bye teams skip the wildcard round but still "made the playoffs" —
-        # credit them via their divisional game if no earlier playoff
-        # appearance event exists yet for the season.
-        if game.round == "divisional" && !has_playoff_appearance?(season_team)
-          upsert_event(
-            season_team:, game:,
-            event_type: "playoff_appearance",
-            points: @rules.points_for("playoff_appearance"),
-            occurred_at: occurred
-          )
+      if appearance
+        points = @rules.points_for(appearance)
+        game.participants.compact.each do |season_team|
+          upsert_event(season_team:, game:, event_type: appearance, points:, occurred_at: occurred) if points.positive?
+          backfill_bye(season_team, game, occurred)
         end
       end
 
-      if game.round == "championship"
-        winner = game.winner_season_team
-        if winner && @rules.points_for("championship_win").positive?
-          upsert_event(
-            season_team: winner, game:,
-            event_type: "championship_win",
-            points: @rules.points_for("championship_win"),
-            occurred_at: occurred
-          )
-        end
-      end
+      championship_event = @rules.championship_win_event
+      return unless championship_event && game.round == championship_round_key
+
+      winner = game.winner_season_team
+      return unless winner
+      points = @rules.points_for(championship_event)
+      return unless points.positive?
+      upsert_event(
+        season_team: winner, game:,
+        event_type: championship_event,
+        points:,
+        occurred_at: occurred
+      )
     end
 
-    def has_playoff_appearance?(season_team)
+    def backfill_bye(season_team, game, occurred)
+      rule = @rules.bye_backfill_rule
+      return unless rule
+      return unless game.round == @rules.bye_backfill_trigger_round
+      return if has_event?(season_team, rule.event_type)
+      points = rule.points
+      return unless points.positive?
+      upsert_event(
+        season_team:, game:,
+        event_type: rule.event_type,
+        points:,
+        occurred_at: occurred
+      )
+    end
+
+    # The final playoff round for the sport — whichever round_key the
+    # championship_win event is paired with. We infer it by finding the
+    # last-display_order playoff_appearance rule.
+    def championship_round_key
+      @championship_round_key ||= @season.sport.scoring_rules.ordered
+        .where(kind: "playoff_appearance")
+        .last&.round_key
+    end
+
+    def has_event?(season_team, event_type)
       ScoringEvent
-        .where(season_team_id: season_team.id, event_type: "playoff_appearance")
+        .where(season_team_id: season_team.id, event_type: event_type)
         .joins(:game).where(games: {season_id: @season.id})
         .exists?
     end
