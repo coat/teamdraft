@@ -141,9 +141,10 @@ module Leagues
       when "points"
         # Picked rows ahead of unpicked; direction is baked into the key
         # so the picked/unpicked grouping survives a desc flip. Tiebreak
-        # by team name so a stable secondary order makes scanning easy.
+        # by pick order so ties (common pre-scoring) read as the draft
+        # board rather than a noisy alphabetical reshuffle.
         signed_points = (sort_dir == "desc") ? -row.points.to_i : row.points.to_i
-        [row.pick ? 0 : 1, signed_points, row.team.name.downcase]
+        [row.pick ? 0 : 1, signed_points, row.pick&.pick_number || Float::INFINITY]
       else # "rank"
         [rank_for(row), row.team.name.downcase]
       end
