@@ -65,9 +65,13 @@ RSpec.describe "Leagues", type: :request do
 
       post verify_invite_league_path(league), params: {code: code}
       follow_redirect!
+      # Claiming completes the seat roster, which starts the draft and
+      # bounces claimed viewers to /draft. The welcome flash survives the
+      # extra hop; we just need to follow it.
+      follow_redirect! if response.redirect?
 
       expect(bob_seat.reload.joined_at).to be_present
-      expect(response.body).to include("Welcome, Bob")
+      expect(flash[:notice].to_s + response.body).to include("Welcome, Bob")
       expect(response.body).not_to include("Are you Bob?")
     end
   end

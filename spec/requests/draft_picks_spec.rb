@@ -12,7 +12,8 @@ RSpec.describe "Draft picks", type: :request do
     expect {
       post league_draft_picks_path(league), params: {season_team_id: season_team.id}
     }.to change(DraftPick, :count).by(1)
-    expect(response).to redirect_to(league_path(league))
+    # Mid-draft picks redirect back to the draft room.
+    expect(response).to redirect_to(league_draft_path(league))
   end
 
   it "non-owner gets bounced in manual mode" do

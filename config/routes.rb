@@ -20,7 +20,9 @@ Rails.application.routes.draw do
 
   root "leagues#index"
   resources :leagues, only: [:index, :new, :create, :show, :edit, :update], param: :id do
-    resources :draft_picks, only: [:create]
+    resource :draft, only: [:show, :edit, :update] do
+      resources :picks, only: [:create], controller: "draft_picks"
+    end
     resources :participants, only: [] do
       member do
         patch :move_up

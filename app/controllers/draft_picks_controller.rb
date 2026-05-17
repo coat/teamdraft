@@ -7,9 +7,11 @@ class DraftPicksController < ApplicationController
   def create
     season_team = @league_season.season.season_teams.find(params[:season_team_id])
     Drafts::SubmitPick.call(league_season: @league_season, season_team:)
-    redirect_to league_path(@league, **directory_url_params)
+    # The final pick flips status to in_season — at that point the
+    # standings page is the right destination, not the draft room.
+    redirect_to post_pick_path
   rescue ActiveRecord::RecordInvalid => e
-    redirect_to league_path(@league, **directory_url_params),
+    redirect_to league_draft_path(@league, **directory_url_params),
       alert: e.record.errors.full_messages.to_sentence
   end
 
@@ -44,10 +46,18 @@ class DraftPicksController < ApplicationController
   end
 
   def unauthorized!(message)
-    redirect_to league_path(@league, **directory_url_params), alert: message
+    redirect_to league_draft_path(@league, **directory_url_params), alert: message
   end
 
   def directory_url_params
     params.permit(:sort, :dir, :status, :division).to_h.compact_blank.symbolize_keys
+  end
+
+  def post_pick_path
+    if @league_season.reload.draft_finished?
+      league_path(@league)
+    else
+      league_draft_path(@league, **directory_url_params)
+    end
   end
 end

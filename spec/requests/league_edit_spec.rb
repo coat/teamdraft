@@ -59,8 +59,7 @@ RSpec.describe "League edit", type: :request do
     league = League.last
     ls = league.current_league_season
 
-    patch league_path(league), params: {
-      league: {name: league.name},
+    patch league_draft_path(league), params: {
       league_season: {
         draft_mode: "live",
         draft_order_style: "snake",
@@ -87,8 +86,7 @@ RSpec.describe "League edit", type: :request do
     league = League.last
     ls = league.current_league_season
 
-    patch league_path(league), params: {
-      league: {name: league.name},
+    patch league_draft_path(league), params: {
       league_season: {draft_mode: "manual"}
     }
 
@@ -110,7 +108,7 @@ RSpec.describe "League edit", type: :request do
     owner = league.participants.find_by(is_owner: true)
     Drafts::SubmitPick.call(league_season: ls, season_team: season.season_teams.first)
 
-    patch league_path(league), params: {
+    patch league_draft_path(league), params: {
       league_season: {draft_mode: "live", pick_clock_seconds: "20"}
     }
 

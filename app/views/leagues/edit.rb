@@ -23,12 +23,12 @@ class Views::Leagues::Edit < Views::Base
 
             form_with(model: @league, url: league_path(@league), method: :patch, class: "space-y-4 mt-3") do |form|
               render_identity_section(form)
-              render_draft_section
               div(class: "card-actions justify-end pt-2") do
                 a(href: league_path(@league), class: "btn btn-ghost") { "Cancel" }
                 form.submit "Save changes", class: "btn btn-primary"
               end
             end
+            render_draft_settings_link
             render_participant_order_section
           end
         end
@@ -52,83 +52,23 @@ class Views::Leagues::Edit < Views::Base
     end
   end
 
-  def render_draft_section
+  def render_draft_settings_link
     return unless @league_season
-
-    if @league_season.draft_picks.any?
-      div(class: "alert alert-info") do
-        p { "Draft has started — these settings are locked." }
-      end
-      return
-    end
-
-    div(data: {controller: "draft-mode"}, class: "space-y-3") do
-      fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
-        legend(class: "fieldset-legend text-sm font-medium") { "Draft" }
-        mode_radio("manual", "Manual — record both picks yourself")
-        mode_radio("live", "Live — each player picks on the clock")
-
-        div(class: "space-y-4 #{"hidden" unless @league_season.draft_mode == "live"}".strip,
-          data_draft_mode_target: "liveOnly") do
-          render_style_field
-          render_datetime_field
-          render_clock_field
-        end
+    div(class: "mt-4") do
+      a(href: edit_league_draft_path(@league),
+        class: "btn btn-ghost w-full justify-between") do
+        span { "Draft settings →" }
+        span(class: "text-xs opacity-60") { draft_settings_summary }
       end
     end
   end
 
-  def mode_radio(value, copy)
-    div(class: "space-y-1") do
-      label(class: "label cursor-pointer justify-start gap-3") do
-        input(type: "radio", name: "league_season[draft_mode]", value: value,
-          checked: @league_season.draft_mode == value,
-          class: "radio radio-primary",
-          data: {action: "change->draft-mode#sync"})
-        span(class: "label-text") { copy }
-      end
+  def draft_settings_summary
+    parts = [@league_season.draft_mode.capitalize]
+    if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds
+      parts << "#{@league_season.pick_clock_seconds}s clock"
     end
-  end
-
-  def render_style_field
-    div(class: "space-y-1") do
-      label(for: "league_season_draft_order_style", class: "label label-text font-medium") { "Draft order" }
-      select(name: "league_season[draft_order_style]",
-        id: "league_season_draft_order_style",
-        class: "select w-full") do
-        LeagueSeason::DRAFT_ORDER_STYLES.each do |style|
-          option(value: style, selected: style == @league_season.draft_order_style) { style.capitalize }
-        end
-      end
-    end
-  end
-
-  def render_datetime_field
-    div(class: "space-y-1", data: {controller: "local-datetime-field"}) do
-      label(for: "league_season_draft_scheduled_at", class: "label label-text font-medium") { "Draft date" }
-      input(type: "datetime-local",
-        name: "league_season[draft_scheduled_at]",
-        id: "league_season_draft_scheduled_at",
-        value: @league_season.draft_scheduled_at&.strftime("%Y-%m-%dT%H:%M"),
-        step: 60,
-        class: "input w-full",
-        data: {local_datetime_field_target: "input", action: "change->local-datetime-field#update"})
-      input(type: "hidden", name: "league_season[time_zone]",
-        data: {local_datetime_field_target: "timezone"})
-      span(class: "label-text-alt text-xs opacity-60",
-        data: {local_datetime_field_target: "hint"}) { "Detecting your timezone…" }
-    end
-  end
-
-  def render_clock_field
-    div(class: "space-y-1") do
-      label(for: "league_season_pick_clock_seconds", class: "label label-text font-medium") { "Pick clock (seconds)" }
-      input(type: "number",
-        name: "league_season[pick_clock_seconds]",
-        id: "league_season_pick_clock_seconds",
-        value: @league_season.pick_clock_seconds || 60,
-        min: 10, step: 5, class: "input w-32")
-    end
+    parts.join(" · ")
   end
 
   def render_participant_order_section

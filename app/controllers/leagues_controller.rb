@@ -46,13 +46,6 @@ class LeaguesController < ApplicationController
 
   def show
     @league_season = @league.current_league_season
-    # Self-heal a draft whose scheduled start time has passed but whose
-    # StartDraftJob never ran (dev :async loses jobs on process restart;
-    # prod is fine but the guard costs nothing). StartIfReady is idempotent.
-    if @league_season&.status == "draft_pending"
-      Drafts::StartIfReady.call(league_season: @league_season)
-      @league_season.reload
-    end
     if params[:invite].present?
       if @league_season && @league_season.verify_invite!(params[:invite])
         mark_invite_verified(@league_season)
@@ -66,6 +59,20 @@ class LeaguesController < ApplicationController
         flash.now[:alert] = "That invite code didn't match."
       end
     end
+
+    # Two URLs, two intents: /leagues/:id is the standings/landing page;
+    # /leagues/:id/draft is the draft room. Send claimed viewers to the
+    # draft room once picking has started AND every seat is claimed.
+    # An unclaimed seat means the share card is still load-bearing here
+    # — manual drafts in particular flip to `drafting` the moment the
+    # league is created, so the owner would never see the invite code
+    # if we redirected on status alone.
+    if @league_season&.status == "drafting" &&
+        @league_season.participants.where(joined_at: nil).none? &&
+        current_participant_for(@league).present?
+      redirect_to league_draft_path(@league) and return
+    end
+
     render Views::Leagues::Show.new(
       league: @league,
       league_season: @league_season,
@@ -82,21 +89,7 @@ class LeaguesController < ApplicationController
 
   def update
     @league_season = @league.current_league_season
-    ApplicationRecord.transaction do
-      @league.update!(league_params) if params[:league].present?
-      if params[:league_season].present? && @league_season && @league_season.draft_picks.none?
-        attrs = league_season_params.to_h
-        if attrs[:draft_scheduled_at].present?
-          attrs[:draft_scheduled_at] = parsed_local_datetime(
-            attrs[:draft_scheduled_at],
-            params.dig(:league_season, :time_zone)
-          )
-        end
-        @league_season.assign_attributes(attrs)
-        normalize_draft_mode_switch(@league_season)
-        @league_season.save!
-      end
-    end
+    @league.update!(league_params) if params[:league].present?
     redirect_to league_path(@league), notice: "League updated."
   rescue ActiveRecord::RecordInvalid
     render Views::Leagues::Edit.new(league: @league, league_season: @league_season),
@@ -181,21 +174,6 @@ class LeaguesController < ApplicationController
 
   def league_params
     params.require(:league).permit(:name, :private)
-  end
-
-  def league_season_params
-    params.require(:league_season).permit(:draft_mode, :draft_order_style,
-      :draft_scheduled_at, :pick_clock_seconds)
-  end
-
-  # Keep live-only fields consistent with the chosen mode. Manual drafts
-  # don't carry a scheduled time or pick clock; live drafts need a clock.
-  def normalize_draft_mode_switch(league_season)
-    case league_season.draft_mode
-    when "manual"
-      league_season.pick_clock_seconds = nil
-      league_season.draft_scheduled_at = nil
-    end
   end
 
   # Parse a "YYYY-MM-DDTHH:MM" string from a datetime-local input using the

@@ -30,7 +30,7 @@ RSpec.describe "Live draft", type: :request do
     claim_seat_via_http(league, bob_seat)
     Drafts::SubmitPick.call(league_season: league.reload.current_league_season, season_team: season.season_teams.first)
 
-    get league_path(league)
+    get league_draft_path(league)
 
     expect(response.body).to include('<turbo-frame')
     expect(response.body).to include('id="team_directory"')
@@ -44,7 +44,7 @@ RSpec.describe "Live draft", type: :request do
     bob_seat = league.participants.find_by(draft_position: 2)
     reset!
     claim_seat_via_http(league, bob_seat)
-    get league_path(league)
+    get league_draft_path(league)
 
     expect(response.body).to include('id="team_directory"')
     expect(response.body).not_to match(%r{<form[^>]*action="/leagues/[^"?]+/draft_picks})
@@ -62,7 +62,7 @@ RSpec.describe "Live draft", type: :request do
     Drafts::SubmitPick.call(league_season: ls, season_team: season.season_teams.first)
 
     # status=all so the picked team isn't filtered out by the default
-    get league_path(league, status: "")
+    get league_draft_path(league, status: "")
 
     expect(response.body).to match(/##{ls.reload.draft_picks.first.pick_number}\b/)
     expect(response.body).to include("Alice")
@@ -77,7 +77,7 @@ RSpec.describe "Live draft", type: :request do
     bob_seat = league.participants.find_by(draft_position: 2)
     claim_seat_via_http(league, bob_seat)
 
-    get league_path(league, sort: "name", dir: "desc")
+    get league_draft_path(league, sort: "name", dir: "desc")
 
     body = response.body[response.body.index("<turbo-frame")..response.body.index("</turbo-frame>")]
     ordered = body.scan(%r{<span class="font-medium">(Team \d+)</span>})
@@ -111,7 +111,7 @@ RSpec.describe "Live draft", type: :request do
     bob_seat = league.participants.find_by(draft_position: 2)
     claim_seat_via_http(league, bob_seat)
 
-    get league_path(league)
+    get league_draft_path(league)
 
     expect(response.body).to include('data-controller="local-time"')
     expect(response.body).to match(/<time[^>]+datetime="\d{4}-\d{2}-\d{2}T/)

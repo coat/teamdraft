@@ -24,7 +24,11 @@ RSpec.describe "League invite verification", type: :request do
     expect(response).to redirect_to(league_path(league))
     expect(bob_seat.reload.joined_at).to be_present
     follow_redirect!
-    expect(response.body).to include("Welcome, Bob")
+    # When both seats are claimed the draft starts and /leagues/:id
+    # redirects claimed viewers to /draft. Either way, the welcome flash
+    # is present on the final rendered page.
+    follow_redirect! if response.redirect?
+    expect(flash[:notice].to_s + response.body).to include("Welcome, Bob")
     expect(response.body).not_to include("Are you Bob?")
   end
 
