@@ -40,7 +40,7 @@ module SportsData
       "200" => "Super Bowl"
     ).freeze
 
-    def initialize(season:, api_key: ENV.fetch("THESPORTSDB_API_KEY", DEFAULT_KEY), http: Net::HTTP)
+    def initialize(season:, api_key: ENV.fetch("THESPORTSDB_KEY", DEFAULT_KEY), http: Net::HTTP)
       super(season:)
       @api_key = api_key
       @http = http
