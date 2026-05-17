@@ -83,7 +83,9 @@ class Views::Leagues::Show < Views::Base
 
   def render_season_chip
     return unless @league_season&.season
-    span(class: "badge badge-ghost badge-sm mt-1") { @league_season.season.label }
+    a(href: season_path(@league_season.season), class: "badge badge-ghost badge-sm mt-1 link link-hover") do
+      plain @league_season.season.label
+    end
   end
 
   def render_share_card
