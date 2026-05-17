@@ -87,17 +87,31 @@ class Views::Drafts::Show < Views::Base
 
   def render_drafting_state
     on_the_clock = clock_participant
-    div(class: "flex items-center gap-3 mb-3") do
+    viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
+    render_on_the_clock_banner(on_the_clock, viewer_on_clock)
+    render_clock(viewer_on_clock) if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
+    render_team_directory(on_the_clock)
+  end
+
+  def render_on_the_clock_banner(on_the_clock, viewer_on_clock)
+    classes = if viewer_on_clock
+      "alert alert-success mb-3 flex-wrap gap-3 ring-2 ring-success/60 shadow-lg"
+    else
+      "alert mb-3 flex-wrap gap-3"
+    end
+    div(class: classes) do
       span(class: "badge badge-lg") { "Pick ##{@league_season.current_pick_number} of #{@league_season.total_picks}" }
       if on_the_clock
-        span do
-          plain "On the clock: "
-          strong(class: "text-primary") { on_the_clock.display_name }
+        if viewer_on_clock
+          span(class: "text-lg font-bold uppercase tracking-wide") { "You're on the clock!" }
+        else
+          span do
+            plain "On the clock: "
+            strong { on_the_clock.display_name }
+          end
         end
       end
     end
-    render_clock if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
-    render_team_directory(on_the_clock)
   end
 
   def render_pending_notice
@@ -145,21 +159,26 @@ class Views::Drafts::Show < Views::Base
     end
   end
 
-  def render_clock
+  def render_clock(viewer_on_clock = false)
     deadline = clock_deadline
     return if deadline.nil?
     autopick = next_autopick_team
+    clock_classes = if viewer_on_clock
+      "alert alert-warning mb-3 flex-wrap gap-2 ring-2 ring-warning/60"
+    else
+      "alert mb-3 flex-wrap gap-2"
+    end
     # Stable id so Turbo morphing matches this element across refreshes
     # and reliably propagates the updated deadline value to Stimulus.
     # Without an id, morphdom can fall back to positional matching, which
     # in some cases left the autopick clock stuck on "auto-picking…".
     div(
       id: "draft-clock",
-      class: "alert mb-3 flex-wrap gap-2",
+      class: clock_classes,
       data_controller: "draft-clock",
       data_draft_clock_deadline_value: deadline.iso8601
     ) do
-      span(class: "font-mono text-lg", data_draft_clock_target: "display") { "#{@league_season.pick_clock_seconds}s" }
+      span(class: "font-mono text-2xl font-bold", data_draft_clock_target: "display") { "#{@league_season.pick_clock_seconds}s" }
       if autopick
         span(class: "hidden text-sm", data_draft_clock_target: "autopick") do
           plain "Auto-pick if time expires: "
