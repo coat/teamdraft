@@ -16,7 +16,6 @@ RSpec.describe Scoring::Recompute do
     expect(events.size).to eq(1)
     expect(events.first.season_team).to eq(game.winner_season_team)
     expect(events.first.event_type).to eq("regular_win")
-    expect(events.first.points).to eq(1)
   end
 
   it "credits both wild-card participants with playoff_appearance" do
@@ -31,7 +30,6 @@ RSpec.describe Scoring::Recompute do
 
     events = ScoringEvent.where(game: game).order(:event_type).to_a
     expect(events.map(&:event_type)).to match_array(%w[playoff_appearance playoff_appearance])
-    expect(events.map(&:points)).to all(eq(5))
   end
 
   it "credits bye teams with playoff_appearance via their divisional game" do
@@ -63,8 +61,6 @@ RSpec.describe Scoring::Recompute do
       %w[championship_appearance championship_appearance championship_win]
     )
     expect(events.find { |e| e.event_type == "championship_win" }.season_team).to eq(game.winner_season_team)
-    expect(events.find { |e| e.event_type == "championship_win" }.points).to eq(5)
-    expect(events.select { |e| e.event_type == "championship_appearance" }.map(&:points)).to all(eq(10))
   end
 
   it "is idempotent across repeated calls" do

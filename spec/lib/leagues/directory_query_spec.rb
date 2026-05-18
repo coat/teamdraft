@@ -115,7 +115,7 @@ RSpec.describe Leagues::DirectoryQuery do
     it "reports any_scoring_events? true when the season has any events" do
       ls = drafting_league_season
       ScoringEvent.create!(season_team: ls.season.season_teams.first,
-        event_type: "regular_win", points: 1, occurred_at: Time.current)
+        event_type: "regular_win", occurred_at: Time.current)
 
       query = Leagues::DirectoryQuery.new(league_season: ls, params: {})
 
@@ -125,7 +125,7 @@ RSpec.describe Leagues::DirectoryQuery do
     it "defaults sort to points/desc while drafting when events exist" do
       ls = drafting_league_season
       ScoringEvent.create!(season_team: ls.season.season_teams.first,
-        event_type: "regular_win", points: 1, occurred_at: Time.current)
+        event_type: "regular_win", occurred_at: Time.current)
 
       query = Leagues::DirectoryQuery.new(league_season: ls, params: {})
 
@@ -148,14 +148,14 @@ RSpec.describe Leagues::DirectoryQuery do
       teams = ls.season.season_teams.to_a
       # Give the 2nd and 3rd team equal points; 3rd has higher (worse) rank.
       ScoringEvent.create!(season_team: teams[1], event_type: "regular_win",
-        points: 2, occurred_at: Time.current)
+        occurred_at: Time.current)
       ScoringEvent.create!(season_team: teams[2], event_type: "regular_win",
-        points: 2, occurred_at: Time.current)
+        occurred_at: Time.current)
 
       rows = Leagues::DirectoryQuery.new(league_season: ls,
         params: {status: "", sort: "points", dir: "desc"}).rows
 
-      tied_rows = rows.select { |r| r.points == 2 }
+      tied_rows = rows.select { |r| r.points == 1 }
       expect(tied_rows.map { |r| r.team.default_pick_rank }).to eq([2, 3])
     end
   end

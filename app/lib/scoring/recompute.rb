@@ -45,7 +45,6 @@ module Scoring
         season_team: winner,
         game:,
         event_type:,
-        points: @rules.points_for(event_type),
         occurred_at: occurred_at(game)
       )
     end
@@ -55,9 +54,8 @@ module Scoring
       occurred = occurred_at(game)
 
       if appearance
-        points = @rules.points_for(appearance)
         game.participants.compact.each do |season_team|
-          upsert_event(season_team:, game:, event_type: appearance, points:, occurred_at: occurred) if points.positive?
+          upsert_event(season_team:, game:, event_type: appearance, occurred_at: occurred)
           backfill_bye(season_team, game, occurred)
         end
       end
@@ -67,12 +65,9 @@ module Scoring
 
       winner = game.winner_season_team
       return unless winner
-      points = @rules.points_for(championship_event)
-      return unless points.positive?
       upsert_event(
         season_team: winner, game:,
         event_type: championship_event,
-        points:,
         occurred_at: occurred
       )
     end
@@ -82,12 +77,9 @@ module Scoring
       return unless rule
       return unless game.round == @rules.bye_backfill_trigger_round
       return if has_event?(season_team, rule.event_type)
-      points = rule.points
-      return unless points.positive?
       upsert_event(
         season_team:, game:,
         event_type: rule.event_type,
-        points:,
         occurred_at: occurred
       )
     end
@@ -112,13 +104,12 @@ module Scoring
       game.completed_at || game.kickoff_at
     end
 
-    def upsert_event(season_team:, game:, event_type:, points:, occurred_at:)
+    def upsert_event(season_team:, game:, event_type:, occurred_at:)
       ScoringEvent.upsert(
         {
           season_team_id: season_team.id,
           game_id: game.id,
           event_type:,
-          points:,
           occurred_at:,
           created_at: Time.current,
           updated_at: Time.current

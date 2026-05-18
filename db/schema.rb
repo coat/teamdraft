@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -146,14 +146,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000003) do
     t.string "event_type", null: false
     t.bigint "game_id"
     t.datetime "occurred_at", null: false
-    t.integer "points", default: 0, null: false
     t.bigint "season_team_id", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_scoring_events_on_game_id"
     t.index ["season_team_id", "game_id", "event_type"], name: "index_scoring_events_unique_per_team_game_type", unique: true
     t.index ["season_team_id", "occurred_at"], name: "index_scoring_events_on_season_team_id_and_occurred_at"
     t.index ["season_team_id"], name: "index_scoring_events_on_season_team_id"
-    t.check_constraint "points >= 0", name: "scoring_events_points_non_negative"
   end
 
   create_table "scoring_rules", force: :cascade do |t|

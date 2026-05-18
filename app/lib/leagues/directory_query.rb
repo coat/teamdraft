@@ -106,14 +106,16 @@ module Leagues
 
     def load_rows
       picks_by_team = @league_season.draft_picks.includes(:participant).index_by(&:season_team_id)
+      rules = Scoring::Rules.for_league_season(@league_season)
       @league_season.season.season_teams.includes(:team, :scoring_events).map do |st|
         events = st.scoring_events
-        breakdown = events.group_by(&:event_type).transform_values { |list| list.sum(&:points) }
+        breakdown = events.group_by(&:event_type)
+          .transform_values { |list| list.sum { |e| rules.points_for(e.event_type) } }
         Row.new(
           season_team: st,
           team: st.team,
           pick: picks_by_team[st.id],
-          points: events.sum(&:points),
+          points: events.sum { |e| rules.points_for(e.event_type) },
           events: breakdown
         )
       end

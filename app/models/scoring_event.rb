@@ -5,7 +5,6 @@ class ScoringEvent < ApplicationRecord
   belongs_to :game, optional: true
 
   validates :event_type, presence: true
-  validates :points, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates :occurred_at, presence: true
   validates :event_type, uniqueness: {scope: [:season_team_id, :game_id]}
   validate :event_type_known_for_sport

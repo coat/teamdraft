@@ -10,8 +10,8 @@ RSpec.describe "League show scoring breakdown", type: :request do
     create(:participant, league_season: ls, display_name: "Bob", draft_position: 2)
     alice_team = season.season_teams.first
     DraftPick.create!(league_season: ls, participant: alice, season_team: alice_team, pick_number: 1)
-    ScoringEvent.create!(season_team: alice_team, event_type: "regular_win", points: 12, occurred_at: Time.current)
-    ScoringEvent.create!(season_team: alice_team, event_type: "championship_win", points: 8, occurred_at: Time.current)
+    ScoringEvent.create!(season_team: alice_team, event_type: "regular_win", occurred_at: Time.current)
+    ScoringEvent.create!(season_team: alice_team, event_type: "championship_win", occurred_at: Time.current)
 
     get league_path(ls.league)
 
@@ -30,7 +30,7 @@ RSpec.describe "League show scoring breakdown", type: :request do
     alice_team, bob_team = season.season_teams.first(2)
     DraftPick.create!(league_season: ls, participant: alice, season_team: alice_team, pick_number: 1)
     DraftPick.create!(league_season: ls, participant: bob, season_team: bob_team, pick_number: 2)
-    ScoringEvent.create!(season_team: bob_team, event_type: "regular_win", points: 7, occurred_at: Time.current)
+    ScoringEvent.create!(season_team: bob_team, event_type: "regular_win", occurred_at: Time.current)
 
     get league_path(ls.league)
 
