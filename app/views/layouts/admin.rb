@@ -35,8 +35,9 @@ class Views::Layouts::Admin < Views::Base
         javascript_importmap_tags
       end
       body(class: "min-h-screen bg-base-200 text-base-content") do
-        div(class: "drawer lg:drawer-open") do
-          input(id: "admin-drawer", type: "checkbox", class: "drawer-toggle")
+        div(class: "drawer lg:drawer-open", data: {controller: "admin-drawer"}) do
+          input(id: "admin-drawer", type: "checkbox", class: "drawer-toggle",
+            autocomplete: "off", data: {admin_drawer_target: "toggle"})
           div(class: "drawer-content flex flex-col min-h-screen") do
             render_topbar
             div(class: "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-4") do
