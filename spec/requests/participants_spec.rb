@@ -12,7 +12,7 @@ RSpec.describe "Reordering draft participants", type: :request do
 
     patch move_down_league_participant_path(league, owner)
 
-    expect(response).to redirect_to(edit_league_path(league))
+    expect(response).to redirect_to(edit_league_draft_path(league))
     expect(owner.reload.draft_position).to eq(2)
     expect(opponent.reload.draft_position).to eq(1)
   end
@@ -94,7 +94,7 @@ RSpec.describe "Reordering draft participants", type: :request do
     DraftPick.create!(league_season: league_season, participant: owner,
       season_team: season.season_teams.first, pick_number: 1)
 
-    get edit_league_path(league)
+    get edit_league_draft_path(league)
 
     expect(response.body).to include("Draft has started")
     expect(response.body).not_to include(move_up_league_participant_path(league, owner))
