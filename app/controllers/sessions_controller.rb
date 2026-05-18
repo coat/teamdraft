@@ -10,7 +10,9 @@ class SessionsController < ApplicationController
 
   def create
     user = User.authenticate_by(params.permit(:email_address, :password))
-    if user
+    if user&.disabled?
+      redirect_to new_session_path, alert: "This account has been disabled. Contact an admin if you think this is a mistake."
+    elsif user
       start_new_session_for(user)
       redirect_to after_authentication_url, notice: "Signed in."
     else

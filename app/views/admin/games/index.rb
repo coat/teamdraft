@@ -10,17 +10,13 @@ class Views::Admin::Games::Index < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Admin · Games") do
-      main(class: "py-6 space-y-4") do
-        h1(class: "text-3xl font-bold") { "Games" }
-
-        render_season_picker
-
-        if @games.any?
-          render_games_table
-        else
-          p(class: "text-base-content/60") { "No games for this season yet. Use the dashboard's sync action to pull them." }
-        end
+    render Views::Layouts::Admin.new(title: "Games", section: :games, breadcrumbs: [["Games", nil]]) do
+      render Views::Components::Admin::PageHeader.new(title: "Games")
+      render_season_picker
+      if @games.any?
+        render_games_table
+      else
+        p(class: "text-base-content/60") { "No games for this season yet. Use the dashboard's sync action to pull them." }
       end
     end
   end
@@ -39,24 +35,20 @@ class Views::Admin::Games::Index < Views::Base
   end
 
   def render_games_table
-    div(class: "card bg-base-100 shadow") do
-      div(class: "overflow-x-auto") do
-        table(class: "table table-sm table-zebra") do
-          thead do
-            tr do
-              th { "When" }
-              th { "Round" }
-              th { "Wk" }
-              th { "Matchup" }
-              th { "Score" }
-              th { "Status" }
-              th
-            end
-          end
-          tbody do
-            @games.each { |g| render_row(g) }
-          end
+    render Views::Components::Admin::TableCard.new do
+      thead do
+        tr do
+          th { "When" }
+          th { "Round" }
+          th { "Wk" }
+          th { "Matchup" }
+          th { "Score" }
+          th { "Status" }
+          th
         end
+      end
+      tbody do
+        @games.each { |g| render_row(g) }
       end
     end
   end

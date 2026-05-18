@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 class Admin::LeaguesController < Admin::BaseController
-  before_action :load_league, only: [:edit, :update, :destroy]
+  before_action :load_league, only: [:show, :edit, :update, :destroy]
 
   def index
     query = Admin::Leagues::ListQuery.new(params)
     pagy, leagues = pagy(query.relation)
     render Views::Admin::Leagues::Index.new(query: query, leagues: leagues, pagy: pagy)
+  end
+
+  def show
+    render Views::Admin::Leagues::Show.new(league: @league)
   end
 
   def edit

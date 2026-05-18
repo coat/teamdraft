@@ -9,14 +9,21 @@ class Views::Admin::Leagues::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Edit league · Admin") do
-      main(class: "py-6") do
-        div(class: "card bg-base-100 shadow") do
-          div(class: "card-body") do
-            h1(class: "card-title text-2xl") { "Edit #{@league.name}" }
-            p(class: "text-sm text-base-content/70") do
-              plain "Current season: #{@league_season&.season&.label || "—"}"
-            end
+    render Views::Layouts::Admin.new(
+      title: "Edit #{@league.name}",
+      section: :leagues,
+      breadcrumbs: [
+        ["Leagues", admin_leagues_path],
+        [@league.name, admin_league_path(@league)],
+        ["Edit", nil]
+      ]
+    ) do
+      render Views::Components::Admin::PageHeader.new(
+        title: "Edit #{@league.name}",
+        subtitle: "Current season: #{@league_season&.season&.label || "—"}"
+      )
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body") do
 
             render_participants
 
@@ -54,7 +61,6 @@ class Views::Admin::Leagues::Edit < Views::Base
             end
           end
         end
-      end
     end
   end
 

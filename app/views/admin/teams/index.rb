@@ -13,16 +13,13 @@ class Views::Admin::Teams::Index < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Admin · Teams") do
-      main(class: "py-6 space-y-4") do
-        h1(class: "text-3xl font-bold") { "Teams" }
-        p(class: "text-sm text-base-content/70") do
-          plain "External ID is what links a team to its provider (e.g. TheSportsDB's idTeam). Required for game sync."
-        end
-        render_filter_card
-        div(class: "card bg-base-100 shadow") do
-          div(class: "overflow-x-auto") do
-            table(class: "table table-sm table-zebra") do
+    render Views::Layouts::Admin.new(title: "Teams", section: :teams, breadcrumbs: [["Teams", nil]]) do
+      render Views::Components::Admin::PageHeader.new(
+        title: "Teams",
+        subtitle: "External ID is what links a team to its provider (e.g. TheSportsDB's idTeam). Required for game sync."
+      )
+      render_filter_card
+      render Views::Components::Admin::TableCard.new do
               thead do
                 tr do
                   th { "Sport" }
@@ -34,11 +31,8 @@ class Views::Admin::Teams::Index < Views::Base
                   th(colspan: 3) { "Actions" }
                 end
               end
-              tbody do
-                @teams.each { |team| render_row(team) }
-              end
-            end
-          end
+        tbody do
+          @teams.each { |team| render_row(team) }
         end
       end
     end
@@ -47,29 +41,18 @@ class Views::Admin::Teams::Index < Views::Base
   private
 
   def render_filter_card
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body p-4") do
-        form_with(url: admin_teams_path, method: :get, scope: nil, local: true,
-          class: "flex flex-wrap items-end gap-3") do |form|
-          div(class: "space-y-1") do
-            form.label :sport_id, "Sport", class: "label label-text text-xs uppercase tracking-wide opacity-60"
-            form.select :sport_id,
-              [["All sports", ""]] + @sports,
-              {selected: @query.sport_id},
-              class: "select select-bordered"
-          end
-          div(class: "space-y-1") do
-            form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
-            form.text_field :q, value: @query.search_term, placeholder: "Team name…",
-              class: "input input-bordered w-48"
-          end
-          form.hidden_field :sort, value: @query.sort_column
-          form.hidden_field :dir, value: @query.sort_dir
-          div(class: "flex gap-2") do
-            form.submit "Filter", class: "btn btn-primary"
-            a(href: admin_teams_path, class: "btn btn-ghost") { "Clear" }
-          end
-        end
+    render Views::Components::Admin::FilterCard.new(url: admin_teams_path, query: @query) do |form|
+      div(class: "space-y-1") do
+        form.label :sport_id, "Sport", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.select :sport_id,
+          [["All sports", ""]] + @sports,
+          {selected: @query.sport_id},
+          class: "select select-bordered"
+      end
+      div(class: "space-y-1") do
+        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.text_field :q, value: @query.search_term, placeholder: "Team name…",
+          class: "input input-bordered w-48"
       end
     end
   end

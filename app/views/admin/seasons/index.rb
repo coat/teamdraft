@@ -8,34 +8,27 @@ class Views::Admin::Seasons::Index < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Admin · Seasons") do
-      main(class: "py-6 space-y-4") do
-        div(class: "flex items-center justify-between") do
-          h1(class: "text-3xl font-bold") { "Seasons" }
-          a(href: new_admin_season_path, class: "btn btn-primary btn-sm") { "New season" }
-        end
-        p(class: "text-sm text-base-content/70") do
-          plain "External ID is the provider's season key (e.g. TheSportsDB's idLeague + year code). Required for game sync."
-        end
-        div(class: "card bg-base-100 shadow") do
-          div(class: "overflow-x-auto") do
-            table(class: "table table-sm table-zebra") do
-              thead do
-                tr do
-                  th { "Sport" }
-                  th { "Year" }
-                  th { "Label" }
-                  th { "Status" }
-                  th { "Dates" }
-                  th { "External" }
-                  th
-                end
-              end
-              tbody do
-                @seasons.each { |season| render_row(season) }
-              end
-            end
+    render Views::Layouts::Admin.new(title: "Seasons", section: :seasons, breadcrumbs: [["Seasons", nil]]) do
+      render Views::Components::Admin::PageHeader.new(
+        title: "Seasons",
+        subtitle: "External ID is the provider's season key (e.g. TheSportsDB's idLeague + year code). Required for game sync."
+      ) do
+        a(href: new_admin_season_path, class: "btn btn-primary btn-sm") { "New season" }
+      end
+      render Views::Components::Admin::TableCard.new do
+        thead do
+          tr do
+            th { "Sport" }
+            th { "Year" }
+            th { "Label" }
+            th { "Status" }
+            th { "Dates" }
+            th { "External" }
+            th
           end
+        end
+        tbody do
+          @seasons.each { |season| render_row(season) }
         end
       end
     end

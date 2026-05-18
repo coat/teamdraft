@@ -8,11 +8,14 @@ class Views::Admin::Teams::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Edit team · Admin") do
-      main(class: "py-6") do
-        div(class: "card bg-base-100 shadow") do
-          div(class: "card-body") do
-            h1(class: "card-title text-2xl") { "Edit #{@team.name}" }
+    render Views::Layouts::Admin.new(
+      title: "Edit #{@team.name}",
+      section: :teams,
+      breadcrumbs: [["Teams", admin_teams_path], [@team.name, nil], ["Edit", nil]]
+    ) do
+      render Views::Components::Admin::PageHeader.new(title: "Edit #{@team.name}")
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body") do
 
             if @team.errors.any?
               div(class: "alert alert-error", role: "alert") do
@@ -36,7 +39,6 @@ class Views::Admin::Teams::Edit < Views::Base
                 f.submit "Save", class: "btn btn-primary"
               end
             end
-          end
         end
       end
     end

@@ -11,89 +11,65 @@ class Views::Admin::Leagues::Index < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Admin · Leagues") do
-      main(class: "py-6 space-y-4") do
-        h1(class: "text-3xl font-bold") { "Leagues" }
-        p(class: "text-sm text-base-content/70") do
-          plain "Each row reflects the league's current season. Destructive controls: edit fields (including status), or delete the entire league. Deletion cascades to every season's participants and draft picks."
-        end
-        render_filter_card
-        render_table_card
-        render Views::Components::Admin::Pagination.new(pagy: @pagy)
-      end
+    render Views::Layouts::Admin.new(title: "Leagues", section: :leagues, breadcrumbs: [["Leagues", nil]]) do
+      render Views::Components::Admin::PageHeader.new(
+        title: "Leagues",
+        subtitle: "Each row reflects the league's current season. Destructive controls: edit fields (including status), or delete the entire league. Deletion cascades to every season's participants and draft picks."
+      )
+      render_filter_card
+      render_table_card
+      render Views::Components::Admin::Pagination.new(pagy: @pagy)
     end
   end
 
   private
 
   def render_filter_card
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body p-4") do
-        form_with(url: admin_leagues_path, method: :get, scope: nil, local: true,
-          class: "flex flex-wrap items-end gap-3") do |form|
-          div(class: "space-y-1") do
-            form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
-            form.text_field :q, value: @query.search_term, placeholder: "League name…",
-              class: "input input-bordered w-64"
-          end
-          div(class: "space-y-1") do
-            form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide opacity-60"
-            form.select :status,
-              [["Any status", ""]] + LeagueSeason::STATUSES.map { |s| [s.humanize, s] },
-              {selected: @query.status},
-              class: "select select-bordered"
-          end
-          div(class: "space-y-1") do
-            form.label :users, "Users", class: "label label-text text-xs uppercase tracking-wide opacity-60"
-            form.select :users,
-              [["Any", ""], ["Has signed-up users", "yes"], ["Anonymous only", "no"]],
-              {selected: @query.users},
-              class: "select select-bordered"
-          end
-          # Preserve current sort across filter submits.
-          form.hidden_field :sort, value: @query.sort_column
-          form.hidden_field :dir, value: @query.sort_dir
-          div(class: "flex gap-2") do
-            form.submit "Filter", class: "btn btn-primary"
-            a(href: admin_leagues_path, class: "btn btn-ghost") { "Clear" }
-          end
-        end
+    render Views::Components::Admin::FilterCard.new(url: admin_leagues_path, query: @query) do |form|
+      div(class: "space-y-1") do
+        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.text_field :q, value: @query.search_term, placeholder: "League name…",
+          class: "input input-bordered w-64"
+      end
+      div(class: "space-y-1") do
+        form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.select :status,
+          [["Any status", ""]] + LeagueSeason::STATUSES.map { |s| [s.humanize, s] },
+          {selected: @query.status},
+          class: "select select-bordered"
+      end
+      div(class: "space-y-1") do
+        form.label :users, "Users", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.select :users,
+          [["Any", ""], ["Has signed-up users", "yes"], ["Anonymous only", "no"]],
+          {selected: @query.users},
+          class: "select select-bordered"
       end
     end
   end
 
   def render_table_card
-    div(class: "card bg-base-100 shadow") do
-      div(class: "overflow-x-auto") do
-        table(class: "table table-sm table-zebra") do
-          thead do
-            tr do
-              render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_leagues_path)
-              th { "Current season" }
-              th { "Status" }
-              th { "Owner" }
-              th { "Users" }
-              render Views::Components::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_leagues_path)
-              th
-            end
-          end
-          tbody do
-            if @leagues.empty?
-              render_empty_row
-            else
-              @leagues.each { |league| render_row(league) }
-            end
-          end
+    render Views::Components::Admin::TableCard.new do
+      thead do
+        tr do
+          render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_leagues_path)
+          th { "Current season" }
+          th { "Status" }
+          th { "Owner" }
+          th { "Users" }
+          render Views::Components::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_leagues_path)
+          th
         end
       end
-    end
-  end
-
-  def render_empty_row
-    tr do
-      td(colspan: "7") do
-        div(class: "alert alert-info my-2") do
-          span { "No leagues match these filters." }
+      tbody do
+        if @leagues.empty?
+          tr do
+            td(colspan: "7") do
+              div(class: "alert alert-info my-2") { span { "No leagues match these filters." } }
+            end
+          end
+        else
+          @leagues.each { |league| render_row(league) }
         end
       end
     end
@@ -105,7 +81,7 @@ class Views::Admin::Leagues::Index < Views::Base
     user_count = participants.count { |p| p.user_id }
     tr(class: (user_count.zero? ? "bg-warning/10" : nil)) do
       td(class: "font-medium") do
-        a(href: league_path(league), class: "link link-hover") { league.name }
+        a(href: admin_league_path(league), class: "link link-hover") { league.name }
         if league.private?
           span(class: "badge badge-sm badge-ghost ml-2") { "private" }
         end

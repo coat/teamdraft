@@ -12,7 +12,7 @@ class Admin::BaseController < ApplicationController
   private
 
   def require_admin
-    return if current_user&.admin?
+    return if current_user&.admin? && !current_user.disabled?
     redirect_to main_app.root_path, alert: "Admin access required."
   end
 end

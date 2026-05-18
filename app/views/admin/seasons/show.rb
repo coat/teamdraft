@@ -9,33 +9,27 @@ class Views::Admin::Seasons::Show < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Admin · #{@season.label}") do
-      main(class: "py-6 space-y-4") do
-        render_header
-        render_metadata
-        render_counts
-        render_sync_panel
-      end
+    render Views::Layouts::Admin.new(
+      title: @season.label,
+      section: :seasons,
+      breadcrumbs: [["Seasons", admin_seasons_path], [@season.label, nil]]
+    ) do
+      render_header
+      render_metadata
+      render_counts
+      render_sync_panel
     end
   end
 
   private
 
   def render_header
-    div(class: "flex items-center justify-between gap-4") do
-      div do
-        div(class: "text-sm text-base-content/60") do
-          a(href: admin_seasons_path, class: "link link-hover") { "← Seasons" }
-        end
-        h1(class: "text-3xl font-bold") { @season.label }
-        span(class: "badge badge-sm #{status_color}") { @season.status }
-      end
-      div(class: "flex flex-wrap gap-2") do
-        a(href: edit_admin_season_path(@season), class: "btn btn-ghost btn-sm") { "Edit" }
-        if @season.status != "active"
-          button_to "Activate", activate_admin_season_path(@season),
-            method: :post, form: {class: "inline"}, class: "btn btn-sm"
-        end
+    render Views::Components::Admin::PageHeader.new(title: @season.label) do
+      span(class: "badge #{status_color}") { @season.status }
+      a(href: edit_admin_season_path(@season), class: "btn btn-ghost btn-sm") { "Edit" }
+      if @season.status != "active"
+        button_to "Activate", activate_admin_season_path(@season),
+          method: :post, form: {class: "inline"}, class: "btn btn-sm"
       end
     end
   end

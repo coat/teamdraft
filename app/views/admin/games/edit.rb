@@ -8,16 +8,22 @@ class Views::Admin::Games::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Edit game · Admin") do
-      main(class: "py-6") do
-        div(class: "card bg-base-100 shadow") do
-          div(class: "card-body") do
-            h1(class: "card-title text-2xl") {
-              "#{@game.away_season_team.team.name} @ #{@game.home_season_team.team.name}"
-            }
-            p(class: "text-sm text-base-content/70") {
-              "Manual override. Saving with status=final triggers a scoring recompute."
-            }
+    matchup = "#{@game.away_season_team.team.name} @ #{@game.home_season_team.team.name}"
+    render Views::Layouts::Admin.new(
+      title: "Edit game",
+      section: :games,
+      breadcrumbs: [
+        ["Games", admin_games_path(season_id: @game.season_id)],
+        [matchup, nil],
+        ["Edit", nil]
+      ]
+    ) do
+      render Views::Components::Admin::PageHeader.new(
+        title: matchup,
+        subtitle: "Manual override. Saving with status=final triggers a scoring recompute."
+      )
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body") do
 
             if @game.errors.any?
               div(class: "alert alert-error", role: "alert") do
@@ -39,7 +45,6 @@ class Views::Admin::Games::Edit < Views::Base
                 f.submit "Save", class: "btn btn-primary"
               end
             end
-          end
         end
       end
     end

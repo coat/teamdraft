@@ -52,7 +52,15 @@ Rails.application.routes.draw do
       end
     end
     resources :games, only: [:index, :edit, :update]
-    resources :leagues, only: [:index, :edit, :update, :destroy]
+    resources :leagues, only: [:index, :show, :edit, :update, :destroy]
+    resources :users, only: [:index, :show, :edit, :update] do
+      member do
+        patch :grant_admin
+        patch :revoke_admin
+        patch :disable
+        patch :enable
+      end
+    end
     resources :syncs, only: [:create]
     mount MissionControl::Jobs::Engine, at: "/jobs", as: :jobs
   end

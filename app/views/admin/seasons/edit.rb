@@ -7,16 +7,22 @@ class Views::Admin::Seasons::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Edit season · Admin") do
-      main(class: "py-6") do
-        div(class: "card bg-base-100 shadow") do
-          div(class: "card-body") do
-            h1(class: "card-title text-2xl") { "Edit #{@season.label}" }
-            render Views::Admin::Seasons::Form.new(
-              season: @season, sports: @sports,
-              url: admin_season_path(@season), method: :patch
-            )
-          end
+    render Views::Layouts::Admin.new(
+      title: "Edit #{@season.label}",
+      section: :seasons,
+      breadcrumbs: [
+        ["Seasons", admin_seasons_path],
+        [@season.label, admin_season_path(@season)],
+        ["Edit", nil]
+      ]
+    ) do
+      render Views::Components::Admin::PageHeader.new(title: "Edit #{@season.label}")
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body") do
+          render Views::Admin::Seasons::Form.new(
+            season: @season, sports: @sports,
+            url: admin_season_path(@season), method: :patch
+          )
         end
       end
     end

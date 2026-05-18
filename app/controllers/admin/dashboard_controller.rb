@@ -8,6 +8,7 @@ class Admin::DashboardController < Admin::BaseController
   private
 
   def gather_stats
+    week_ago = 7.days.ago
     {
       active_seasons: Season.where(status: "active").to_a,
       leagues: League.count,
@@ -15,7 +16,11 @@ class Admin::DashboardController < Admin::BaseController
       games: Game.count,
       games_final: Game.final.count,
       scoring_events: ScoringEvent.count,
-      users: User.count
+      users: User.count,
+      admins: User.where(admin: true).count,
+      disabled_users: User.where.not(disabled_at: nil).count,
+      recent_leagues: League.where("created_at > ?", week_ago).order(created_at: :desc).limit(5).to_a,
+      recent_users: User.where("created_at > ?", week_ago).order(created_at: :desc).limit(5).to_a
     }
   end
 end
