@@ -38,15 +38,18 @@ module SportsData
         },
         season_format: ->(year) { year.to_s }
       ),
-      # NBA: regular-season games are returned under intRound="0" (verified
-      # against 2024-2025 via eventsround.php). The free TheSportsDB tier
-      # caps that response at 50 events per request, so a regular-season
-      # sync built only on eventsround will undercount; the proper fix is
-      # to switch NBA regular-season ingestion to eventsday.php in a future
-      # iteration. Playoff codes were verified live on 2026-05-17.
+      # NBA: 2024-2025 and earlier put all regular-season games under
+      # intRound="0" (verified via eventsround.php). Starting with
+      # 2025-2026 the API switched to per-week numbering (rounds 1-26,
+      # verified live on 2026-05-17). Round 0 in the new scheme maps to
+      # NBA Cup / in-season tournament games. The free TheSportsDB tier
+      # caps responses at 50 events per request; a regular-season sync
+      # built only on eventsround will undercount for "0"-based seasons.
+      # The proper long-term fix is to switch NBA regular-season ingestion
+      # to eventsday.php.
       "nba" => SportConfig.new(
         league_id: "4387",
-        regular_rounds: ["0"],
+        regular_rounds: (0..26).map(&:to_s),
         playoff_rounds: {
           "400" => "play_in",
           "160" => "first_round",
