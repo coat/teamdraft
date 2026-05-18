@@ -40,10 +40,17 @@ class Views::Leagues::Form < Views::Base
 
   def render_season_field(form)
     return if @seasons.blank?
+    active   = @seasons.select { |s| s.status == "active" }
+    upcoming = @seasons.select { |s| s.status == "upcoming" }
+    grouped  = [
+      ["Upcoming",    upcoming.map { |s| [s.label, s.id] }],
+      ["In Progress", active.map   { |s| [s.label, s.id] }]
+    ]
+
     div(class: "space-y-1") do
       form.label :season_id, "Season", class: "label label-text font-medium"
       form.select :season_id,
-        @seasons.map { |s| [s.label, s.id] },
+        grouped,
         {include_blank: false, selected: @league.season_id},
         class: "select select-bordered w-full"
     end

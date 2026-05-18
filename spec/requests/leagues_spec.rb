@@ -10,6 +10,103 @@ RSpec.describe "Leagues", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Start a draft")
     end
+
+    describe "season selection" do
+      # Helper that sets ends_on automatically so the Season validation passes.
+      def make_season(sport:, status:, starts_on:, label:, year:)
+        create(:season, sport: sport, status: status,
+          starts_on: starts_on, ends_on: starts_on + 6.months,
+          label: label, year: year)
+      end
+
+      it "groups seasons into Upcoming and In Progress optgroups" do
+        nfl = create(:sport, :nfl)
+        make_season(sport: nfl, status: "upcoming", starts_on: 6.months.from_now.to_date, label: "Upcoming NFL", year: 2026)
+        make_season(sport: nfl, status: "active",   starts_on: 6.months.ago.to_date,   label: "Active NFL",   year: 2025)
+
+        get "/"
+
+        expect(response.body).to include(%(optgroup label="Upcoming"))
+        expect(response.body).to include(%(optgroup label="In Progress"))
+      end
+
+      it "places upcoming seasons before active seasons" do
+        nfl = create(:sport, :nfl)
+        make_season(sport: nfl, status: "upcoming", starts_on: 6.months.from_now.to_date, label: "Upcoming NFL", year: 2026)
+        make_season(sport: nfl, status: "active",   starts_on: 6.months.ago.to_date,   label: "Active NFL",   year: 2025)
+
+        get "/"
+
+        expect(response.body).to match(/Upcoming.*In Progress/m)
+      end
+
+      it "sorts upcoming seasons across sports by starts_on ascending" do
+        nfl = create(:sport, :nfl)
+        nba = create(:sport, :nba)
+        # NFL starts later than NBA → NBA should appear first
+        make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 15), label: "2026 NFL", year: 2026)
+        make_season(sport: nba, status: "upcoming", starts_on: Date.new(2026, 8, 1),  label: "2026 NBA", year: 2026)
+
+        get "/"
+
+        expect(response.body).to match(/2026 NBA.*2026 NFL/m)
+      end
+
+      it "sorts active seasons across sports by starts_on descending" do
+        nfl = create(:sport, :nfl)
+        nba = create(:sport, :nba)
+        # NBA started more recently → NBA should appear first
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
+        make_season(sport: nba, status: "active", starts_on: Date.new(2026, 1, 1), label: "2026 NBA", year: 2026)
+
+        get "/"
+
+        expect(response.body).to match(/2026 NBA.*2025 NFL/m)
+      end
+
+      it "only shows the earliest upcoming season per sport" do
+        nfl = create(:sport, :nfl)
+        make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 1), label: "2026 NFL", year: 2026)
+        make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2027, 9, 1), label: "2027 NFL", year: 2027)
+
+        get "/"
+
+        expect(response.body).to include("2026 NFL")
+        expect(response.body).not_to include("2027 NFL")
+      end
+
+      it "shows all active seasons regardless of how many per sport" do
+        nfl = create(:sport, :nfl)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2024, 9, 1), label: "2024 NFL", year: 2024)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
+
+        get "/"
+
+        expect(response.body).to include("2024 NFL")
+        expect(response.body).to include("2025 NFL")
+      end
+
+      it "preselects the soonest upcoming season when available" do
+        nfl = create(:sport, :nfl)
+        upcoming = make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 1), label: "2026 NFL", year: 2026)
+        make_season(sport: nfl, status: "active",   starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
+
+        get "/"
+
+        expect(response.body).to include(%(selected="selected" value="#{upcoming.id}"))
+      end
+
+      it "falls back to active when no upcoming season exists" do
+        nfl = create(:sport, :nfl)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1),  label: "2025 NFL", year: 2025)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2024, 11, 1), label: "2024 NFL", year: 2024)
+
+        get "/"
+
+        # Most-recently-started active should be selected
+        expect(response.body).to match(/selected.*2025 NFL/)
+      end
+    end
   end
 
   describe "POST /leagues" do
