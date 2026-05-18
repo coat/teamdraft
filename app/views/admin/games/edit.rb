@@ -33,9 +33,11 @@ class Views::Admin::Games::Edit < Views::Base
               end
             end
 
+            rounds = [Game::REGULAR_SEASON] +
+              @game.season.sport.scoring_rules.where(kind: "playoff_appearance").ordered.pluck(:round_key)
             form_with(model: @game, url: admin_game_path(@game), method: :patch, class: "space-y-3") do |f|
               select_row(f, :status, "Status", Game::STATUSES)
-              select_row(f, :round, "Round", Game::ROUNDS)
+              select_row(f, :round, "Round", rounds)
               number_row(f, :week, "Week", min: 1)
               datetime_row(f, :kickoff_at, "Kickoff", value: @game.kickoff_at&.iso8601)
               number_row(f, :home_score, "Home score", min: 0)
