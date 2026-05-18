@@ -10,6 +10,16 @@ FactoryBot.define do
     status { "draft_pending" }
     current_pick_number { 1 }
 
+    transient do
+      with_scoring_rule_overrides { true }
+    end
+
+    after(:create) do |ls, evaluator|
+      next unless evaluator.with_scoring_rule_overrides
+      next if ls.scoring_rule_overrides.any?
+      LeagueSeasonScoringRules::Seed.call(ls)
+    end
+
     trait :manual do
       draft_mode { "manual" }
       pick_clock_seconds { nil }

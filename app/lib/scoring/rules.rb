@@ -5,6 +5,13 @@ module Scoring
   # earnable event_type. The rule's `kind` (regular_win | playoff_appearance |
   # championship_win) tells Recompute how to award it, and `round_key` links a
   # playoff-appearance rule to the matching games.round value for that sport.
+  #
+  # Two factories:
+  #   - .for(sport) reads point values straight from ScoringRule rows; used by
+  #     Scoring::Recompute, which is sport-wide and ignorant of leagues.
+  #   - .for_league_season(league_season) overlays the league's per-rule point
+  #     overrides; used by Standings::Calculate at read time so owners can tune
+  #     point values mid-season without re-running Recompute.
   class Rules
     UnknownEvent = Class.new(StandardError)
 
@@ -12,12 +19,20 @@ module Scoring
       new(sport)
     end
 
-    def initialize(sport)
+    def self.for_league_season(league_season)
+      overrides = league_season.scoring_rule_overrides.includes(:scoring_rule).to_a
+      points_by_event = overrides.to_h { |o| [o.scoring_rule.event_type, Integer(o.points)] }
+      new(league_season.season.sport, points_override: points_by_event)
+    end
+
+    def initialize(sport, points_override: nil)
       @sport = sport
       @rules = sport.scoring_rules.ordered.to_a
+      @points_override = points_override
     end
 
     def points_for(event_type)
+      return Integer(@points_override[event_type] || 0) if @points_override
       rule = by_event_type[event_type]
       rule ? Integer(rule.points) : 0
     end

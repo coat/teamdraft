@@ -15,6 +15,7 @@ module Standings
     end
 
     def call
+      @rules = Scoring::Rules.for_league_season(@league_season)
       picks = @league_season.draft_picks.includes(:participant, season_team: [:team, :scoring_events]).to_a
       grouped = picks.group_by(&:participant)
 
@@ -36,8 +37,10 @@ module Standings
 
     def build_team_line(pick)
       events = pick.season_team.scoring_events
-      points = events.sum(&:points)
-      breakdown = events.group_by(&:event_type).transform_values { |list| list.sum(&:points) }
+      event_points = events.map { |e| [e, @rules.points_for(e.event_type)] }
+      points = event_points.sum { |_, pts| pts }
+      breakdown = event_points.group_by { |e, _| e.event_type }
+        .transform_values { |pairs| pairs.sum { |_, pts| pts } }
 
       TeamLine.new(
         season_team: pick.season_team,

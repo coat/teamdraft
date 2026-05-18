@@ -8,6 +8,7 @@ class ScoringRule < ApplicationRecord
   KINDS = %w[regular_win playoff_appearance championship_win].freeze
 
   belongs_to :sport
+  has_many :league_season_scoring_rules, dependent: :destroy
 
   validates :event_type, presence: true, uniqueness: {scope: :sport_id}
   validates :kind, inclusion: {in: KINDS}

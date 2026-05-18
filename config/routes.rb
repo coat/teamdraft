@@ -23,6 +23,9 @@ Rails.application.routes.draw do
     resource :draft, only: [:show, :edit, :update] do
       resources :picks, only: [:create], controller: "draft_picks"
     end
+    resource :scoring_rules, only: [:edit, :update], controller: "league_scoring_rules" do
+      post :reset
+    end
     resources :participants, only: [] do
       member do
         patch :move_up

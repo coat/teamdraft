@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -66,6 +66,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000002) do
     t.check_constraint "home_season_team_id <> away_season_team_id", name: "games_distinct_teams"
     t.check_constraint "status::text <> 'final'::text OR home_score IS NOT NULL AND away_score IS NOT NULL", name: "games_final_has_scores"
     t.check_constraint "status::text = ANY (ARRAY['scheduled'::character varying::text, 'in_progress'::character varying::text, 'final'::character varying::text, 'postponed'::character varying::text])", name: "games_status_valid"
+  end
+
+  create_table "league_season_scoring_rules", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "league_season_id", null: false
+    t.integer "points", default: 0, null: false
+    t.bigint "scoring_rule_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["league_season_id", "scoring_rule_id"], name: "idx_lssr_on_league_season_and_rule", unique: true
+    t.index ["league_season_id"], name: "index_league_season_scoring_rules_on_league_season_id"
+    t.index ["scoring_rule_id"], name: "index_league_season_scoring_rules_on_scoring_rule_id"
+    t.check_constraint "points >= 0", name: "lssr_points_non_negative"
   end
 
   create_table "league_seasons", force: :cascade do |t|
@@ -134,7 +146,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000002) do
     t.string "event_type", null: false
     t.bigint "game_id"
     t.datetime "occurred_at", null: false
-    t.integer "points", null: false
+    t.integer "points", default: 0, null: false
     t.bigint "season_team_id", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_scoring_events_on_game_id"
@@ -393,6 +405,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_000002) do
   add_foreign_key "games", "season_teams", column: "away_season_team_id", on_delete: :restrict
   add_foreign_key "games", "season_teams", column: "home_season_team_id", on_delete: :restrict
   add_foreign_key "games", "seasons", on_delete: :cascade
+  add_foreign_key "league_season_scoring_rules", "league_seasons", on_delete: :cascade
+  add_foreign_key "league_season_scoring_rules", "scoring_rules", on_delete: :cascade
   add_foreign_key "league_seasons", "leagues"
   add_foreign_key "league_seasons", "seasons"
   add_foreign_key "participants", "league_seasons"

@@ -28,6 +28,7 @@ class Views::Leagues::Edit < Views::Base
               end
             end
             render_draft_settings_link
+            render_scoring_link
           end
         end
       end
@@ -59,6 +60,24 @@ class Views::Leagues::Edit < Views::Base
         span(class: "text-xs opacity-60") { draft_settings_summary }
       end
     end
+  end
+
+  def render_scoring_link
+    return unless @league_season
+    div(class: "mt-2") do
+      a(href: edit_league_scoring_rules_path(@league),
+        class: "btn btn-ghost w-full justify-between") do
+        span { "Scoring →" }
+        span(class: "text-xs opacity-60") { scoring_summary }
+      end
+    end
+  end
+
+  def scoring_summary
+    overrides = @league_season.scoring_rule_overrides.includes(:scoring_rule)
+    customized = overrides.count { |o| o.points != o.scoring_rule.points }
+    return "Sport defaults" if customized.zero?
+    "#{customized} customized"
   end
 
   def draft_settings_summary

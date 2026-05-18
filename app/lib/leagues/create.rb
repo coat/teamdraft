@@ -31,6 +31,7 @@ module Leagues
           draft_scheduled_at: @draft_scheduled_at,
           pick_clock_seconds: @pick_clock_seconds
         )
+        LeagueSeasonScoringRules::Seed.call(league_season)
         owner = league_season.participants.create!(
           display_name: @your_name,
           draft_position: 1,
