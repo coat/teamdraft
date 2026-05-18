@@ -23,14 +23,11 @@ class Views::Components::Admin::Sidebar < Views::Base
 
   def view_template
     aside(class: "w-64 min-h-full bg-base-100 border-r border-base-300") do
-      div(class: "p-4 border-b border-base-300 hidden lg:block") do
-        a(href: admin_root_path, class: "font-semibold text-lg") { "Team Draft Admin" }
-      end
       nav(class: "p-3 space-y-4") do
         GROUPS.each do |label, items|
           div do
             div(class: "text-xs uppercase tracking-wide opacity-60 px-3 pb-1") { label }
-            ul(class: "menu menu-sm p-0 [&_li>a]:rounded-lg w-full") do
+            ul(class: "menu p-0 [&_li>a]:rounded-lg w-full") do
               items.each do |key, item_label, path_helper|
                 active = (key == @current_section)
                 li do

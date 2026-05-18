@@ -6,6 +6,7 @@ class Views::Components::Admin::Breadcrumbs < Views::Base
   end
 
   def view_template
+    return if @trail.empty?
     div(class: "text-sm breadcrumbs") do
       ul do
         li { a(href: admin_root_path) { "Admin" } }
