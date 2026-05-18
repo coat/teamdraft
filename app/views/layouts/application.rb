@@ -46,10 +46,40 @@ class Views::Layouts::Application < Views::Base
   private
 
   def render_nav
-    div(class: "navbar bg-base-100 shadow-sm border-b border-base-300") do
-      div(class: "mx-auto w-full max-w-3xl px-4 flex items-center justify-between") do
-        a(href: root_path, class: "btn btn-ghost text-xl normal-case px-2") { "Team Draft" }
-        render_nav_auth
+    div(class: "bg-base-100 shadow-sm border-b border-base-300") do
+      div(class: "navbar mx-auto w-full max-w-3xl px-4") do
+        div(class: "navbar-start") do
+          div(class: "dropdown") do
+            div(tabindex: "0", role: "button", class: "btn btn-ghost lg:hidden") do
+              svg(
+                xmlns: "http://www.w3.org/2000/svg",
+                class: "h-5 w-5",
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor"
+              ) do |s|
+                s.path(
+                  stroke_linecap: "round",
+                  stroke_linejoin: "round",
+                  stroke_width: "2",
+                  d: "M4 6h16M4 12h16M4 18h7"
+                )
+              end
+            end
+            ul(tabindex: "0", class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow") do
+              li { a(href: about_path) { "About" } }
+            end
+          end
+          a(href: root_path, class: "btn btn-ghost text-xl normal-case") { "Team Draft" }
+        end
+        div(class: "navbar-center hidden lg:flex") do
+          ul(class: "menu menu-horizontal px-1") do
+            li { a(href: about_path) { "About" } }
+          end
+        end
+        div(class: "navbar-end") do
+          render_nav_auth
+        end
       end
     end
   end
@@ -78,7 +108,6 @@ class Views::Layouts::Application < Views::Base
     footer(class: "mt-12 py-6 text-sm text-base-content/60 border-t border-base-300") do
       div(class: "mx-auto w-full max-w-3xl px-4 flex flex-wrap items-center justify-between gap-3") do
         div(class: "flex flex-wrap items-center gap-x-4 gap-y-1") do
-          a(href: about_path, class: "link link-hover") { "About" }
           a(href: privacy_path, class: "link link-hover") { "Privacy" }
         end
         a(
