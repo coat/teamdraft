@@ -50,21 +50,8 @@ class Views::Layouts::Application < Views::Base
       div(class: "navbar mx-auto w-full max-w-3xl px-4") do
         div(class: "navbar-start") do
           div(class: "dropdown") do
-            div(tabindex: "0", role: "button", class: "btn btn-ghost lg:hidden") do
-              svg(
-                xmlns: "http://www.w3.org/2000/svg",
-                class: "h-5 w-5",
-                fill: "none",
-                viewBox: "0 0 24 24",
-                stroke: "currentColor"
-              ) do |s|
-                s.path(
-                  stroke_linecap: "round",
-                  stroke_linejoin: "round",
-                  stroke_width: "2",
-                  d: "M4 6h16M4 12h16M4 18h7"
-                )
-              end
+            div(tabindex: "0", role: "button", class: "btn btn-ghost lg:hidden", aria_label: "Open menu") do
+              render Views::Components::HamburgerIcon.new
             end
             ul(tabindex: "0", class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow") do
               li { a(href: about_path) { "About" } }

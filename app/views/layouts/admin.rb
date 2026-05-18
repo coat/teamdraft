@@ -62,9 +62,7 @@ class Views::Layouts::Admin < Views::Base
         div(class: "navbar min-h-0 py-2") do
           div(class: "navbar-start gap-2") do
             label(for: "admin-drawer", class: "btn btn-ghost btn-sm lg:hidden", aria_label: "Open menu") do
-              svg(xmlns: "http://www.w3.org/2000/svg", class: "h-5 w-5", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor") do |s|
-                s.path(stroke_linecap: "round", stroke_linejoin: "round", stroke_width: "2", d: "M4 6h16M4 12h16M4 18h16")
-              end
+              render Views::Components::HamburgerIcon.new
             end
             a(href: admin_root_path, class: "btn btn-ghost btn-sm normal-case text-base font-semibold") { "Team Draft Admin" }
           end
