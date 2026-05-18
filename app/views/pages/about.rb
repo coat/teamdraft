@@ -22,44 +22,42 @@ class Views::Pages::About < Views::Pages::Base
 
     h2 { "Scoring" }
 
-    if @sports.size > 1
-      render_sport_tabs
-    end
-
-    if @active_sport
-      render_blurb(@active_sport)
-      render_scoring_table(@active_sport)
-    else
+    if @sports.empty?
       p { "No sports configured yet." }
+    elsif @sports.size == 1
+      sport = @sports.first
+      render_blurb(sport)
+      render_scoring_table(sport)
+    else
+      render_tabs_with_content
     end
   end
 
   private
 
-  def render_sport_tabs
-    div(role: "tablist", class: "tabs tabs-boxed w-fit mb-3") do
+  def render_tabs_with_content
+    div(class: "tabs tabs-box mb-3") do
       @sports.each do |sport|
-        active = (sport.id == @active_sport&.id)
-        classes = ["tab"]
-        classes << "tab-active" if active
-        a(href: about_path(sport: sport.key),
-          role: "tab",
-          class: classes.join(" "),
-          aria_selected: active.to_s) { sport.name }
+        input(type: "radio", name: "sport_tabs", class: "tab",
+          aria_label: sport.name, checked: sport.id == @active_sport&.id)
+        div(class: "tab-content bg-base-100 p-4") do
+          render_blurb(sport)
+          render_scoring_table(sport)
+        end
       end
     end
   end
 
   def render_blurb(sport)
     return if sport.about_blurb.blank?
-    p(class: "text-base-content/70 mb-2") { sport.about_blurb }
+    p(class: "text-base-content/70 mb-2 mt-4") { sport.about_blurb }
   end
 
   def render_scoring_table(sport)
     rules = sport.scoring_rules.ordered
     p(class: "text-sm text-base-content/60 mb-2") { "Playoff points stack — each round you reach adds to your total." }
     div(class: "overflow-x-auto") do
-      table(class: "table table-sm") do
+      table(class: "table table-sm table-zebra") do
         thead do
           tr do
             th { "Event" }
