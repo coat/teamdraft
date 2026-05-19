@@ -3,6 +3,8 @@
 class Season < ApplicationRecord
   STATUSES = %w[upcoming active completed].freeze
 
+  scope :active, -> { where(status: "active") }
+
   belongs_to :sport
   has_many :season_teams, dependent: :destroy
   has_many :teams, through: :season_teams
