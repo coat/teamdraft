@@ -3,8 +3,9 @@
 class Views::Admin::Seasons::Index < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
 
-  def initialize(seasons:)
+  def initialize(seasons:, pagy:)
     @seasons = seasons
+    @pagy = pagy
   end
 
   def view_template
@@ -31,6 +32,7 @@ class Views::Admin::Seasons::Index < Views::Base
           @seasons.each { |season| render_row(season) }
         end
       end
+      render Views::Components::Admin::Pagination.new(pagy: @pagy)
     end
   end
 

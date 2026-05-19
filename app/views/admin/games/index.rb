@@ -3,10 +3,11 @@
 class Views::Admin::Games::Index < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
-  def initialize(season:, games:, all_seasons:)
+  def initialize(season:, games:, all_seasons:, pagy:)
     @season = season
     @games = games
     @all_seasons = all_seasons
+    @pagy = pagy
   end
 
   def view_template
@@ -15,6 +16,7 @@ class Views::Admin::Games::Index < Views::Base
       render_season_picker
       if @games.any?
         render_games_table
+        render Views::Components::Admin::Pagination.new(pagy: @pagy)
       else
         p(class: "text-base-content/60") { "No games for this season yet. Use the dashboard's sync action to pull them." }
       end

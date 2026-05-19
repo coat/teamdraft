@@ -6,14 +6,15 @@ class Admin::GamesController < Admin::BaseController
   def index
     season_id = params[:season_id].presence || Season.where(status: "active").pick(:id) || Season.first&.id
     season = season_id && Season.find(season_id)
-    games = if season
+    scope = if season
       season.games
         .includes(home_season_team: :team, away_season_team: :team)
         .order(Arel.sql("kickoff_at ASC NULLS LAST"))
     else
       Game.none
     end
-    render Views::Admin::Games::Index.new(season: season, games: games, all_seasons: Season.order(year: :desc))
+    pagy, games = pagy(scope)
+    render Views::Admin::Games::Index.new(season: season, games: games, all_seasons: Season.order(year: :desc), pagy: pagy)
   end
 
   def edit

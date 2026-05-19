@@ -4,10 +4,11 @@ class Views::Admin::Teams::Index < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
   include Phlex::Rails::Helpers::FormWith
 
-  def initialize(query:, teams:, sports:, top_ids: Set.new, bottom_ids: Set.new)
+  def initialize(query:, teams:, sports:, pagy:, top_ids: Set.new, bottom_ids: Set.new)
     @query = query
     @teams = teams
     @sports = sports
+    @pagy = pagy
     @top_ids = top_ids
     @bottom_ids = bottom_ids
   end
@@ -35,6 +36,7 @@ class Views::Admin::Teams::Index < Views::Base
           @teams.each { |team| render_row(team) }
         end
       end
+      render Views::Components::Admin::Pagination.new(pagy: @pagy)
     end
   end
 

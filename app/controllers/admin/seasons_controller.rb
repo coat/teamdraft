@@ -4,8 +4,8 @@ class Admin::SeasonsController < Admin::BaseController
   before_action :load_season, only: [:show, :edit, :update, :activate]
 
   def index
-    seasons = Season.includes(:sport).order("sports.key, seasons.year DESC")
-    render Views::Admin::Seasons::Index.new(seasons: seasons)
+    pagy, seasons = pagy(Season.includes(:sport).order("sports.key, seasons.year DESC"))
+    render Views::Admin::Seasons::Index.new(seasons: seasons, pagy: pagy)
   end
 
   def show

@@ -5,22 +5,13 @@ class Admin::TeamsController < Admin::BaseController
 
   def index
     query = Admin::Teams::ListQuery.new(params)
-    teams = query.relation.to_a
+    pagy, teams = pagy(query.relation)
     sports = Sport.order(:key).pluck(:name, :id)
-
-    top_ids = Set.new
-    bottom_ids = Set.new
-    teams.group_by(&:sport_id).each_value do |sport_teams|
-      ranked = sport_teams.select(&:default_pick_rank)
-      next if ranked.empty?
-
-      top_ids.add(ranked.min_by(&:default_pick_rank).id)
-      bottom_ids.add(ranked.max_by(&:default_pick_rank).id)
-    end
+    top_ids, bottom_ids = rank_markers(query)
 
     render Views::Admin::Teams::Index.new(
       query: query, teams: teams, sports: sports,
-      top_ids: top_ids, bottom_ids: bottom_ids
+      top_ids: top_ids, bottom_ids: bottom_ids, pagy: pagy
     )
   end
 
@@ -75,6 +66,24 @@ class Admin::TeamsController < Admin::BaseController
   end
 
   private
+
+  # Compute "top of rank" / "bottom of rank" per sport from the full filtered
+  # set, not just the current page, so the arrow-disable badges stay correct
+  # when pagination is in play.
+  def rank_markers(query)
+    ranked = query.relation
+      .unscope(:limit, :offset, :order)
+      .where.not(default_pick_rank: nil)
+      .pluck(:id, :sport_id, :default_pick_rank)
+
+    top = Set.new
+    bottom = Set.new
+    ranked.group_by { |_id, sport_id, _rank| sport_id }.each_value do |rows|
+      top.add(rows.min_by { |_id, _sport_id, rank| rank }[0])
+      bottom.add(rows.max_by { |_id, _sport_id, rank| rank }[0])
+    end
+    [top, bottom]
+  end
 
   def load_team
     @team = Team.find(params[:id])
