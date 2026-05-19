@@ -12,7 +12,7 @@
 
 module Sports
   class Installer
-    SUPPORTED = %w[nfl nba].freeze
+    SUPPORTED = %w[nfl nba mlb].freeze
 
     Result = Struct.new(:sport, :created, :existed, :seasons, keyword_init: true)
 

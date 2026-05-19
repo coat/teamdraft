@@ -58,6 +58,25 @@ module SportsData
           "180" => "finals"
         },
         season_format: ->(year) { "#{year}-#{year + 1}" }
+      ),
+      # MLB: TheSportsDB's free tier caps eventsday.php and eventsseason.php
+      # at ~3 events per call against league 4424 (verified 2026-05-18), so
+      # ingesting a 2,430-game regular season from this provider is not
+      # feasible. Playoff rounds DO work — each fits well under the per-call
+      # cap (Wild Card ~11 games, DS ~18, LCS ~11, World Series ~7) — and
+      # MLB happens to share NFL's playoff intRound encoding. We ship MLB
+      # as playoffs-only; regular_rounds is intentionally empty so a
+      # full-season sync no-ops gracefully rather than throwing.
+      "mlb" => SportConfig.new(
+        league_id: "4424",
+        regular_rounds: [],
+        playoff_rounds: {
+          "160" => "wildcard",
+          "125" => "division_series",
+          "150" => "lcs",
+          "200" => "world_series"
+        },
+        season_format: ->(year) { year.to_s }
       )
     }.freeze
 

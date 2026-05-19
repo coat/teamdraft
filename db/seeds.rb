@@ -11,7 +11,10 @@ Sports::Installer::SUPPORTED.each do |key|
   Sports::Installer.call(key: key, config: config)
 end
 
-# Optional: load a completed NFL season's worth of games so local devs can
-# work on scoring/leagues without thesportsdb. Safe to re-run.
+# Optional: load completed-season game fixtures so local devs can work on
+# scoring/leagues without thesportsdb. Safe to re-run. MLB ships postseason
+# only — the free tier can't deliver a full 2,430-game regular season.
 require Rails.root.join("db/seeds/nfl_games")
 Seeds::NflGames.call
+require Rails.root.join("db/seeds/mlb_games")
+Seeds::MlbGames.call

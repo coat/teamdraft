@@ -80,6 +80,27 @@ RSpec.describe SportsData::TheSportsDbProvider do
     expect { provider.fetch_games(rounds: ["999"]) }.to raise_error(SportsData::Provider::FetchFailed, /999/)
   end
 
+  it "maps MLB playoff rounds and skips regular-season ingestion" do
+    sport = create(:sport, :mlb)
+    season = create(:season, sport: sport, year: 2025, external_id: "mlb-2025")
+    create(:team, sport: sport, external_id: "TH")
+    create(:team, sport: sport, external_id: "TA")
+    rounds = SportsData::TheSportsDbProvider.round_numbers_for("mlb")
+    expect(rounds).to contain_exactly("160", "125", "150", "200")
+    rounds.each do |round|
+      stub_request(:get, mlb_round_url(season, round)).to_return(
+        status: 200,
+        body: {"events" => [event(id: "mlb-#{round}", round: round, home_score: "5", away_score: "3", status: "Match Finished")]}.to_json,
+        headers: {"Content-Type" => "application/json"}
+      )
+    end
+
+    games = SportsData::TheSportsDbProvider.new(season: season, api_key: "test-key").fetch_games
+
+    expect(games.map(&:round)).to contain_exactly("wildcard", "division_series", "lcs", "world_series")
+    expect(games.map(&:week).uniq).to eq([nil])
+  end
+
   it "raises on HTTP errors" do
     season = create_nfl_season(team_count: 2)
     stub_request(:get, round_url(season, "1")).to_return(status: 500, body: "boom")
@@ -90,6 +111,10 @@ RSpec.describe SportsData::TheSportsDbProvider do
 
   def round_url(season, round)
     "https://www.thesportsdb.com/api/v1/json/test-key/eventsround.php?id=4391&r=#{round}&s=#{season.year}"
+  end
+
+  def mlb_round_url(season, round)
+    "https://www.thesportsdb.com/api/v1/json/test-key/eventsround.php?id=4424&r=#{round}&s=#{season.year}"
   end
 
   def stub_all_rounds(season, events_by_round:)

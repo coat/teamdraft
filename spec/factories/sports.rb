@@ -44,6 +44,22 @@ FactoryBot.define do
         ].each { |attrs| sport.scoring_rules.create!(attrs) }
       end
     end
+
+    trait :mlb do
+      key { "mlb" }
+      name { "MLB" }
+      with_scoring_rules { false }
+      after(:create) do |sport, _|
+        [
+          {event_type: "regular_win",                kind: "regular_win",        round_key: nil,               points: 1,  label: "Regular-season win",        short_label: "Regular Season",  display_order: 0},
+          {event_type: "wildcard_appearance",        kind: "playoff_appearance", round_key: "wildcard",        points: 3,  label: "Made the Wild Card Series", short_label: "Wild Card",       display_order: 1},
+          {event_type: "division_series_appearance", kind: "playoff_appearance", round_key: "division_series", points: 5,  label: "Made the Division Series",  short_label: "Division Series", display_order: 2},
+          {event_type: "lcs_appearance",             kind: "playoff_appearance", round_key: "lcs",             points: 8,  label: "Made the LCS",              short_label: "LCS",             display_order: 3},
+          {event_type: "world_series_appearance",    kind: "playoff_appearance", round_key: "world_series",    points: 12, label: "Made the World Series",     short_label: "World Series",    display_order: 4},
+          {event_type: "championship_win",           kind: "championship_win",   round_key: nil,               points: 8,  label: "Won the World Series",      short_label: "Champion",        display_order: 5}
+        ].each { |attrs| sport.scoring_rules.create!(attrs) }
+      end
+    end
   end
 
   factory :scoring_rule do
