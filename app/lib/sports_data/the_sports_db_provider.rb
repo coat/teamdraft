@@ -59,17 +59,18 @@ module SportsData
         },
         season_format: ->(year) { "#{year}-#{year + 1}" }
       ),
-      # MLB: TheSportsDB's free tier caps eventsday.php and eventsseason.php
-      # at ~3 events per call against league 4424 (verified 2026-05-18), so
-      # ingesting a 2,430-game regular season from this provider is not
-      # feasible. Playoff rounds DO work — each fits well under the per-call
-      # cap (Wild Card ~11 games, DS ~18, LCS ~11, World Series ~7) — and
-      # MLB happens to share NFL's playoff intRound encoding. We ship MLB
-      # as playoffs-only; regular_rounds is intentionally empty so a
-      # full-season sync no-ops gracefully rather than throwing.
+      # MLB regular-season events all carry intRound="0" — there's no per-week
+      # structure. On the free tier eventsday.php caps at ~3 events per call,
+      # so date-based ingestion was infeasible; on the paid tier the cap
+      # lifts and the recurring date-based sync (Sync::RefreshActiveSeasonsJob)
+      # can pull a full day's slate. Listing "0" here lets parse_event label
+      # those games as regular_season — the round-based "fetch all rounds"
+      # path will also attempt r=0, which on paid tier returns the season
+      # opener chunk and on free tier returns null (a no-op, not an error).
+      # MLB happens to share NFL's playoff intRound encoding.
       "mlb" => SportConfig.new(
         league_id: "4424",
-        regular_rounds: [],
+        regular_rounds: ["0"],
         playoff_rounds: {
           "160" => "wildcard",
           "125" => "division_series",
@@ -86,7 +87,8 @@ module SportsData
       @http = http
     end
 
-    def fetch_games(rounds: nil)
+    def fetch_games(rounds: nil, dates: nil)
+      return fetch_games_by_date(dates) if dates
       rounds_to_fetch = rounds_to_fetch_for(rounds)
       rounds_to_fetch.flat_map do |round|
         payload = request("eventsround.php", id: sport_config.league_id, r: round, s: season_string)
@@ -112,6 +114,13 @@ module SportsData
       SPORT_CONFIG.fetch(@season.sport.key) {
         raise FetchFailed, "no TheSportsDB config mapped for sport #{@season.sport.key.inspect}"
       }
+    end
+
+    def fetch_games_by_date(dates)
+      Array(dates).flat_map do |date|
+        payload = request("eventsday.php", d: date.to_s, l: sport_config.league_id)
+        Array(payload["events"]).filter_map { |e| parse_event(e) }
+      end
     end
 
     def rounds_to_fetch_for(rounds)
@@ -148,9 +157,18 @@ module SportsData
         away_score: parse_int(event["intAwayScore"]),
         kickoff_at: parse_kickoff(event),
         round:,
-        week: (round == "regular_season") ? Integer(event["intRound"]) : nil,
+        week: parsed_week_for(round, event["intRound"]),
         status: status_for(event)
       )
+    end
+
+    # Only NFL/NBA-style weekly rounds carry meaningful week numbers. MLB
+    # tags every regular-season game as intRound=0; storing week=0 would be
+    # misleading, so we keep it nil there.
+    def parsed_week_for(round, int_round)
+      return nil unless round == "regular_season"
+      week = parse_int(int_round)
+      (week && week > 0) ? week : nil
     end
 
     def round_for(int_round)
