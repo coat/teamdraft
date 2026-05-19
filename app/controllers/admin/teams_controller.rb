@@ -21,7 +21,7 @@ class Admin::TeamsController < Admin::BaseController
 
   def move_up
     if @team.default_pick_rank.nil?
-      return redirect_to admin_teams_path, alert: "Cannot move a team without a pick rank."
+      return redirect_to admin_teams_path(list_params), alert: "Cannot move a team without a pick rank."
     end
 
     swap_with = Team.where(sport_id: @team.sport_id)
@@ -32,15 +32,15 @@ class Admin::TeamsController < Admin::BaseController
 
     if swap_with
       swap_ranks(@team, swap_with)
-      redirect_to admin_teams_path, notice: "Moved #{@team.name} up."
+      redirect_to admin_teams_path(list_params), notice: "Moved #{@team.name} up."
     else
-      redirect_to admin_teams_path, alert: "#{@team.name} is already at the top."
+      redirect_to admin_teams_path(list_params), alert: "#{@team.name} is already at the top."
     end
   end
 
   def move_down
     if @team.default_pick_rank.nil?
-      return redirect_to admin_teams_path, alert: "Cannot move a team without a pick rank."
+      return redirect_to admin_teams_path(list_params), alert: "Cannot move a team without a pick rank."
     end
 
     swap_with = Team.where(sport_id: @team.sport_id)
@@ -51,15 +51,15 @@ class Admin::TeamsController < Admin::BaseController
 
     if swap_with
       swap_ranks(@team, swap_with)
-      redirect_to admin_teams_path, notice: "Moved #{@team.name} down."
+      redirect_to admin_teams_path(list_params), notice: "Moved #{@team.name} down."
     else
-      redirect_to admin_teams_path, alert: "#{@team.name} is already at the bottom."
+      redirect_to admin_teams_path(list_params), alert: "#{@team.name} is already at the bottom."
     end
   end
 
   def update
     if @team.update(team_params)
-      redirect_to admin_teams_path, notice: "Updated #{@team.name}."
+      redirect_to admin_teams_path(list_params), notice: "Updated #{@team.name}."
     else
       render Views::Admin::Teams::Edit.new(team: @team), status: :unprocessable_entity
     end
@@ -83,6 +83,10 @@ class Admin::TeamsController < Admin::BaseController
       bottom.add(rows.max_by { |_id, _sport_id, rank| rank }[0])
     end
     [top, bottom]
+  end
+
+  def list_params
+    params.permit(:q, :sport_id, :sort, :dir, :page).to_h.compact_blank
   end
 
   def load_team

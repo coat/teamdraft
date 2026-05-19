@@ -3,6 +3,7 @@
 class Views::Admin::Teams::Index < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
   include Phlex::Rails::Helpers::FormWith
+  include Phlex::Rails::Helpers::Request
 
   def initialize(query:, teams:, sports:, pagy:, top_ids: Set.new, bottom_ids: Set.new)
     @query = query
@@ -42,6 +43,10 @@ class Views::Admin::Teams::Index < Views::Base
 
   private
 
+  def list_params
+    request.query_parameters.slice("q", "sport_id", "sort", "dir", "page").symbolize_keys
+  end
+
   def render_filter_card
     render Views::Components::Admin::FilterCard.new(url: admin_teams_path, query: @query) do |form|
       div(class: "space-y-1") do
@@ -71,7 +76,7 @@ class Views::Admin::Teams::Index < Views::Base
         if team.default_pick_rank.nil? || @top_ids.include?(team.id)
           span(class: "btn btn-ghost btn-xs btn-disabled px-0.5", aria_hidden: "true") { "▲" }
         else
-          button_to "▲", move_up_admin_team_path(team), method: :patch,
+          button_to "▲", move_up_admin_team_path(team, **list_params), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs px-0.5",
             title: "Move up in draft order"
@@ -81,7 +86,7 @@ class Views::Admin::Teams::Index < Views::Base
         if team.default_pick_rank.nil? || @bottom_ids.include?(team.id)
           span(class: "btn btn-ghost btn-xs btn-disabled px-0.5", aria_hidden: "true") { "▼" }
         else
-          button_to "▼", move_down_admin_team_path(team), method: :patch,
+          button_to "▼", move_down_admin_team_path(team, **list_params), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs px-0.5",
             title: "Move down in draft order"
