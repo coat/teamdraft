@@ -22,7 +22,8 @@ module Sports
           current_season: ->(today) {
             year = (today.month >= 11) ? today.year + 1 : today.year
             {year: year, label: "#{year} MLB Season",
-             starts_on: Date.new(year, 3, 15), ends_on: Date.new(year, 11, 5)}
+             starts_on: Date.new(year, 3, 15), ends_on: Date.new(year, 11, 5),
+             external_provider: "mlb_stats_api", external_id: year.to_s}
           }
         )
       end

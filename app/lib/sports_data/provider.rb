@@ -6,7 +6,8 @@ module SportsData
   # Enumerable of SportsData::ParsedGame.
   class Provider
     PROVIDERS = {
-      "thesportsdb" => "SportsData::TheSportsDbProvider"
+      "thesportsdb" => "SportsData::TheSportsDbProvider",
+      "mlb_stats_api" => "SportsData::MlbStatsApiProvider"
     }.freeze
 
     def self.for(season)
