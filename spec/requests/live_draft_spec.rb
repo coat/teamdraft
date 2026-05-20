@@ -101,7 +101,7 @@ RSpec.describe "Live draft", type: :request do
     expect(response.location).to include("dir=desc")
   end
 
-  it "shows a local-time tag for a draft scheduled more than 5 minutes out" do
+  it "shows a boxed countdown for a draft scheduled in the future" do
     season = create_nfl_season(team_count: 4)
     league = Leagues::Create.call(
       your_name: "Alice", opponent_name: "Bob", season: season,
@@ -113,8 +113,8 @@ RSpec.describe "Live draft", type: :request do
 
     get league_draft_path(league)
 
-    expect(response.body).to include('data-controller="local-time"')
-    expect(response.body).to match(/<time[^>]+datetime="\d{4}-\d{2}-\d{2}T/)
+    expect(response.body).to include('data-draft-clock-mode-value="boxes"')
+    expect(response.body).to include('class="countdown font-mono text-4xl"')
   end
 
   it "Bob can pick on pick #2 (back-and-forth order)" do

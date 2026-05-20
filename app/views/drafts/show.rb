@@ -94,66 +94,117 @@ class Views::Drafts::Show < Views::Base
   def render_drafting_state
     on_the_clock = clock_participant
     viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
-    render_on_the_clock_banner(on_the_clock, viewer_on_clock)
-    render_clock(viewer_on_clock) if @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
+    render_draft_panel(on_the_clock, viewer_on_clock)
     render_team_directory(on_the_clock)
   end
 
-  def render_on_the_clock_banner(on_the_clock, viewer_on_clock)
-    classes = if viewer_on_clock
-      "alert alert-success mb-3 flex-wrap gap-3 ring-2 ring-success/60 shadow-lg"
+  def render_draft_panel(on_the_clock, viewer_on_clock)
+    has_clock = @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
+    deadline = has_clock ? clock_deadline : nil
+    autopick = (deadline ? next_autopick_team : nil)
+
+    base = "sticky top-0 z-20 -mx-4 sm:mx-0 sm:rounded-box border shadow-sm mb-3 px-4 py-3"
+    state = if viewer_on_clock
+      "border-success bg-success text-success-content"
     else
-      "alert mb-3 flex-wrap gap-3"
+      "border-base-300 bg-base-100/95 backdrop-blur supports-[backdrop-filter]:bg-base-100/80"
     end
-    div(class: classes) do
-      span(class: "badge badge-lg") { "Pick ##{@league_season.current_pick_number} of #{@league_season.total_picks}" }
-      if on_the_clock
-        if viewer_on_clock
-          span(class: "text-lg font-bold uppercase tracking-wide") { "You're on the clock!" }
-        else
-          span do
-            plain "On the clock: "
-            strong { on_the_clock.display_name }
+
+    attrs = {class: [base, state].reject(&:empty?).join(" ")}
+    if deadline
+      # Stable id so Turbo morphing matches this element across refreshes
+      # and reliably propagates the updated deadline value to Stimulus.
+      attrs[:id] = "draft-clock"
+      attrs[:data_controller] = "draft-clock"
+      attrs[:data_draft_clock_deadline_value] = deadline.iso8601
+      attrs[:data_draft_clock_mode_value] = "seconds"
+    end
+
+    div(**attrs) do
+      div(class: "flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap") do
+        div(class: "flex items-center gap-2 sm:gap-3 flex-wrap min-w-0") do
+          span(class: "badge badge-lg") { "Pick ##{@league_season.current_pick_number} of #{@league_season.total_picks}" }
+          if on_the_clock
+            if viewer_on_clock
+              span(class: "text-base sm:text-lg font-bold uppercase tracking-wide") { "You're on the clock!" }
+            else
+              span(class: "truncate") do
+                plain "On the clock: "
+                strong { on_the_clock.display_name }
+              end
+            end
           end
+        end
+        render_clock_box(@league_season.pick_clock_seconds) if deadline
+      end
+      if autopick
+        div(class: "hidden mt-2 text-sm text-base-content/70", data_draft_clock_target: "autopick") do
+          plain "Auto-pick if time expires: "
+          strong { "#{autopick.team.name} (#{autopick.team.abbreviation})" }
         end
       end
     end
   end
 
+  def render_clock_box(initial)
+    div(class: "flex flex-col items-center px-3 py-1.5 bg-neutral text-neutral-content rounded-box shrink-0") do
+      span(class: "countdown font-mono text-3xl sm:text-4xl font-bold leading-none") do
+        span(
+          class: "inline-block min-w-[2ch] text-center tabular-nums",
+          style: "--value:#{initial};",
+          data_draft_clock_target: "display",
+          aria_live: "polite",
+          aria_label: initial.to_s
+        ) { initial.to_s }
+      end
+    end
+  end
+
   def render_pending_notice
-    if @league_season.participants.where(joined_at: nil).any?
+    unclaimed = @league_season.participants.where(joined_at: nil).any?
+    scheduled = @league_season.draft_scheduled_at.present? && @league_season.draft_scheduled_at > Time.current
+    if unclaimed
       p(class: "text-base-content/70") { "Waiting for the other player to claim their seat." }
-    elsif @league_season.draft_scheduled_at.present? && @league_season.draft_scheduled_at > Time.current
+    end
+    if scheduled
       render_scheduled_notice
-    else
+    elsif !unclaimed
       p(class: "text-base-content/70") { "Draft is starting…" }
     end
   end
 
   def render_scheduled_notice
     starts_at = @league_season.draft_scheduled_at
-    if starts_at <= 5.minutes.from_now
-      div(
-        class: "alert alert-info",
-        data_controller: "draft-clock",
-        data_draft_clock_deadline_value: starts_at.iso8601,
-        data_draft_clock_expired_text_value: "starting…"
-      ) do
-        span { "Draft starts in " }
-        span(class: "font-mono text-lg font-medium", data_draft_clock_target: "display") {
-          "#{(starts_at - Time.current).round}s"
-        }
+    remaining = [(starts_at - Time.current).round, 0].max
+    div(
+      class: "flex flex-col items-center gap-3 py-4",
+      data_controller: "draft-clock",
+      data_draft_clock_deadline_value: starts_at.iso8601,
+      data_draft_clock_mode_value: "boxes",
+      data_draft_clock_expired_text_value: "starting…"
+    ) do
+      span(class: "text-base-content/70") { "Draft starts in" }
+      div(class: "grid grid-flow-col gap-3 sm:gap-5 text-center auto-cols-max") do
+        render_countdown_box("days",  "days",  remaining / 86400)
+        render_countdown_box("hours", "hours", (remaining % 86400) / 3600)
+        render_countdown_box("min",   "min",   (remaining % 3600) / 60)
+        render_countdown_box("sec",   "sec",   remaining % 60)
       end
-    else
-      p do
-        plain "Draft starts "
-        time(datetime: starts_at.iso8601,
-          data_controller: "local-time",
-          class: "font-medium") {
-          starts_at.strftime("%a %b %-d at %-l:%M %p %Z")
-        }
-        plain "."
+    end
+  end
+
+  def render_countdown_box(target, label, initial)
+    div(class: "flex flex-col p-2 bg-neutral rounded-box text-neutral-content") do
+      span(class: "countdown font-mono text-4xl") do
+        span(
+          class: "inline-block min-w-[2ch] text-center tabular-nums",
+          style: "--value:#{initial};",
+          data_draft_clock_target: target,
+          aria_live: "polite",
+          aria_label: initial.to_s
+        ) { initial.to_s }
       end
+      plain label
     end
   end
 
@@ -166,34 +217,6 @@ class Views::Drafts::Show < Views::Base
     end
   end
 
-  def render_clock(viewer_on_clock = false)
-    deadline = clock_deadline
-    return if deadline.nil?
-    autopick = next_autopick_team
-    clock_classes = if viewer_on_clock
-      "alert alert-warning mb-3 flex-wrap gap-2 ring-2 ring-warning/60"
-    else
-      "alert mb-3 flex-wrap gap-2"
-    end
-    # Stable id so Turbo morphing matches this element across refreshes
-    # and reliably propagates the updated deadline value to Stimulus.
-    # Without an id, morphdom can fall back to positional matching, which
-    # in some cases left the autopick clock stuck on "auto-picking…".
-    div(
-      id: "draft-clock",
-      class: clock_classes,
-      data_controller: "draft-clock",
-      data_draft_clock_deadline_value: deadline.iso8601
-    ) do
-      span(class: "font-mono text-2xl font-bold", data_draft_clock_target: "display") { "#{@league_season.pick_clock_seconds}s" }
-      if autopick
-        span(class: "hidden text-sm", data_draft_clock_target: "autopick") do
-          plain "Auto-pick if time expires: "
-          strong { "#{autopick.team.name} (#{autopick.team.abbreviation})" }
-        end
-      end
-    end
-  end
 
   def next_autopick_team
     drafted = @league_season.draft_picks.pluck(:season_team_id)

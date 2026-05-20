@@ -34,9 +34,15 @@
 /* draft_clock_controller toggles these states as the clock counts down. */
 @layer components {
   [data-controller~="draft-clock"].draft-clock--warning {
-    @apply alert-warning animate-pulse;
+    @apply ring-2 ring-warning/70 bg-warning/10;
+  }
+  [data-controller~="draft-clock"].draft-clock--warning .countdown {
+    @apply text-warning animate-pulse;
   }
   [data-controller~="draft-clock"].draft-clock--expired {
-    @apply alert-error;
+    @apply ring-2 ring-error/70 bg-error/10;
+  }
+  [data-controller~="draft-clock"].draft-clock--expired .countdown {
+    @apply text-error;
   }
 }
