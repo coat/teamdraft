@@ -122,6 +122,15 @@
               command = "${rubyEnv.env}/bin/bundle exec rails tailwindcss:watch";
               environment.TAILWINDCSS_INSTALL_DIR = "${pkgs.tailwindcss_4}/bin";
             };
+            # SolidQueue worker. Live-draft pick clocks and the recurring
+            # sweeper need this running to fire on time; without it,
+            # scheduled jobs sit in solid_queue_scheduled_executions
+            # until something dispatches them.
+            settings.processes.jobs = {
+              command = "${rubyEnv.env}/bin/bundle exec rails solid_queue:start";
+              environment.PGHOST = "127.0.0.1";
+              depends_on."pg".condition = "process_healthy";
+            };
           };
 
           evalServices = extraModules:

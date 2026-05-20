@@ -62,6 +62,11 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
+  # Persist background jobs through the DB in dev so scheduled work (e.g.
+  # the live-draft pick clock) survives a rails-server restart. Matches
+  # production. Requires the `jobs` process from Procfile.dev / flake.nix.
+  config.active_job.queue_adapter = :solid_queue
+
   # Highlight code that triggered redirect in logs.
   config.action_dispatch.verbose_redirect_logs = true
 
