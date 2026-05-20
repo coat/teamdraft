@@ -126,10 +126,18 @@ module SportsData
       )
     end
 
+    # Postponed and cancelled games come back with abstractGameState="Final"
+    # (codedGameState "C", "D", "P", …) but no scores, which then fails the
+    # Game model's "scores required for final" validation. Require scores
+    # to be present before calling a game final; everything else is
+    # treated as scheduled so the row still upserts cleanly.
     def status_for(game)
       state = game.dig("status", "abstractGameState")
       coded = game.dig("status", "codedGameState")
-      (state == "Final" || coded == "F") ? "final" : "scheduled"
+      home = game.dig("teams", "home", "score")
+      away = game.dig("teams", "away", "score")
+      return "final" if (state == "Final" || coded == "F") && !home.nil? && !away.nil?
+      "scheduled"
     end
 
     def parse_kickoff(value)

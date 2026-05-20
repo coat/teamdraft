@@ -33,6 +33,20 @@ RSpec.describe SportsData::MlbStatsApiProvider do
     expect(sched.home_score).to be_nil
   end
 
+  it "treats postponed/cancelled games (Final with no scores) as scheduled" do
+    sport = create(:sport, :mlb)
+    season = create(:season, sport: sport, year: 2026, external_provider: "mlb_stats_api")
+    stub_request(:get, schedule_url(season: "2026", gameTypes: "R,F,D,L,W"))
+      .to_return(json_body("dates" => [{"games" => [
+        game(pk: 800001, type: "R", state: "Final", coded: "C", home_score: nil, away_score: nil)
+      ]}]))
+
+    games = SportsData::MlbStatsApiProvider.new(season: season).fetch_games
+
+    expect(games.first.status).to eq("scheduled")
+    expect(games.first.home_score).to be_nil
+  end
+
   it "maps every postseason gameType to the right round key" do
     sport = create(:sport, :mlb)
     season = create(:season, sport: sport, year: 2025, external_provider: "mlb_stats_api")
@@ -130,12 +144,13 @@ RSpec.describe SportsData::MlbStatsApiProvider do
     {status: 200, body: payload.to_json, headers: {"Content-Type" => "application/json"}}
   end
 
-  def game(pk:, type:, state: "Preview", home_id: 147, away_id: 111, home_score: nil, away_score: nil)
+  def game(pk:, type:, state: "Preview", coded: nil, home_id: 147, away_id: 111, home_score: nil, away_score: nil)
+    coded ||= (state == "Final") ? "F" : "P"
     {
       "gamePk" => pk,
       "gameType" => type,
       "gameDate" => "2025-04-15T23:05:00Z",
-      "status" => {"abstractGameState" => state, "codedGameState" => (state == "Final") ? "F" : "P"},
+      "status" => {"abstractGameState" => state, "codedGameState" => coded},
       "teams" => {
         "home" => {"team" => {"id" => home_id, "name" => "Home"}, "score" => home_score},
         "away" => {"team" => {"id" => away_id, "name" => "Away"}, "score" => away_score}
