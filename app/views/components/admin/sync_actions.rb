@@ -39,7 +39,7 @@ class Views::Components::Admin::SyncActions < Views::Base
       form.hidden_field :season_id, value: @season.id
       form.hidden_field :redirect_to, value: @back_path
       form.select :round,
-        [["All rounds", ""]] + SportsData::TheSportsDbProvider.round_labels_for(@season.sport.key).map { |k, v| [v, k] },
+        [["All rounds", ""]] + SportsData::Provider.for(@season).round_labels.map { |k, v| [v, k] },
         {},
         class: "select select-sm select-bordered"
       form.submit "Pull games from #{@season.external_provider.presence || "thesportsdb"}",

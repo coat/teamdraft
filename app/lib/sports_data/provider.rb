@@ -22,7 +22,22 @@ module SportsData
       @season = season
     end
 
-    def fetch_games(rounds: nil)
+    def fetch_games(rounds: nil, dates: nil)
+      raise NotImplementedError
+    end
+
+    # Valid round keys (strings) the admin UI may pass via `rounds:`. Each
+    # concrete provider chooses its own encoding (TheSportsDB uses intRound
+    # codes like "1", "200"; MLB Stats API uses gameType codes like "R",
+    # "W"). The shape is opaque to the controller — values flow back
+    # through fetch_games(rounds: …).
+    def round_numbers
+      raise NotImplementedError
+    end
+
+    # Map from round key to human-readable label, used in the admin sync
+    # form dropdown.
+    def round_labels
       raise NotImplementedError
     end
   end

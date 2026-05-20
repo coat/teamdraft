@@ -96,6 +96,14 @@ module SportsData
       end
     end
 
+    def round_numbers
+      self.class.round_numbers_for(@season.sport.key)
+    end
+
+    def round_labels
+      self.class.round_labels_for(@season.sport.key)
+    end
+
     def self.round_numbers_for(sport_key)
       cfg = SPORT_CONFIG.fetch(sport_key) { return [] }
       cfg.all_rounds
