@@ -267,7 +267,7 @@ class Views::Drafts::Show < Views::Base
   end
 
   def directory_query
-    @directory_query ||= Leagues::DirectoryQuery.new(league_season: @league_season, params: {})
+    @directory_query ||= Leagues::DirectoryQuery.new(league_season: @league_season, params: {}, user: current_user)
   end
 
   def render_directory_filters(query, divisions)
@@ -349,11 +349,22 @@ class Views::Drafts::Show < Views::Base
           span(class: "text-xs opacity-60") { team.abbreviation }
         end
       end
-      td(class: "font-mono text-sm") { team.default_pick_rank ? team.default_pick_rank.to_s : "—" }
+      td(class: "font-mono text-sm") { render_rank_cell(row) }
       td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
       td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
       td(class: "font-mono text-right") { row.points.to_s } if show_points
       th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
+    end
+  end
+
+  def render_rank_cell(row)
+    if row.user_rank
+      span(class: "font-semibold", title: "Your rank") { row.user_rank.to_s }
+      span(class: "ml-1 opacity-50 text-xs") { "★" }
+    elsif row.team.default_pick_rank
+      plain row.team.default_pick_rank.to_s
+    else
+      plain "—"
     end
   end
 

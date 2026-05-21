@@ -229,7 +229,8 @@ class LeaguesController < ApplicationController
     return nil unless @league_season
     Leagues::DirectoryQuery.new(
       league_season: @league_season,
-      params: params.permit(:sort, :dir, :status, :division)
+      params: params.permit(:sort, :dir, :status, :division),
+      user: current_user
     )
   end
 

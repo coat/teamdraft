@@ -245,7 +245,7 @@ class Views::Leagues::Show < Views::Base
   end
 
   def directory_query
-    @directory_query ||= Leagues::DirectoryQuery.new(league_season: @league_season, params: {})
+    @directory_query ||= Leagues::DirectoryQuery.new(league_season: @league_season, params: {}, user: current_user)
   end
 
   def render_directory_filters(query, divisions)

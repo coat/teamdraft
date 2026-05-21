@@ -11,13 +11,14 @@ module Leagues
   # on the optional associated DraftPick). 32 teams per season is small
   # enough that an in-memory comparator is simpler than a left-join SQL.
   class DirectoryQuery
-    Row = Data.define(:season_team, :team, :pick, :points, :events)
+    Row = Data.define(:season_team, :team, :pick, :points, :events, :user_rank)
 
     SORTS = %w[rank name division pick points].freeze
 
-    def initialize(league_season:, params: {})
+    def initialize(league_season:, params: {}, user: nil)
       @league_season = league_season
       @params = params || {}
+      @user = user
     end
 
     attr_reader :league_season, :params
@@ -107,6 +108,7 @@ module Leagues
     def load_rows
       picks_by_team = @league_season.draft_picks.includes(:participant).index_by(&:season_team_id)
       rules = Scoring::Rules.for_league_season(@league_season)
+      user_ranks = user_rank_map
       @league_season.season.season_teams.includes(:team, :scoring_events).map do |st|
         events = st.scoring_events
         breakdown = events.group_by(&:event_type)
@@ -116,9 +118,17 @@ module Leagues
           team: st.team,
           pick: picks_by_team[st.id],
           points: events.sum { |e| rules.points_for(e.event_type) },
-          events: breakdown
+          events: breakdown,
+          user_rank: user_ranks[st.team_id]
         )
       end
+    end
+
+    def user_rank_map
+      return {} unless @user
+      @user.team_rankings
+        .where(sport_id: @league_season.season.sport_id)
+        .pluck(:team_id, :rank).to_h
     end
 
     def apply_filters(rows)
@@ -163,8 +173,13 @@ module Leagues
       end
     end
 
+    # Two-tier sort key so personal-ranked teams sort first (in personal
+    # order), then anything else falls through to the global default — the
+    # same precedence the auto-pick query uses.
     def rank_for(row)
-      row.team.default_pick_rank || Float::INFINITY
+      personal = row.user_rank || Float::INFINITY
+      global = row.team.default_pick_rank || Float::INFINITY
+      [personal, global]
     end
 
     def division_label(team)

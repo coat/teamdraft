@@ -99,7 +99,8 @@ class DraftsController < ApplicationController
   def build_directory_query
     Leagues::DirectoryQuery.new(
       league_season: @league_season,
-      params: params.permit(:sort, :dir, :status, :division)
+      params: params.permit(:sort, :dir, :status, :division),
+      user: current_user
     )
   end
 end
