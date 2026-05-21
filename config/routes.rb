@@ -15,6 +15,12 @@ Rails.application.routes.draw do
   resources :seasons, only: [:index, :show] do
     resources :teams, only: [:show], param: :slug
   end
+  get "rankings" => "rankings#sports_index", as: :rankings
+  get "rankings/:sport_slug" => "rankings#index", as: :sport_rankings
+  post "rankings/:sport_slug" => "rankings#create", as: :sport_rankings_create
+  delete "rankings/:sport_slug/:id" => "rankings#destroy", as: :sport_ranking
+  patch "rankings/:sport_slug/:id/move_up" => "rankings#move_up", as: :move_up_sport_ranking
+  patch "rankings/:sport_slug/:id/move_down" => "rankings#move_down", as: :move_down_sport_ranking
   get "about" => "pages#about"
   get "privacy" => "pages#privacy"
 

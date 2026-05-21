@@ -38,6 +38,11 @@ class Views::Drafts::Show < Views::Base
         end
       end
       div(class: "flex items-center gap-2") do
+        if rankings_link_visible?
+          a(href: sport_rankings_path(@league_season.season.sport.key),
+            class: "btn btn-ghost btn-sm",
+            title: "Edits affect future auto-picks only.") { "My rankings" }
+        end
         if @current_participant&.is_owner?
           a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
         end
@@ -46,6 +51,11 @@ class Views::Drafts::Show < Views::Base
         end
       end
     end
+  end
+
+  def rankings_link_visible?
+    return false unless @current_participant&.user_id
+    %w[draft_pending drafting].include?(@league_season.status)
   end
 
   # Would /leagues/:id actually render content, or does the landing-page

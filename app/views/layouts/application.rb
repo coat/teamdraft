@@ -62,6 +62,7 @@ class Views::Layouts::Application < Views::Base
     user = current_user
     if user
       div(class: "flex items-center gap-2 text-sm") do
+        a(href: rankings_path, class: "btn btn-ghost btn-sm") { "My Rankings" }
         if user.admin?
           a(href: admin_root_path, class: "btn btn-ghost btn-sm") { "Admin" }
         end
