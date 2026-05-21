@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # The "create a league" form, used on the landing page and at /leagues/new.
-# Posts to LeaguesController#create. Pick clock + scheduled date are only
-# meaningful for live drafts; the draft-mode Stimulus controller hides them
-# when "manual" is selected.
+# Posts to LeaguesController#create. The scheduled date is only meaningful
+# for live drafts; the draft-mode Stimulus controller hides it when
+# "manual" is selected.
 class Views::Leagues::Form < Views::Base
   include Phlex::Rails::Helpers::FormWith
 
@@ -23,12 +23,6 @@ class Views::Leagues::Form < Views::Base
       render_text_field(form, :your_name, "Your name", autocomplete: "given-name")
       render_text_field(form, :opponent_name, "Opponent's name")
       render_mode_fieldset(form)
-
-      div(class: "space-y-4 #{"hidden" unless @league.draft_mode == "live"}".strip,
-        data_draft_mode_target: "liveOnly") do
-        render_datetime_field(form, :draft_scheduled_at, "Draft date")
-        render_pick_clock_field(form)
-      end
 
       div(class: "card-actions justify-end pt-1") do
         form.submit @submit_label, class: "btn btn-primary"
@@ -80,8 +74,13 @@ class Views::Leagues::Form < Views::Base
   def render_mode_fieldset(form)
     fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
       legend(class: "fieldset-legend text-sm font-medium") { "Draft style" }
-      mode_radio(form, "manual", "Manual — I'll record both picks myself")
       mode_radio(form, "live", "Live — each player picks on the clock")
+      mode_radio(form, "manual", "Manual — I'll record both picks myself")
+
+      div(class: "space-y-4 #{"hidden" unless @league.draft_mode == "live"}".strip,
+        data_draft_mode_target: "liveOnly") do
+        render_datetime_field(form, :draft_scheduled_at, "Draft date")
+      end
     end
   end
 
@@ -93,14 +92,6 @@ class Views::Leagues::Form < Views::Base
           data: {action: "change->draft-mode#sync"}
         span(class: "label-text") { copy }
       end
-    end
-  end
-
-  def render_pick_clock_field(form)
-    div(class: "space-y-1") do
-      form.label :pick_clock_seconds, "Pick clock (seconds)", class: "label label-text font-medium"
-      form.number_field :pick_clock_seconds, value: @league.pick_clock_seconds || 60,
-        min: 10, step: 5, class: "input w-32"
     end
   end
 

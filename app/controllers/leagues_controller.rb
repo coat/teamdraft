@@ -145,7 +145,7 @@ class LeaguesController < ApplicationController
   def new_league
     League.new(
       draft_scheduled_at: 5.minutes.from_now,
-      draft_mode: "manual",
+      draft_mode: "live",
       season_id: default_season&.id
     )
   end
