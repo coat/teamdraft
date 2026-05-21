@@ -2,22 +2,29 @@
 
 class Views::Rankings::Index < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::TurboFrameTag
   include Views::Components::TeamDirectoryHelpers
 
-  def initialize(sport:, ranked:, unranked:, live_drafts_count: 0)
+  def initialize(sport:, ranked:, unranked:, frame: false)
     @sport = sport
     @ranked = ranked
     @unranked = unranked
-    @live_drafts_count = live_drafts_count
+    @frame = frame
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "#{@sport.name} rankings") do
-      main(class: "py-6 space-y-4") do
-        render_header
-        render_live_banner if @live_drafts_count.positive?
+    if @frame
+      turbo_frame_tag "user_rankings", class: "space-y-4 block" do
         render_ranked_section
         render_unranked_section
+      end
+    else
+      render Views::Layouts::Application.new(title: "#{@sport.name} rankings") do
+        main(class: "py-6 space-y-4") do
+          render_header
+          render_ranked_section
+          render_unranked_section
+        end
       end
     end
   end
@@ -33,12 +40,6 @@ class Views::Rankings::Index < Views::Base
         end
       end
       a(href: rankings_path, class: "btn btn-ghost btn-sm") { "← All sports" }
-    end
-  end
-
-  def render_live_banner
-    div(class: "alert alert-info") do
-      p { "Live draft in progress — edits apply to future auto-picks only." }
     end
   end
 

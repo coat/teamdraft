@@ -38,11 +38,6 @@ class Views::Drafts::Show < Views::Base
         end
       end
       div(class: "flex items-center gap-2") do
-        if rankings_link_visible?
-          a(href: sport_rankings_path(@league_season.season.sport.key),
-            class: "btn btn-ghost btn-sm",
-            title: "Edits affect future auto-picks only.") { "My rankings" }
-        end
         if @current_participant&.is_owner?
           a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
         end
@@ -51,11 +46,6 @@ class Views::Drafts::Show < Views::Base
         end
       end
     end
-  end
-
-  def rankings_link_visible?
-    return false unless @current_participant&.user_id
-    %w[draft_pending drafting].include?(@league_season.status)
   end
 
   # Would /leagues/:id actually render content, or does the landing-page
@@ -84,7 +74,7 @@ class Views::Drafts::Show < Views::Base
 
   def render_pending_state
     render_pending_notice
-    render_team_directory(nil)
+    render_directory_with_optional_rankings(nil)
   end
 
   # When the final pick lands (manual or autopick), the broadcast refresh
@@ -105,7 +95,32 @@ class Views::Drafts::Show < Views::Base
     on_the_clock = clock_participant
     viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
     render_draft_panel(on_the_clock, viewer_on_clock)
-    render_team_directory(on_the_clock)
+    render_directory_with_optional_rankings(on_the_clock)
+  end
+
+  def render_directory_with_optional_rankings(on_the_clock)
+    if current_user
+      render_directory_and_rankings_tabs(on_the_clock)
+    else
+      render_team_directory(on_the_clock)
+    end
+  end
+
+  def render_directory_and_rankings_tabs(on_the_clock)
+    div(class: "tabs tabs-lift mt-4") do
+      input(type: "radio", name: "draft_view_tabs", class: "tab",
+        aria_label: "Available teams", checked: true)
+      div(class: "tab-content bg-base-100 border-base-300 p-4") do
+        render_team_directory(on_the_clock)
+      end
+      input(type: "radio", name: "draft_view_tabs", class: "tab",
+        aria_label: "My rankings")
+      div(class: "tab-content bg-base-100 border-base-300 p-4") do
+        turbo_frame_tag "user_rankings",
+          src: sport_rankings_path(@league_season.season.sport.key),
+          class: "block"
+      end
+    end
   end
 
   def render_draft_panel(on_the_clock, viewer_on_clock)

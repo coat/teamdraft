@@ -98,6 +98,18 @@ RSpec.describe "Rankings", type: :request do
     expect(ranks).to eq([[a.id, 1], [c.id, 2]])
   end
 
+  it "renders without layout and wraps in a turbo-frame when requested as a frame" do
+    sport = create(:sport, :nfl)
+    create(:team, sport: sport, name: "Alpha", default_pick_rank: 1)
+    sign_in_new_user("alice@example.com")
+
+    get sport_rankings_path(sport.key), headers: {"Turbo-Frame" => "user_rankings"}
+
+    expect(response.body).to include(%(<turbo-frame))
+    expect(response.body).to include(%(id="user_rankings"))
+    expect(response.body).not_to include("<html")
+  end
+
   it "isolates rankings by sport" do
     nfl = create(:sport, :nfl)
     nba = create(:sport, :nba)

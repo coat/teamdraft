@@ -19,16 +19,15 @@ class RankingsController < ApplicationController
     ranked_team_ids = ranked.map(&:team_id)
     unranked = @sport.teams.where.not(id: ranked_team_ids)
       .order(Arel.sql("default_pick_rank NULLS LAST, name ASC"))
-    live_drafts_count = current_user.participants
-      .joins(:league_season)
-      .joins("INNER JOIN seasons ON seasons.id = league_seasons.season_id")
-      .where(league_seasons: {status: "drafting"})
-      .where(seasons: {sport_id: @sport.id})
-      .count
-    render Views::Rankings::Index.new(
+    view = Views::Rankings::Index.new(
       sport: @sport, ranked: ranked, unranked: unranked,
-      live_drafts_count: live_drafts_count
+      frame: turbo_frame_request?
     )
+    if turbo_frame_request?
+      render view, layout: false
+    else
+      render view
+    end
   end
 
   def create
