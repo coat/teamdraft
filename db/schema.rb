@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_21_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_21_213040) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -388,6 +388,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_000001) do
     t.check_constraint "slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::citext", name: "teams_slug_format"
   end
 
+  create_table "user_team_rankings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "rank", null: false
+    t.bigint "sport_id", null: false
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["sport_id"], name: "index_user_team_rankings_on_sport_id"
+    t.index ["team_id"], name: "index_user_team_rankings_on_team_id"
+    t.index ["user_id", "sport_id"], name: "index_user_team_rankings_on_user_id_and_sport_id"
+    t.index ["user_id", "team_id"], name: "index_user_team_rankings_on_user_id_and_team_id", unique: true
+    t.index ["user_id"], name: "index_user_team_rankings_on_user_id"
+    t.check_constraint "rank > 0", name: "user_team_rankings_rank_positive"
+    t.unique_constraint ["user_id", "sport_id", "rank"], deferrable: :immediate, name: "user_team_rankings_user_sport_rank_unique"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
@@ -426,4 +442,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_000001) do
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "teams", "sports", on_delete: :restrict
+  add_foreign_key "user_team_rankings", "sports", on_delete: :cascade
+  add_foreign_key "user_team_rankings", "teams", on_delete: :cascade
+  add_foreign_key "user_team_rankings", "users", on_delete: :cascade
 end
