@@ -49,20 +49,7 @@ class Views::Layouts::Application < Views::Base
     div(class: "bg-base-100 shadow-sm border-b border-base-300") do
       div(class: "navbar mx-auto w-full max-w-3xl px-4") do
         div(class: "navbar-start") do
-          div(class: "dropdown") do
-            div(tabindex: "0", role: "button", class: "btn btn-ghost lg:hidden", aria_label: "Open menu") do
-              render Views::Components::HamburgerIcon.new
-            end
-            ul(tabindex: "0", class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow") do
-              li { a(href: about_path) { "About" } }
-            end
-          end
           a(href: root_path, class: "btn btn-ghost text-xl normal-case") { "Team Draft" }
-        end
-        div(class: "navbar-center hidden lg:flex") do
-          ul(class: "menu menu-horizontal px-1") do
-            li { a(href: about_path) { "About" } }
-          end
         end
         div(class: "navbar-end") do
           render_nav_auth
@@ -85,8 +72,8 @@ class Views::Layouts::Application < Views::Base
       end
     else
       div(class: "flex items-center gap-1") do
+        a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
         a(href: new_session_path, class: "btn btn-ghost btn-sm") { "Sign in" }
-        a(href: new_registration_path, class: "btn btn-primary btn-sm") { "Create account" }
       end
     end
   end
