@@ -8,9 +8,12 @@ class SeasonsController < ApplicationController
 
   def show
     season = Season.includes(:sport, season_teams: :team).find(params[:id])
-    league_seasons = season.league_seasons
-      .joins(:league).where(leagues: {private: false})
-      .includes(:league, :participants).order("leagues.name")
-    render Views::Seasons::Show.new(season: season, league_seasons: league_seasons)
+    standings = Seasons::TeamStandings.call(season: season)
+    league_leaders = Seasons::LeagueLeaders.call(season: season)
+    render Views::Seasons::Show.new(
+      season: season,
+      standings: standings,
+      league_leaders: league_leaders
+    )
   end
 end
