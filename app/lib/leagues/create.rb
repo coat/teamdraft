@@ -15,7 +15,7 @@ module Leagues
       @name = name.presence || "#{@your_name} vs #{@opponent_name}"
       @draft_scheduled_at = draft_scheduled_at
       @draft_mode = (LeagueSeason::DRAFT_MODES.include?(draft_mode.to_s) ? draft_mode.to_s : "live")
-      @pick_clock_seconds = pick_clock_seconds.presence&.to_i
+      @pick_clock_seconds = resolve_pick_clock(pick_clock_seconds)
       @owner_user = owner_user
     end
 
@@ -51,6 +51,14 @@ module Leagues
     end
 
     private
+
+    # Live drafts need a clock for the auto-pick job to fire on a schedule;
+    # default to LeagueSeason::DEFAULT_PICK_CLOCK_SECONDS when the caller
+    # doesn't specify one. Manual drafts stay clockless.
+    def resolve_pick_clock(value)
+      return nil unless @draft_mode == "live"
+      value.presence&.to_i || LeagueSeason::DEFAULT_PICK_CLOCK_SECONDS
+    end
 
     def build_league
       League.new(name: @name)

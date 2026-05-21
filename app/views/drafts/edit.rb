@@ -112,7 +112,7 @@ class Views::Drafts::Edit < Views::Base
       input(type: "number",
         name: "league_season[pick_clock_seconds]",
         id: "league_season_pick_clock_seconds",
-        value: @league_season.pick_clock_seconds || 60,
+        value: @league_season.pick_clock_seconds || LeagueSeason::DEFAULT_PICK_CLOCK_SECONDS,
         min: 10, step: 5, class: "input w-32")
     end
   end

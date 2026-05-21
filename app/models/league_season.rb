@@ -4,6 +4,7 @@ class LeagueSeason < ApplicationRecord
   DRAFT_MODES = %w[live manual].freeze
   DRAFT_ORDER_STYLES = %w[snake linear].freeze
   STATUSES = %w[draft_pending drafting in_season completed].freeze
+  DEFAULT_PICK_CLOCK_SECONDS = 120
 
   belongs_to :league, inverse_of: :league_seasons
   belongs_to :season
