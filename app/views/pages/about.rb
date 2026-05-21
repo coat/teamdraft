@@ -55,7 +55,7 @@ class Views::Pages::About < Views::Pages::Base
 
   def render_scoring_table(sport)
     rules = sport.scoring_rules.ordered
-    p(class: "text-sm text-base-content/60 mb-2") { "Playoff points stack — each round you reach adds to your total." }
+    p(class: "text-sm text-base-content/60 mb-2") { "You can customize scoring for your league, these are global defaults" }
     div(class: "overflow-x-auto") do
       table(class: "table table-sm table-zebra") do
         thead do
