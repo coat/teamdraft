@@ -9,5 +9,5 @@
 # one of these from `.build`.
 
 module Sports
-  Config = Struct.new(:key, :name, :about_blurb, :teams, :scoring_rules, :current_season, keyword_init: true)
+  Config = Struct.new(:key, :name, :display_order, :about_blurb, :teams, :scoring_rules, :current_season, keyword_init: true)
 end

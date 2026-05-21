@@ -9,6 +9,7 @@ module Sports
         Sports::Config.new(
           key: "nfl",
           name: "NFL",
+          display_order: 1,
           about_blurb: "Inspired by the Mina Kimes Show's yearly NFL team draft: take turns picking entire NFL teams, then watch points roll in as the season plays out.",
           teams: Seeds::NflTeams::DATA,
           scoring_rules: [

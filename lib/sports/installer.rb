@@ -48,10 +48,14 @@ module Sports
         # Backfill nullable display fields if they were never set, but don't
         # clobber values an admin may have edited (name, active).
         existing.update!(about_blurb: @config.about_blurb) if existing.about_blurb.blank? && @config.about_blurb.present?
+        existing.update!(display_order: @config.display_order) if existing.display_order.zero? && @config.display_order
         return existing
       end
       @created[:sport] += 1
-      Sport.create!(key: @key, name: @config.name, about_blurb: @config.about_blurb, active: true)
+      Sport.create!(
+        key: @key, name: @config.name, about_blurb: @config.about_blurb,
+        display_order: @config.display_order || 0, active: true
+      )
     end
 
     def install_teams(sport)

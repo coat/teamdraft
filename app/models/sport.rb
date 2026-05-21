@@ -10,4 +10,5 @@ class Sport < ApplicationRecord
   validates :active, inclusion: {in: [true, false]}
 
   scope :active, -> { where(active: true) }
+  scope :ordered, -> { order(:display_order, :name) }
 end

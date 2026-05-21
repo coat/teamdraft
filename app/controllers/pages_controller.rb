@@ -5,7 +5,7 @@
 # and create app/views/pages/<name>.rb.
 class PagesController < ApplicationController
   def about
-    sports = Sport.active.order(:name)
+    sports = Sport.active.ordered
     active = sports.find { |s| s.key == params[:sport] } || sports.first
     render Views::Pages::About.new(sports: sports, active_sport: active)
   end

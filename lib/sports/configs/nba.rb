@@ -9,6 +9,7 @@ module Sports
         Sports::Config.new(
           key: "nba",
           name: "NBA",
+          display_order: 3,
           about_blurb: "Same draft, hardwood edition: take turns picking entire NBA teams and chase points through regular-season wins, the play-in tournament, and a deep playoff run.",
           teams: Seeds::NbaTeams::DATA,
           scoring_rules: [

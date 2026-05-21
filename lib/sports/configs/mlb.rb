@@ -9,6 +9,7 @@ module Sports
         Sports::Config.new(
           key: "mlb",
           name: "MLB",
+          display_order: 2,
           about_blurb: "Same draft, baseball edition: take turns picking entire MLB teams and chase points through 162 games and a five-round postseason.",
           teams: Seeds::MlbTeams::DATA,
           scoring_rules: [
