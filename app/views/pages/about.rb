@@ -36,11 +36,11 @@ class Views::Pages::About < Views::Pages::Base
   private
 
   def render_tabs_with_content
-    div(class: "tabs tabs-box mb-3") do
+    div(class: "tabs tabs-lift mb-3") do
       @sports.each do |sport|
         input(type: "radio", name: "sport_tabs", class: "tab",
           aria_label: sport.name, checked: sport.id == @active_sport&.id)
-        div(class: "tab-content bg-base-100 p-4") do
+        div(class: "tab-content bg-base-100 border-base-300 p-4") do
           render_blurb(sport)
           render_scoring_table(sport)
         end

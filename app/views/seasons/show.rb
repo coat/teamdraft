@@ -28,14 +28,14 @@ class Views::Seasons::Show < Views::Base
   private
 
   def render_tabs
-    div(class: "tabs tabs-box") do
+    div(class: "tabs tabs-lift") do
       input(type: "radio", name: "season_tabs", class: "tab",
         aria_label: "Teams", checked: true)
-      div(class: "tab-content bg-base-100 p-4") { render_teams_tab }
+      div(class: "tab-content bg-base-100 border-base-300 p-4") { render_teams_tab }
 
       if @league_leaders.any?
         input(type: "radio", name: "season_tabs", class: "tab", aria_label: "Leagues")
-        div(class: "tab-content bg-base-100 p-4") { render_leagues_tab }
+        div(class: "tab-content bg-base-100 border-base-300 p-4") { render_leagues_tab }
       end
     end
   end
