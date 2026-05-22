@@ -26,6 +26,9 @@ class Views::Registrations::New < Views::Base
                 required: true, autofocus: true, autocomplete: "email")
               field(form, :password, "Password", :password_field,
                 required: true, autocomplete: "new-password", minlength: 8)
+              p(class: "text-xs text-base-content/60 -mt-1") do
+                plain "Please pick a unique password — don't reuse one from another site."
+              end
               field(form, :password_confirmation, "Confirm password", :password_field,
                 required: true, autocomplete: "new-password")
               div(class: "card-actions justify-end pt-2") do
