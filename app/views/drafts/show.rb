@@ -87,13 +87,18 @@ class Views::Drafts::Show < Views::Base
   end
 
   # When the final pick lands (manual or autopick), the broadcast refresh
-  # morphs this page in place. Show a clear "done" state with a CTA to
-  # standings rather than a redirect — redirects across morphs leave the
-  # previous clock UI stuck on screen.
+  # morphs this page in place. Show a clear "done" state and let the
+  # auto-visit controller hand off to the standings page once the morph
+  # finishes — the picker themselves got redirected by the controller,
+  # but other viewers (notably the league owner spectating someone
+  # else's pick) only see the morph and would otherwise be stranded
+  # here. A server-side redirect is avoided because morphing across a
+  # redirect leaves the auto-pick clock UI on screen.
   def render_completed_state
-    div(class: "space-y-3") do
+    div(class: "space-y-3",
+      data: {controller: "auto-visit", auto_visit_url_value: league_path(@league)}) do
       h2(class: "card-title") { "Draft complete" }
-      p(class: "text-base-content/70") { "All #{@league_season.total_picks} picks are in." }
+      p(class: "text-base-content/70") { "All #{@league_season.total_picks} picks are in. Taking you to the standings…" }
       div(class: "card-actions") do
         a(href: league_path(@league), class: "btn btn-primary") { "View standings →" }
       end
