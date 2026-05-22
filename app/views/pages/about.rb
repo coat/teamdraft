@@ -13,6 +13,12 @@ class Views::Pages::About < Views::Pages::Base
       plain "Team Draft is a 2-player fantasy league where you and a friend take turns picking entire teams instead of individual players. As the season unfolds, your teams score you points for wins and playoff runs."
     end
 
+    p do
+      plain "The idea was taken from the "
+      a(href: "https://www.espn.com/radio/play/_/id/46093555", class: "link link-primary") { "Mina Kimes Show's yearly NFL Team Draft" }
+      plain "."
+    end
+
     h2 { "How it works" }
     ol do
       li { "Start a league and share the link with a friend." }
