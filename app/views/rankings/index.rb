@@ -44,16 +44,28 @@ class Views::Rankings::Index < Views::Base
   end
 
   def render_ranked_section
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
-        h2(class: "card-title text-lg") { "Your ranking" }
-        if @ranked.empty?
-          p(class: "text-sm text-base-content/60") do
-            "You haven't ranked any teams yet. Add some from the list below."
-          end
-        else
-          render_ranked_table
+    section_panel do
+      h2(class: "card-title text-lg") { "Your ranking" }
+      if @ranked.empty?
+        p(class: "text-sm text-base-content/60") do
+          "You haven't ranked any teams yet. Add some from the list below."
         end
+      else
+        render_ranked_table
+      end
+    end
+  end
+
+  # In frame mode (embedded as a tab inside the draft view) the rankings
+  # are already inside a tab-content panel, so wrapping each section in
+  # another card just stacks padding and steals horizontal width. Render
+  # flat instead.
+  def section_panel(&block)
+    if @frame
+      div(class: "space-y-2", &block)
+    else
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body", &block)
       end
     end
   end
@@ -66,7 +78,7 @@ class Views::Rankings::Index < Views::Base
             th(class: "w-10 bg-base-100") { "#" }
             th(class: "w-10 bg-base-100")
             th(class: "bg-base-100") { "Team" }
-            th(class: "bg-base-100") { "Conf / Div" }
+            th(class: "bg-base-100 hidden sm:table-cell") { "Conf / Div" }
             th(class: "text-right bg-base-100")
           end
         end
@@ -84,13 +96,8 @@ class Views::Rankings::Index < Views::Base
     tr do
       th(class: "font-mono text-sm") { ranking.rank.to_s }
       th { render_team_swatch(team) }
-      td do
-        div(class: "flex flex-col") do
-          span(class: "font-medium") { team.name }
-          span(class: "text-xs opacity-60") { team.abbreviation }
-        end
-      end
-      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
+      td(class: "font-medium") { team.name }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
       th(class: "text-right") do
         div(class: "inline-flex gap-1") do
           if first
@@ -125,17 +132,15 @@ class Views::Rankings::Index < Views::Base
   end
 
   def render_unranked_section
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
-        h2(class: "card-title text-lg") { "Unranked" }
-        p(class: "text-xs text-base-content/60") do
-          "These follow the global default order in your auto-picks."
-        end
-        if @unranked.any?
-          render_unranked_table
-        else
-          p(class: "text-sm text-base-content/60") { "Every team is ranked." }
-        end
+    section_panel do
+      h2(class: "card-title text-lg") { "Unranked" }
+      p(class: "text-xs text-base-content/60") do
+        "These follow the global default order in your auto-picks."
+      end
+      if @unranked.any?
+        render_unranked_table
+      else
+        p(class: "text-sm text-base-content/60") { "Every team is ranked." }
       end
     end
   end
@@ -147,7 +152,7 @@ class Views::Rankings::Index < Views::Base
           tr do
             th(class: "w-10 bg-base-100")
             th(class: "bg-base-100") { "Team" }
-            th(class: "bg-base-100") { "Conf / Div" }
+            th(class: "bg-base-100 hidden sm:table-cell") { "Conf / Div" }
             th(class: "bg-base-100") { "Global rank" }
             th(class: "text-right bg-base-100")
           end
@@ -162,13 +167,8 @@ class Views::Rankings::Index < Views::Base
   def render_unranked_row(team)
     tr do
       th { render_team_swatch(team) }
-      td do
-        div(class: "flex flex-col") do
-          span(class: "font-medium") { team.name }
-          span(class: "text-xs opacity-60") { team.abbreviation }
-        end
-      end
-      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
+      td(class: "font-medium") { team.name }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
       td(class: "font-mono text-sm") { team.default_pick_rank ? "##{team.default_pick_rank}" : "—" }
       th(class: "text-right") do
         button_to sport_rankings_create_path(@sport.key, team_id: team.id),

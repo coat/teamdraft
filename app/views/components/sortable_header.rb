@@ -6,15 +6,16 @@
 # the admin index pages and the in-app team directory; lives outside the
 # Admin namespace because nothing about it is admin-specific.
 class Views::Components::SortableHeader < Views::Base
-  def initialize(query:, column:, label:, path:)
+  def initialize(query:, column:, label:, path:, class_name: nil)
     @query = query
     @column = column.to_s
     @label = label
     @path = path
+    @class_name = class_name
   end
 
   def view_template
-    th do
+    th(class: @class_name) do
       # data-turbo-action="advance" pushes the new URL to the address bar
       # when this link updates a surrounding turbo-frame. Without it, the
       # frame updates but `window.location.href` stays stale — so a

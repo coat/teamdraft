@@ -60,24 +60,31 @@ class Views::Drafts::Show < Views::Base
     @current_participant.nil?
   end
 
+  # The sticky draft-clock bar lives OUTSIDE the card on purpose. daisyUI's
+  # .card has overflow:clip and a corner radius, which clip the bar's top
+  # edge and create a sticky scrolling context that jitters during scroll.
+  # Keeping the bar as a sibling lets it pin cleanly to the viewport top.
+  #
+  # The drafting state also skips the card wrapper entirely so the team
+  # directory (and the rankings tab embedded inside it) gets the full
+  # mobile width instead of being squeezed by card-body padding. The
+  # pending and completed states keep the card chrome since they show
+  # short content that benefits from the visual container.
   def render_draft_section
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
-        case @league_season.status
-        when "draft_pending"
-          render_pending_state
-        when "drafting"
-          render_drafting_state
-        else
-          render_completed_state
-        end
+    case @league_season.status
+    when "draft_pending"
+      render_pending_notice
+      render_directory_with_optional_rankings(nil)
+    when "drafting"
+      on_the_clock = clock_participant
+      viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
+      render_draft_panel(on_the_clock, viewer_on_clock)
+      render_directory_with_optional_rankings(on_the_clock)
+    else
+      div(class: "card bg-base-100 shadow") do
+        div(class: "card-body p-3 sm:p-6") { render_completed_state }
       end
     end
-  end
-
-  def render_pending_state
-    render_pending_notice
-    render_directory_with_optional_rankings(nil)
   end
 
   # When the final pick lands (manual or autopick), the broadcast refresh
@@ -94,13 +101,6 @@ class Views::Drafts::Show < Views::Base
     end
   end
 
-  def render_drafting_state
-    on_the_clock = clock_participant
-    viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
-    render_draft_panel(on_the_clock, viewer_on_clock)
-    render_directory_with_optional_rankings(on_the_clock)
-  end
-
   def render_directory_with_optional_rankings(on_the_clock)
     if current_user
       render_directory_and_rankings_tabs(on_the_clock)
@@ -110,17 +110,26 @@ class Views::Drafts::Show < Views::Base
   end
 
   def render_directory_and_rankings_tabs(on_the_clock)
-    div(class: "tabs tabs-lift mt-4") do
+    # -mx-4 sm:mx-0: break out of the layout's px-4 on phones so the tabs
+    # go edge-to-edge. The tab-content keeps its own inner padding so
+    # filters/tables aren't pressed against the panel border.
+    div(class: "tabs tabs-lift mt-4 -mx-4 sm:mx-0") do
       input(type: "radio", name: "draft_view_tabs", class: "tab",
         aria_label: "Available teams", checked: true)
-      div(class: "tab-content bg-base-100 border-base-300 p-4") do
+      div(class: "tab-content bg-base-100 border-base-300 p-3 sm:p-4") do
         render_team_directory(on_the_clock)
       end
       input(type: "radio", name: "draft_view_tabs", class: "tab",
         aria_label: "My rankings")
-      div(class: "tab-content bg-base-100 border-base-300 p-4") do
+      # loading="lazy": defer the rankings fetch until the tab is actually
+      # selected. An eager src= here mutates the DOM while the page is
+      # still settling, which competes with the sticky draft-clock bar's
+      # initial layout pass and produces a few-pixel scroll jitter on
+      # owner views (the only role that sees this tab).
+      div(class: "tab-content bg-base-100 border-base-300 p-3 sm:p-4") do
         turbo_frame_tag "user_rankings",
           src: sport_rankings_path(@league_season.season.sport.key),
+          loading: "lazy",
           class: "block"
       end
     end
@@ -131,7 +140,7 @@ class Views::Drafts::Show < Views::Base
     deadline = has_clock ? clock_deadline : nil
     autopick = (deadline ? next_autopick_team : nil)
 
-    base = "sticky top-0 z-20 -mx-4 sm:mx-0 sm:rounded-box border shadow-sm mb-3 px-4 py-3"
+    base = "sticky top-0 z-20 -mx-4 sm:mx-0 sm:rounded-box border shadow-sm px-4 py-3"
     state = if viewer_on_clock
       "border-success bg-success text-success-content"
     else
@@ -149,12 +158,12 @@ class Views::Drafts::Show < Views::Base
     end
 
     div(**attrs) do
-      div(class: "flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap") do
-        div(class: "flex items-center gap-2 sm:gap-3 flex-wrap min-w-0") do
-          span(class: "badge badge-lg") { "Pick ##{@league_season.current_pick_number} of #{@league_season.total_picks}" }
+      div(class: "flex items-center justify-between gap-3") do
+        div(class: "flex flex-col min-w-0") do
           if on_the_clock
             if viewer_on_clock
-              span(class: "text-base sm:text-lg font-bold uppercase tracking-wide") { "You're on the clock!" }
+              span(class: "sm:hidden font-bold") { "Your pick!" }
+              span(class: "hidden sm:inline text-lg font-bold uppercase tracking-wide leading-tight") { "You're on the clock!" }
             else
               span(class: "truncate") do
                 plain "On the clock: "
@@ -162,13 +171,18 @@ class Views::Drafts::Show < Views::Base
               end
             end
           end
+          span(class: "text-xs opacity-70") do
+            plain "Pick "
+            strong { "##{@league_season.current_pick_number}" }
+            plain " of #{@league_season.total_picks}"
+          end
         end
         render_clock_box(@league_season.pick_clock_seconds) if deadline
       end
       if autopick
         div(class: "hidden mt-2 text-sm text-base-content/70", data_draft_clock_target: "autopick") do
           plain "Auto-pick if time expires: "
-          strong { "#{autopick.team.name} (#{autopick.team.abbreviation})" }
+          strong { autopick.team.name }
         end
       end
     end
@@ -178,7 +192,7 @@ class Views::Drafts::Show < Views::Base
     div(class: "flex flex-col items-center px-3 py-1.5 bg-neutral text-neutral-content rounded-box shrink-0") do
       span(class: "countdown font-mono text-3xl sm:text-4xl font-bold leading-none") do
         span(
-          class: "inline-block min-w-[2ch] text-center tabular-nums",
+          class: "inline-block min-w-[3ch] text-center tabular-nums",
           style: "--value:#{initial};",
           data_draft_clock_target: "display",
           aria_live: "polite",
@@ -329,6 +343,9 @@ class Views::Drafts::Show < Views::Base
 
   def render_draft_table(query, rows, on_the_clock)
     show_points = query.any_scoring_events?
+    # The Pick column is meaningless under the "Available" filter — every
+    # row would be blank — so collapse it in that case.
+    show_pick = query.status != "available"
     div(class: "overflow-x-auto") do
       table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
@@ -336,40 +353,37 @@ class Views::Drafts::Show < Views::Base
             th(class: "w-10 bg-base-100")
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_draft_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "rank", label: "Rank", path: league_draft_path(@league))
-            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_draft_path(@league))
-            render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_draft_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_draft_path(@league), class_name: "hidden sm:table-cell")
+            if show_pick
+              render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_draft_path(@league))
+            end
             if show_points
               render Views::Components::SortableHeader.new(query: query, column: "points", label: "Points", path: league_draft_path(@league))
             end
             th(class: "text-right bg-base-100")
           end
         end
-        column_count = show_points ? DRAFT_COLUMNS_WITH_POINTS : DRAFT_COLUMNS
+        column_count = (show_points ? DRAFT_COLUMNS_WITH_POINTS : DRAFT_COLUMNS) - (show_pick ? 0 : 1)
         if rows.empty?
           tbody { render_empty_row(column_count) }
         else
           tbody do
-            rows.each { |row| render_draft_row(query, row, on_the_clock, show_points) }
+            rows.each { |row| render_draft_row(query, row, on_the_clock, show_points, show_pick) }
           end
         end
       end
     end
   end
 
-  def render_draft_row(query, row, on_the_clock, show_points)
+  def render_draft_row(query, row, on_the_clock, show_points, show_pick)
     team = row.team
     pick = row.pick
     tr do
       th { render_team_swatch(team) }
-      td do
-        div(class: "flex flex-col") do
-          span(class: "font-medium") { team.name }
-          span(class: "text-xs opacity-60") { team.abbreviation }
-        end
-      end
+      td(class: "font-medium") { team.name }
       td(class: "font-mono text-sm") { render_rank_cell(row) }
-      td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
-      td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
+      td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) } if show_pick
       td(class: "font-mono text-right") { row.points.to_s } if show_points
       th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
     end

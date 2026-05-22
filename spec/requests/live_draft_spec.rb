@@ -80,7 +80,7 @@ RSpec.describe "Live draft", type: :request do
     get league_draft_path(league, sort: "name", dir: "desc")
 
     body = response.body[response.body.index("<turbo-frame")..response.body.index("</turbo-frame>")]
-    ordered = body.scan(%r{<span class="font-medium">(Team \d+)</span>})
+    ordered = body.scan(%r{<td class="font-medium">(Team \d+)</td>})
     expect(ordered.flatten).to eq(["Team 4", "Team 3", "Team 2", "Team 1"])
   end
 
