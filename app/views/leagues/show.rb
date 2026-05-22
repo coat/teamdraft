@@ -81,7 +81,10 @@ class Views::Leagues::Show < Views::Base
           a(href: history_league_path(@league), class: "btn btn-ghost btn-sm") { "History" }
         end
         if @current_participant&.is_owner?
-          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
+          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+            render Views::Components::Icon.new(:pencil_square)
+            plain "Edit league"
+          end
         end
       end
     end
@@ -310,17 +313,17 @@ class Views::Leagues::Show < Views::Base
 
   def render_points_header(query)
     next_dir = (query.sort_column == "points" && query.sort_dir == "asc") ? "desc" : "asc"
-    arrow = if query.sort_column == "points"
-      (query.sort_dir == "asc") ? "▲" : "▼"
+    arrow_name = if query.sort_column == "points"
+      (query.sort_dir == "asc") ? :chevron_up : :chevron_down
     else
-      "↕"
+      :chevron_up_down
     end
     href_params = query.to_url_params(sort: "points", dir: next_dir)
     a(href: "#{league_path(@league)}?#{href_params.to_query}",
       class: "link link-hover inline-flex items-center gap-1",
       data: {turbo_action: "advance"}) do
       plain "Points"
-      span(class: "text-xs opacity-60") { arrow }
+      span(class: "opacity-60") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
     end
   end
 

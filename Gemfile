@@ -18,6 +18,8 @@ gem "stimulus-rails"
 # Phlex view components + typed properties [https://www.phlex.fun]
 gem "phlex-rails"
 gem "literal"
+# Heroicons SVGs as Phlex components — Ruby-only, no npm.
+gem "phlex-icons-hero"
 
 # Human-readable league slugs (e.g. "badger-apple-blue")
 gem "haikunator"

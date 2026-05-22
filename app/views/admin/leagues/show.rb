@@ -23,11 +23,17 @@ class Views::Admin::Leagues::Show < Views::Base
           span(class: "badge badge-ghost") { "private" }
         end
         a(href: league_path(@league), class: "btn btn-ghost btn-sm") { "View public" }
-        a(href: edit_admin_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit" }
-        button_to "Delete", admin_league_path(@league),
+        a(href: edit_admin_league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+          render Views::Components::Icon.new(:pencil_square)
+          plain "Edit"
+        end
+        button_to admin_league_path(@league),
           method: :delete,
           form: {class: "inline", data: {turbo_confirm: "Delete #{@league.name}? This removes every season's participants and draft picks."}},
-          class: "btn btn-error btn-sm"
+          class: "btn btn-error btn-sm inline-flex items-center gap-1" do
+          render Views::Components::Icon.new(:trash)
+          plain "Delete"
+        end
       end
 
       render_current_season

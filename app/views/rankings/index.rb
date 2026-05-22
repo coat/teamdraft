@@ -94,22 +94,31 @@ class Views::Rankings::Index < Views::Base
       th(class: "text-right") do
         div(class: "inline-flex gap-1") do
           if first
-            span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { "▲" }
+            span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_up) }
           else
-            button_to "▲", move_up_sport_ranking_path(@sport.key, ranking),
+            button_to move_up_sport_ranking_path(@sport.key, ranking),
               method: :patch, form: {class: "inline"},
-              class: "btn btn-ghost btn-xs", title: "Move up"
+              class: "btn btn-ghost btn-xs", title: "Move up",
+              aria: {label: "Move up"} do
+              render Views::Components::Icon.new(:chevron_up)
+            end
           end
           if last
-            span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { "▼" }
+            span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_down) }
           else
-            button_to "▼", move_down_sport_ranking_path(@sport.key, ranking),
+            button_to move_down_sport_ranking_path(@sport.key, ranking),
               method: :patch, form: {class: "inline"},
-              class: "btn btn-ghost btn-xs", title: "Move down"
+              class: "btn btn-ghost btn-xs", title: "Move down",
+              aria: {label: "Move down"} do
+              render Views::Components::Icon.new(:chevron_down)
+            end
           end
-          button_to "Remove", sport_ranking_path(@sport.key, ranking),
+          button_to sport_ranking_path(@sport.key, ranking),
             method: :delete, form: {class: "inline"},
-            class: "btn btn-ghost btn-xs"
+            class: "btn btn-ghost btn-xs", title: "Remove",
+            aria: {label: "Remove"} do
+            render Views::Components::Icon.new(:trash)
+          end
         end
       end
     end
@@ -162,9 +171,12 @@ class Views::Rankings::Index < Views::Base
       td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
       td(class: "font-mono text-sm") { team.default_pick_rank ? "##{team.default_pick_rank}" : "—" }
       th(class: "text-right") do
-        button_to "Add", sport_rankings_create_path(@sport.key, team_id: team.id),
+        button_to sport_rankings_create_path(@sport.key, team_id: team.id),
           method: :post, form: {class: "inline"},
-          class: "btn btn-ghost btn-xs"
+          class: "btn btn-ghost btn-xs", title: "Add",
+          aria: {label: "Add"} do
+          render Views::Components::Icon.new(:plus)
+        end
       end
     end
   end

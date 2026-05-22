@@ -19,7 +19,10 @@ class Views::Admin::Users::Show < Views::Base
         title: @user.email_address,
         subtitle: "Joined #{@user.created_at.strftime("%Y-%m-%d")}"
       ) do
-        a(href: edit_admin_user_path(@user), class: "btn btn-sm btn-ghost") { "Edit" }
+        a(href: edit_admin_user_path(@user), class: "btn btn-sm btn-ghost inline-flex items-center gap-1") do
+          render Views::Components::Icon.new(:pencil_square)
+          plain "Edit"
+        end
       end
 
       div(class: "flex flex-wrap gap-2") do

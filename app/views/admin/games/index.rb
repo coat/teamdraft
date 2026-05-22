@@ -63,7 +63,12 @@ class Views::Admin::Games::Index < Views::Base
       td { "#{game.away_season_team.team.abbreviation} @ #{game.home_season_team.team.abbreviation}" }
       td(class: "font-mono") { score_display(game) }
       td { span(class: status_badge(game.status)) { game.status } }
-      td { a(href: edit_admin_game_path(game), class: "btn btn-ghost btn-xs") { "Edit" } }
+      td do
+        a(href: edit_admin_game_path(game), class: "btn btn-ghost btn-xs",
+          title: "Edit", aria_label: "Edit") do
+          render Views::Components::Icon.new(:pencil_square)
+        end
+      end
     end
   end
 

@@ -146,20 +146,26 @@ class Views::Drafts::Edit < Views::Base
       end
       div(class: "flex gap-1") do
         if first
-          span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { "▲" }
+          span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_up) }
         else
-          button_to "▲", move_up_league_participant_path(@league, participant), method: :patch,
+          button_to move_up_league_participant_path(@league, participant), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs",
-            title: "Move up"
+            title: "Move up",
+            aria: {label: "Move up"} do
+            render Views::Components::Icon.new(:chevron_up)
+          end
         end
         if last
-          span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { "▼" }
+          span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_down) }
         else
-          button_to "▼", move_down_league_participant_path(@league, participant), method: :patch,
+          button_to move_down_league_participant_path(@league, participant), method: :patch,
             form: {class: "inline"},
             class: "btn btn-ghost btn-xs",
-            title: "Move down"
+            title: "Move down",
+            aria: {label: "Move down"} do
+            render Views::Components::Icon.new(:chevron_down)
+          end
         end
       end
     end

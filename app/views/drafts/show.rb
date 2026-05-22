@@ -39,7 +39,10 @@ class Views::Drafts::Show < Views::Base
       end
       div(class: "flex items-center gap-2") do
         if @current_participant&.is_owner?
-          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "Edit league" }
+          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+            render Views::Components::Icon.new(:pencil_square)
+            plain "Edit league"
+          end
         end
         if @current_participant&.is_owner? && @league_season.draft_picks.none?
           a(href: edit_league_draft_path(@league), class: "btn btn-ghost btn-sm") { "Draft settings" }
@@ -375,7 +378,9 @@ class Views::Drafts::Show < Views::Base
   def render_rank_cell(row)
     if row.user_rank
       span(class: "font-semibold", title: "Your rank") { row.user_rank.to_s }
-      span(class: "ml-1 opacity-50 text-xs") { "★" }
+      span(class: "ml-1 opacity-50 inline-flex align-middle", title: "Your rank") do
+        render Views::Components::Icon.new(:star, variant: :solid, class_name: "size-3")
+      end
     elsif row.team.default_pick_rank
       plain row.team.default_pick_rank.to_s
     else

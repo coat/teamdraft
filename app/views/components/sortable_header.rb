@@ -23,7 +23,7 @@ class Views::Components::SortableHeader < Views::Base
       a(href: link_href, class: "link link-hover inline-flex items-center gap-1",
         data: {turbo_action: "advance"}) do
         plain @label
-        span(class: "text-xs opacity-60") { arrow }
+        span(class: "opacity-60") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
       end
     end
   end
@@ -37,9 +37,9 @@ class Views::Components::SortableHeader < Views::Base
     (@query.sort_dir == "asc") ? "desc" : "asc"
   end
 
-  def arrow
-    return "↕" unless active?
-    (@query.sort_dir == "asc") ? "▲" : "▼"
+  def arrow_name
+    return :chevron_up_down unless active?
+    (@query.sort_dir == "asc") ? :chevron_up : :chevron_down
   end
 
   def link_href

@@ -26,7 +26,10 @@ class Views::Admin::Seasons::Show < Views::Base
   def render_header
     render Views::Components::Admin::PageHeader.new(title: @season.label) do
       span(class: "badge #{status_color}") { @season.status }
-      a(href: edit_admin_season_path(@season), class: "btn btn-ghost btn-sm") { "Edit" }
+      a(href: edit_admin_season_path(@season), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+        render Views::Components::Icon.new(:pencil_square)
+        plain "Edit"
+      end
       if @season.status != "active"
         button_to "Activate", activate_admin_season_path(@season),
           method: :post, form: {class: "inline"}, class: "btn btn-sm"

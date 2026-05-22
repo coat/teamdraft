@@ -55,7 +55,10 @@ class Views::Admin::Seasons::Index < Views::Base
         end
       end
       td(class: "flex flex-wrap gap-1 justify-end") do
-        a(href: edit_admin_season_path(season), class: "btn btn-ghost btn-xs") { "Edit" }
+        a(href: edit_admin_season_path(season), class: "btn btn-ghost btn-xs",
+          title: "Edit", aria_label: "Edit") do
+          render Views::Components::Icon.new(:pencil_square)
+        end
         unless season.status == "active"
           button_to "Activate", activate_admin_season_path(season),
             method: :post, form: {class: "inline"},

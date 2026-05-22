@@ -1033,6 +1033,19 @@
     targets = [];
     version = "2.4.1";
   };
+  phlex-icons-hero = {
+    dependencies = ["phlex"];
+    groups = ["default"];
+    platforms = [];
+    source = {
+      remotes = ["https://rubygems.org"];
+      sha256 = "1rf5v86w2hx8h6sz43ldjszik1xfrk067c3abx2qm8jilpw6y739";
+      target = "ruby";
+      type = "gem";
+    };
+    targets = [];
+    version = "2.56.0";
+  };
   phlex-rails = {
     dependencies = ["phlex" "railties" "zeitwerk"];
     groups = ["default"];

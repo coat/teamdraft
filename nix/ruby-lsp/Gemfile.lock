@@ -228,6 +228,8 @@ GEM
     phlex (2.4.1)
       refract (~> 1.0)
       zeitwerk (~> 2.7)
+    phlex-icons-hero (2.56.0)
+      phlex (>= 1.11)
     phlex-rails (2.4.0)
       phlex (~> 2.4.0)
       railties (>= 7.1, < 9)
@@ -443,6 +445,7 @@ DEPENDENCIES
   mission_control-jobs
   pagy (~> 9.4)
   pg (~> 1.1)
+  phlex-icons-hero
   phlex-rails
   propshaft
   puma (>= 5.0)

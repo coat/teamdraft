@@ -92,11 +92,17 @@ class Views::Admin::Leagues::Index < Views::Base
       td { render_user_badge(user_count, participants.size) }
       td(class: "text-sm whitespace-nowrap") { league.created_at.strftime("%Y-%m-%d") }
       td(class: "flex flex-wrap gap-1 justify-end") do
-        a(href: edit_admin_league_path(league), class: "btn btn-ghost btn-xs") { "Edit" }
-        button_to "Delete", admin_league_path(league),
+        a(href: edit_admin_league_path(league), class: "btn btn-ghost btn-xs",
+          title: "Edit", aria_label: "Edit") do
+          render Views::Components::Icon.new(:pencil_square)
+        end
+        button_to admin_league_path(league),
           method: :delete,
           form: {class: "inline", data: {turbo_confirm: "Delete #{league.name}? This removes every season's participants and draft picks."}},
-          class: "btn btn-error btn-xs"
+          class: "btn btn-error btn-xs",
+          title: "Delete", aria: {label: "Delete"} do
+          render Views::Components::Icon.new(:trash)
+        end
       end
     end
   end

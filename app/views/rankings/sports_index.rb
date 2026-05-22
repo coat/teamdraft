@@ -18,7 +18,10 @@ class Views::Rankings::SportsIndex < Views::Base
               @sports.each do |sport|
                 li(class: "list-row flex items-center gap-3 px-3 py-2") do
                   span(class: "font-medium grow") { sport.name }
-                  a(href: sport_rankings_path(sport.key), class: "btn btn-sm") { "Edit" }
+                  a(href: sport_rankings_path(sport.key), class: "btn btn-sm inline-flex items-center gap-1") do
+                    render Views::Components::Icon.new(:pencil_square)
+                    plain "Edit"
+                  end
                 end
               end
             end
