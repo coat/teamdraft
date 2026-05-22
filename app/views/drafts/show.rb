@@ -21,6 +21,7 @@ class Views::Drafts::Show < Views::Base
     render Views::Layouts::Application.new(title: "Draft — #{@league.name}") do
       turbo_stream_from @league
       main(class: "py-6 space-y-4") do
+        render_breadcrumbs
         render_header
         render_draft_section
       end
@@ -29,24 +30,22 @@ class Views::Drafts::Show < Views::Base
 
   private
 
+  # Only show the breadcrumb when the league page actually renders for
+  # this viewer. While drafting with both seats claimed, /leagues/:id
+  # redirects right back to the draft, which would make the link a loop.
+  def render_breadcrumbs
+    return unless league_landing_renders?
+    render Views::Components::Breadcrumbs.new(trail: [
+      [@league.name, league_path(@league)],
+      ["Draft", nil]
+    ])
+  end
+
   def render_header
     div(class: "flex items-start justify-between gap-4") do
-      div do
-        h1(class: "text-2xl font-bold") { "#{@league.name} — Draft" }
-        if league_landing_renders?
-          a(href: league_path(@league), class: "text-sm link link-hover") { "← Back to league" }
-        end
-      end
-      div(class: "flex items-center gap-2") do
-        if @current_participant&.is_owner?
-          a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
-            render Views::Components::Icon.new(:pencil_square)
-            plain "Edit league"
-          end
-        end
-        if @current_participant&.is_owner? && @league_season.draft_picks.none?
-          a(href: edit_league_draft_path(@league), class: "btn btn-ghost btn-sm") { "Draft settings" }
-        end
+      h1(class: "text-2xl font-bold") { "#{@league.name} — Draft" }
+      if @current_participant&.is_owner? && @league_season.draft_picks.none?
+        a(href: edit_league_draft_path(@league), class: "btn btn-ghost btn-sm") { "Draft settings" }
       end
     end
   end
