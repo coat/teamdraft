@@ -241,10 +241,10 @@ class Views::Drafts::Show < Views::Base
     ) do
       span(class: "text-base-content/70") { "Draft starts in" }
       div(class: "grid grid-flow-col gap-3 sm:gap-5 text-center auto-cols-max") do
-        render_countdown_box("days",  "days",  remaining / 86400)
+        render_countdown_box("days", "days", remaining / 86400)
         render_countdown_box("hours", "hours", (remaining % 86400) / 3600)
-        render_countdown_box("min",   "min",   (remaining % 3600) / 60)
-        render_countdown_box("sec",   "sec",   remaining % 60)
+        render_countdown_box("min", "min", (remaining % 3600) / 60)
+        render_countdown_box("sec", "sec", remaining % 60)
       end
     end
   end
@@ -272,7 +272,6 @@ class Views::Drafts::Show < Views::Base
     when "live" then on_the_clock && @current_participant.id == on_the_clock.id
     end
   end
-
 
   def next_autopick_team
     drafted = @league_season.draft_picks.pluck(:season_team_id)

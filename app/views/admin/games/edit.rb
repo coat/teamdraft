@@ -24,29 +24,28 @@ class Views::Admin::Games::Edit < Views::Base
       )
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
-
-            if @game.errors.any?
-              div(class: "alert alert-error", role: "alert") do
-                ul(class: "list-disc list-inside") {
-                  @game.errors.full_messages.each { |m| li { m } }
-                }
-              end
+          if @game.errors.any?
+            div(class: "alert alert-error", role: "alert") do
+              ul(class: "list-disc list-inside") {
+                @game.errors.full_messages.each { |m| li { m } }
+              }
             end
+          end
 
-            rounds = [Game::REGULAR_SEASON] +
-              @game.season.sport.scoring_rules.where(kind: "playoff_appearance").ordered.pluck(:round_key)
-            form_with(model: @game, url: admin_game_path(@game), method: :patch, class: "space-y-3") do |f|
-              select_row(f, :status, "Status", Game::STATUSES)
-              select_row(f, :round, "Round", rounds)
-              number_row(f, :week, "Week", min: 1)
-              datetime_row(f, :kickoff_at, "Kickoff", value: @game.kickoff_at&.iso8601)
-              number_row(f, :home_score, "Home score", min: 0)
-              number_row(f, :away_score, "Away score", min: 0)
-              div(class: "card-actions justify-end pt-2") do
-                a(href: admin_games_path(season_id: @game.season_id), class: "btn btn-ghost") { "Cancel" }
-                f.submit "Save", class: "btn btn-primary"
-              end
+          rounds = [Game::REGULAR_SEASON] +
+            @game.season.sport.scoring_rules.where(kind: "playoff_appearance").ordered.pluck(:round_key)
+          form_with(model: @game, url: admin_game_path(@game), method: :patch, class: "space-y-3") do |f|
+            select_row(f, :status, "Status", Game::STATUSES)
+            select_row(f, :round, "Round", rounds)
+            number_row(f, :week, "Week", min: 1)
+            datetime_row(f, :kickoff_at, "Kickoff", value: @game.kickoff_at&.iso8601)
+            number_row(f, :home_score, "Home score", min: 0)
+            number_row(f, :away_score, "Away score", min: 0)
+            div(class: "card-actions justify-end pt-2") do
+              a(href: admin_games_path(season_id: @game.season_id), class: "btn btn-ghost") { "Cancel" }
+              f.submit "Save", class: "btn btn-primary"
             end
+          end
         end
       end
     end

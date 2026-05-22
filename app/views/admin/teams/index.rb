@@ -22,17 +22,17 @@ class Views::Admin::Teams::Index < Views::Base
       )
       render_filter_card
       render Views::Components::Admin::TableCard.new do
-              thead do
-                tr do
-                  th { "Sport" }
-                  render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_teams_path)
-                  th { "Abbr" }
-                  th { "Conf/Div" }
-                  th { "External ID" }
-                  render Views::Components::SortableHeader.new(query: @query, column: "rank", label: "Pick rank", path: admin_teams_path)
-                  th(colspan: 3) { "Actions" }
-                end
-              end
+        thead do
+          tr do
+            th { "Sport" }
+            render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_teams_path)
+            th { "Abbr" }
+            th { "Conf/Div" }
+            th { "External ID" }
+            render Views::Components::SortableHeader.new(query: @query, column: "rank", label: "Pick rank", path: admin_teams_path)
+            th(colspan: 3) { "Actions" }
+          end
+        end
         tbody do
           @teams.each { |team| render_row(team) }
         end

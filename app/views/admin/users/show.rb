@@ -102,7 +102,7 @@ class Views::Admin::Users::Show < Views::Base
             li do
               a(href: admin_league_path(p.league_season.league)) do
                 span(class: "font-medium") { p.league_season.league.name }
-                span(class: "text-xs opacity-60 ml-2") { "as #{p.display_name}#{p.is_owner ? " · owner" : ""}" }
+                span(class: "text-xs opacity-60 ml-2") { "as #{p.display_name}#{" · owner" if p.is_owner}" }
               end
             end
           end

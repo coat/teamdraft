@@ -31,7 +31,7 @@ class Views::Components::Admin::Sidebar < Views::Base
               items.each do |key, item_label, path_helper|
                 active = (key == @current_section)
                 li do
-                  a(href: send(path_helper), class: "#{active ? "menu-active font-medium" : ""}") { item_label }
+                  a(href: send(path_helper), class: ("menu-active font-medium" if active).to_s) { item_label }
                 end
               end
             end

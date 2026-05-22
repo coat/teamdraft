@@ -48,7 +48,7 @@ RSpec.describe Standings::Calculate do
 
   it "leaves other leagues' standings unchanged when one league customizes its rules" do
     season = create_nfl_season(team_count: 2)
-    alice_team, bob_team = season.season_teams.first(2)
+    alice_team, _ = season.season_teams.first(2)
 
     ls_a = create(:league_season, season: season)
     alice = create(:participant, :owner, league_season: ls_a, draft_position: 1)

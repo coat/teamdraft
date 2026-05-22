@@ -62,16 +62,16 @@ class IntroduceScoringRulesTable < ActiveRecord::Migration[8.1]
   # known NFL shape; new sports will be inserted via seeds.
   def backfill_existing_sports
     nfl_template = [
-      {event_type: "regular_win",             kind: "regular_win",         round_key: nil,             label: "Regular-season win",                short_label: "Regular Season", display_order: 0},
-      {event_type: "playoff_appearance",      kind: "playoff_appearance",  round_key: "wildcard",      label: "Made the playoffs",                 short_label: "Wild Card",      display_order: 1, bye_backfill: true},
-      {event_type: "divisional_appearance",   kind: "playoff_appearance",  round_key: "divisional",    label: "Made the divisional round",         short_label: "Divisional",     display_order: 2},
-      {event_type: "conference_appearance",   kind: "playoff_appearance",  round_key: "conference",    label: "Made the conference championship", short_label: "Conference",      display_order: 3},
-      {event_type: "championship_appearance", kind: "playoff_appearance",  round_key: "championship",  label: "Made the Super Bowl",               short_label: "Super Bowl",     display_order: 4},
-      {event_type: "championship_win",        kind: "championship_win",    round_key: nil,             label: "Won the Super Bowl",                short_label: "Champion",       display_order: 5}
+      {event_type: "regular_win", kind: "regular_win", round_key: nil, label: "Regular-season win", short_label: "Regular Season", display_order: 0},
+      {event_type: "playoff_appearance", kind: "playoff_appearance", round_key: "wildcard", label: "Made the playoffs", short_label: "Wild Card", display_order: 1, bye_backfill: true},
+      {event_type: "divisional_appearance", kind: "playoff_appearance", round_key: "divisional", label: "Made the divisional round", short_label: "Divisional", display_order: 2},
+      {event_type: "conference_appearance", kind: "playoff_appearance", round_key: "conference", label: "Made the conference championship", short_label: "Conference", display_order: 3},
+      {event_type: "championship_appearance", kind: "playoff_appearance", round_key: "championship", label: "Made the Super Bowl", short_label: "Super Bowl", display_order: 4},
+      {event_type: "championship_win", kind: "championship_win", round_key: nil, label: "Won the Super Bowl", short_label: "Champion", display_order: 5}
     ]
 
     sport = Class.new(ActiveRecord::Base) { self.table_name = "sports" }
-    rule  = Class.new(ActiveRecord::Base) { self.table_name = "scoring_rules" }
+    rule = Class.new(ActiveRecord::Base) { self.table_name = "scoring_rules" }
 
     sport.where(key: "nfl").find_each do |s|
       jsonb = s.scoring_rules || {}

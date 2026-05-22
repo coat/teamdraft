@@ -22,7 +22,7 @@ RSpec.describe "Leagues", type: :request do
       it "groups seasons into Upcoming and In Progress optgroups" do
         nfl = create(:sport, :nfl)
         make_season(sport: nfl, status: "upcoming", starts_on: 6.months.from_now.to_date, label: "Upcoming NFL", year: 2026)
-        make_season(sport: nfl, status: "active",   starts_on: 6.months.ago.to_date,   label: "Active NFL",   year: 2025)
+        make_season(sport: nfl, status: "active", starts_on: 6.months.ago.to_date, label: "Active NFL", year: 2025)
 
         get "/"
 
@@ -33,7 +33,7 @@ RSpec.describe "Leagues", type: :request do
       it "places upcoming seasons before active seasons" do
         nfl = create(:sport, :nfl)
         make_season(sport: nfl, status: "upcoming", starts_on: 6.months.from_now.to_date, label: "Upcoming NFL", year: 2026)
-        make_season(sport: nfl, status: "active",   starts_on: 6.months.ago.to_date,   label: "Active NFL",   year: 2025)
+        make_season(sport: nfl, status: "active", starts_on: 6.months.ago.to_date, label: "Active NFL", year: 2025)
 
         get "/"
 
@@ -45,7 +45,7 @@ RSpec.describe "Leagues", type: :request do
         nba = create(:sport, :nba)
         # NFL starts later than NBA → NBA should appear first
         make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 15), label: "2026 NFL", year: 2026)
-        make_season(sport: nba, status: "upcoming", starts_on: Date.new(2026, 8, 1),  label: "2026 NBA", year: 2026)
+        make_season(sport: nba, status: "upcoming", starts_on: Date.new(2026, 8, 1), label: "2026 NBA", year: 2026)
 
         get "/"
 
@@ -89,7 +89,7 @@ RSpec.describe "Leagues", type: :request do
       it "preselects the soonest upcoming season when available" do
         nfl = create(:sport, :nfl)
         upcoming = make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 1), label: "2026 NFL", year: 2026)
-        make_season(sport: nfl, status: "active",   starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
 
         get "/"
 
@@ -98,7 +98,7 @@ RSpec.describe "Leagues", type: :request do
 
       it "falls back to active when no upcoming season exists" do
         nfl = create(:sport, :nfl)
-        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1),  label: "2025 NFL", year: 2025)
+        make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
         make_season(sport: nfl, status: "active", starts_on: Date.new(2024, 11, 1), label: "2024 NFL", year: 2024)
 
         get "/"

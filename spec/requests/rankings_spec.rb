@@ -23,7 +23,7 @@ RSpec.describe "Rankings", type: :request do
   it "lists ranked and unranked teams for the sport" do
     sport = create(:sport, :nfl)
     ranked_team = create(:team, sport: sport, name: "Alpha", default_pick_rank: 1)
-    unranked_team = create(:team, sport: sport, name: "Beta", default_pick_rank: 2)
+    create(:team, sport: sport, name: "Beta", default_pick_rank: 2)
     user = sign_in_new_user("alice@example.com")
     create(:user_team_ranking, user: user, team: ranked_team, rank: 1)
 

@@ -24,43 +24,42 @@ class Views::Admin::Leagues::Edit < Views::Base
       )
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
+          render_participants
 
-            render_participants
+          if @league.errors.any? || @league_season&.errors&.any?
+            div(class: "alert alert-error", role: "alert") do
+              ul(class: "list-disc list-inside") {
+                @league.errors.full_messages.each { |m| li { m } }
+                @league_season&.errors&.full_messages&.each { |m| li { m } }
+              }
+            end
+          end
 
-            if @league.errors.any? || @league_season&.errors&.any?
-              div(class: "alert alert-error", role: "alert") do
-                ul(class: "list-disc list-inside") {
-                  @league.errors.full_messages.each { |m| li { m } }
-                  @league_season&.errors&.full_messages&.each { |m| li { m } }
-                }
+          form_with(url: admin_league_path(@league), method: :patch, class: "space-y-3 mt-3") do |f|
+            fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
+              legend(class: "fieldset-legend text-sm font-medium") { "League (durable)" }
+              text_field_row("league[name]", "Name", @league.name, required: true)
+            end
+
+            if @league_season
+              fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
+                legend(class: "fieldset-legend text-sm font-medium") { "Current season state" }
+                number_field_row("league_season[size]", "Size (2–8)", @league_season.size, min: 2, max: 8, required: true)
+                select_field_row("league_season[draft_mode]", "Draft mode", @league_season.draft_mode, LeagueSeason::DRAFT_MODES.map { |m| [m, m] })
+                select_field_row("league_season[draft_order_style]", "Draft order style", @league_season.draft_order_style, LeagueSeason::DRAFT_ORDER_STYLES.map { |s| [s, s] })
+                select_field_row("league_season[status]", "Status", @league_season.status, LeagueSeason::STATUSES.map { |s| [s, s] })
+                number_field_row("league_season[current_pick_number]", "Current pick #", @league_season.current_pick_number, min: 1, required: true)
+                number_field_row("league_season[pick_clock_seconds]", "Pick clock (seconds, blank for none)", @league_season.pick_clock_seconds, min: 1)
               end
             end
 
-            form_with(url: admin_league_path(@league), method: :patch, class: "space-y-3 mt-3") do |f|
-              fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
-                legend(class: "fieldset-legend text-sm font-medium") { "League (durable)" }
-                text_field_row("league[name]", "Name", @league.name, required: true)
-              end
-
-              if @league_season
-                fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
-                  legend(class: "fieldset-legend text-sm font-medium") { "Current season state" }
-                  number_field_row("league_season[size]", "Size (2–8)", @league_season.size, min: 2, max: 8, required: true)
-                  select_field_row("league_season[draft_mode]", "Draft mode", @league_season.draft_mode, LeagueSeason::DRAFT_MODES.map { |m| [m, m] })
-                  select_field_row("league_season[draft_order_style]", "Draft order style", @league_season.draft_order_style, LeagueSeason::DRAFT_ORDER_STYLES.map { |s| [s, s] })
-                  select_field_row("league_season[status]", "Status", @league_season.status, LeagueSeason::STATUSES.map { |s| [s, s] })
-                  number_field_row("league_season[current_pick_number]", "Current pick #", @league_season.current_pick_number, min: 1, required: true)
-                  number_field_row("league_season[pick_clock_seconds]", "Pick clock (seconds, blank for none)", @league_season.pick_clock_seconds, min: 1)
-                end
-              end
-
-              div(class: "card-actions justify-end pt-2") do
-                a(href: admin_leagues_path, class: "btn btn-ghost") { "Cancel" }
-                f.submit "Save", class: "btn btn-primary"
-              end
+            div(class: "card-actions justify-end pt-2") do
+              a(href: admin_leagues_path, class: "btn btn-ghost") { "Cancel" }
+              f.submit "Save", class: "btn btn-primary"
             end
           end
         end
+      end
     end
   end
 

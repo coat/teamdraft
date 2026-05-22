@@ -2,6 +2,10 @@ Every one is welcome to contribute. This was obviously vibe-coded, so LLM-genera
 
 ## Guidelines
 
+### Linting
+
+We use standardb - ensure you run `standardb --fix` before committing.
+
 ### Testing
 
 Follow [Four-Phase Test](https://thoughtbot.com/blog/four-phase-test) pattern when setting up tests. It's OK to repeat yourself in tests - it's better to have readable tests than l

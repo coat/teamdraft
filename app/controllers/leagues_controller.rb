@@ -44,7 +44,7 @@ class LeaguesController < ApplicationController
   def show
     @league_season = @league.current_league_season
     if params[:invite].present?
-      if @league_season && @league_season.verify_invite!(params[:invite])
+      if @league_season&.verify_invite!(params[:invite])
         mark_invite_verified(@league_season)
         claimed = auto_claim_lone_seat(@league_season)
         if claimed
@@ -120,7 +120,7 @@ class LeaguesController < ApplicationController
   def verify_invite
     league_season = @league.current_league_season
     code = params[:code].to_s
-    if league_season && league_season.verify_invite!(code)
+    if league_season&.verify_invite!(code)
       mark_invite_verified(league_season)
       claimed = auto_claim_lone_seat(league_season)
       if claimed

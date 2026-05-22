@@ -16,29 +16,28 @@ class Views::Admin::Teams::Edit < Views::Base
       render Views::Components::Admin::PageHeader.new(title: "Edit #{@team.name}")
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
-
-            if @team.errors.any?
-              div(class: "alert alert-error", role: "alert") do
-                ul(class: "list-disc list-inside") {
-                  @team.errors.full_messages.each { |m| li { m } }
-                }
-              end
+          if @team.errors.any?
+            div(class: "alert alert-error", role: "alert") do
+              ul(class: "list-disc list-inside") {
+                @team.errors.full_messages.each { |m| li { m } }
+              }
             end
+          end
 
-            form_with(model: @team, url: admin_team_path(@team), method: :patch, class: "space-y-3") do |f|
-              text_field_row(f, :name, "Name", required: true)
-              text_field_row(f, :abbreviation, "Abbreviation", required: true)
-              text_field_row(f, :external_id, "External ID (provider id)")
-              number_field_row(f, :default_pick_rank, "Default pick rank (1 = best)", min: 1)
-              text_field_row(f, :conference, "Conference")
-              text_field_row(f, :division, "Division")
-              text_field_row(f, :primary_color, "Primary color")
-              text_field_row(f, :logo_url, "Logo URL")
-              div(class: "card-actions justify-end pt-2") do
-                a(href: admin_teams_path, class: "btn btn-ghost") { "Cancel" }
-                f.submit "Save", class: "btn btn-primary"
-              end
+          form_with(model: @team, url: admin_team_path(@team), method: :patch, class: "space-y-3") do |f|
+            text_field_row(f, :name, "Name", required: true)
+            text_field_row(f, :abbreviation, "Abbreviation", required: true)
+            text_field_row(f, :external_id, "External ID (provider id)")
+            number_field_row(f, :default_pick_rank, "Default pick rank (1 = best)", min: 1)
+            text_field_row(f, :conference, "Conference")
+            text_field_row(f, :division, "Division")
+            text_field_row(f, :primary_color, "Primary color")
+            text_field_row(f, :logo_url, "Logo URL")
+            div(class: "card-actions justify-end pt-2") do
+              a(href: admin_teams_path, class: "btn btn-ghost") { "Cancel" }
+              f.submit "Save", class: "btn btn-primary"
             end
+          end
         end
       end
     end

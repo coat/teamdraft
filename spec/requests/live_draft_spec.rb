@@ -32,13 +32,13 @@ RSpec.describe "Live draft", type: :request do
 
     get league_draft_path(league)
 
-    expect(response.body).to include('<turbo-frame')
+    expect(response.body).to include("<turbo-frame")
     expect(response.body).to include('id="team_directory"')
     expect(response.body).not_to match(%r{<select[^>]*name="season_team_id"})
   end
 
   it "still renders the directory when it's not your turn but hides Pick buttons" do
-    season = create_nfl_season(team_count: 4)
+    create_nfl_season(team_count: 4)
     league = create_league_via_http(your_name: "Alice", opponent_name: "Bob",
       draft_mode: "live", pick_clock_seconds: 30)
     bob_seat = league.participants.find_by(draft_position: 2)
