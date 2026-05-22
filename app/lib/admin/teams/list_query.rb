@@ -8,6 +8,11 @@ module Admin
         "rank" => "teams.default_pick_rank"
       }.freeze
 
+      ORDER_CLAUSES = SORTS.each_with_object({}) do |(key, col), memo|
+        memo[[key, "asc"]] = Arel.sql("#{col} asc NULLS LAST")
+        memo[[key, "desc"]] = Arel.sql("#{col} desc NULLS LAST")
+      end.freeze
+
       def initialize(params = {})
         @params = params || {}
       end
@@ -18,7 +23,7 @@ module Admin
         scope = Team.includes(:sport)
         scope = filter_by_sport(scope)
         scope = filter_by_name(scope)
-        scope.order(Arel.sql("#{SORTS.fetch(sort_column)} #{sort_dir} NULLS LAST"))
+        scope.order(ORDER_CLAUSES.fetch([sort_column, sort_dir]))
       end
 
       def search_term

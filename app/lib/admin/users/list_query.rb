@@ -11,6 +11,11 @@ module Admin
         "created_at" => "users.created_at"
       }.freeze
 
+      ORDER_CLAUSES = SORTS.each_with_object({}) do |(key, col), memo|
+        memo[[key, "asc"]] = Arel.sql("#{col} asc")
+        memo[[key, "desc"]] = Arel.sql("#{col} desc")
+      end.freeze
+
       ROLE_FILTERS = %w[admin non_admin].freeze
       STATUS_FILTERS = %w[active disabled].freeze
 
@@ -25,7 +30,7 @@ module Admin
         scope = filter_by_email(scope)
         scope = filter_by_role(scope)
         scope = filter_by_status(scope)
-        scope.order(Arel.sql("#{SORTS.fetch(sort_column)} #{sort_dir}"))
+        scope.order(ORDER_CLAUSES.fetch([sort_column, sort_dir]))
       end
 
       def search_term

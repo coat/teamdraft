@@ -12,6 +12,11 @@ module Admin
         "created_at" => "leagues.created_at"
       }.freeze
 
+      ORDER_CLAUSES = SORTS.each_with_object({}) do |(key, col), memo|
+        memo[[key, "asc"]] = Arel.sql("#{col} asc")
+        memo[[key, "desc"]] = Arel.sql("#{col} desc")
+      end.freeze
+
       USER_FILTERS = %w[yes no].freeze
 
       def initialize(params = {})
@@ -25,7 +30,7 @@ module Admin
         scope = filter_by_name(scope)
         scope = filter_by_status(scope)
         scope = filter_by_users(scope)
-        scope.order(Arel.sql("#{SORTS.fetch(sort_column)} #{sort_dir}"))
+        scope.order(ORDER_CLAUSES.fetch([sort_column, sort_dir]))
       end
 
       def search_term
