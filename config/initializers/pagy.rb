@@ -2,7 +2,7 @@
 
 require "pagy"
 
-# Default page size; override per-call via `pagy(scope, items: N)`.
-Pagy::DEFAULT[:items] = 25
-# Number of page links shown around the current page in pagy_nav.
-Pagy::DEFAULT[:size] = 5
+# Default page size; override per-call via `pagy(scope, limit: N)`.
+Pagy::OPTIONS[:limit] = 25
+# Number of page links shown around the current page in the series.
+Pagy::OPTIONS[:slots] = 5

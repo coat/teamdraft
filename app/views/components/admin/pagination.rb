@@ -11,12 +11,14 @@ class Views::Components::Admin::Pagination < Views::Base
   end
 
   def view_template
-    return if @pagy.pages <= 1
+    return if @pagy.last <= 1
 
     nav(class: "flex justify-center mt-4", aria_label: "Pagination") do
       div(class: "join") do
-        render_step(:chevron_left, @pagy.prev, "Previous page")
-        @pagy.series.each { |item| render_item(item) }
+        render_step(:chevron_left, @pagy.previous, "Previous page")
+        # `series` is protected in pagy 43+; call it directly since we render
+        # fully custom markup rather than using pagy's built-in series_nav.
+        @pagy.__send__(:series).each { |item| render_item(item) }
         render_step(:chevron_right, @pagy.next, "Next page")
       end
     end

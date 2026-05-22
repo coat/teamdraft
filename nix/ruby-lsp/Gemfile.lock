@@ -218,7 +218,10 @@ GEM
     nokogiri (1.19.3-x86_64-linux-gnu)
       racc (~> 1.4)
     ostruct (0.6.3)
-    pagy (9.4.0)
+    pagy (43.5.4)
+      json
+      uri
+      yaml
     parallel (1.28.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
@@ -392,8 +395,8 @@ GEM
     tailwindcss-ruby (4.2.4-aarch64-linux-gnu)
     tailwindcss-ruby (4.2.4-x86_64-linux-gnu)
     thor (1.5.0)
-    thruster (0.1.20-aarch64-linux)
-    thruster (0.1.20-x86_64-linux)
+    thruster (0.1.21-aarch64-linux)
+    thruster (0.1.21-x86_64-linux)
     timeout (0.6.1)
     tsort (0.2.0)
     turbo-rails (2.0.23)
@@ -421,6 +424,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yaml (0.4.0)
     zeitwerk (2.7.5)
 
 PLATFORMS
@@ -443,7 +447,7 @@ DEPENDENCIES
   kamal
   literal
   mission_control-jobs
-  pagy (~> 9.4)
+  pagy (~> 43.5)
   pg (~> 1.1)
   phlex-icons-hero
   phlex-rails
