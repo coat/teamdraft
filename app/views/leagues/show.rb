@@ -231,12 +231,8 @@ class Views::Leagues::Show < Views::Base
   end
 
   def render_post_draft_directory
-    div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
-        h2(class: "card-title") { "Standings" }
-        render_team_directory
-      end
-    end
+    h2(class: "text-xl font-semibold mt-2") { "Standings" }
+    render_team_directory
   end
 
   def render_team_directory
@@ -293,16 +289,23 @@ class Views::Leagues::Show < Views::Base
   end
 
   def render_standings_table(query, rows)
-    div(class: "overflow-x-auto") do
-      table(class: "table table-sm table-zebra table-pin-cols") do
+    # -mx-4 sm:mx-0: let the table reach the viewport edges on phones,
+    # outside the layout's px-4 gutter. The filters above keep the
+    # gutter so they don't sit flush against the screen edge.
+    # bg-base-100 + sm:border/sm:rounded: give the table its own surface
+    # (matches the draft room's tab-content panel) so the zebra rows have
+    # contrast against the page background. Edge-to-edge on phones,
+    # rounded/bordered on desktop.
+    div(class: "overflow-x-auto -mx-4 sm:mx-0 bg-base-100 sm:rounded-box sm:border sm:border-base-300") do
+      table(class: "table table-sm") do
         thead do
           tr do
-            th(class: "w-8 bg-base-100")
+            th(class: "w-8")
             th(class: "w-10")
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
-            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league))
+            render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league), class_name: "hidden sm:table-cell")
             render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
-            th(class: "text-right bg-base-100") { render_points_header(query) }
+            th(class: "text-right") { render_points_header(query) }
           end
         end
         if rows.empty?
@@ -335,18 +338,21 @@ class Views::Leagues::Show < Views::Base
     pick = row.pick
     panel_id = "breakdown-#{row.season_team.id}"
 
-    tbody(data: pick ? {controller: "disclosure"} : nil) do
+    # even:bg-base-200 — daisyUI's table-zebra targets
+    # `tbody tr:nth-child(2n)`, which never matches here because each row
+    # gets its own <tbody> (required so the Stimulus disclosure
+    # controller scopes to a single panel target). Instead, stripe at
+    # the <tbody> level via :nth-child(even); the thead is child 1, so
+    # tbodies alternate cleanly starting from child 2.
+    tbody(class: "even:bg-base-200", data: pick ? {controller: "disclosure"} : nil) do
       tr do
         th(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
         th { render_team_swatch(team) }
-        td do
-          div(class: "flex flex-col") do
-            a(href: season_team_path(@league_season.season, slug: team.slug),
-              class: "link link-hover font-medium") { team.name }
-            span(class: "text-xs opacity-60") { team.abbreviation }
-          end
+        td(class: "font-medium") do
+          a(href: season_team_path(@league_season.season, slug: team.slug),
+            class: "link link-hover") { team.name }
         end
-        td(class: "text-sm whitespace-nowrap") { division_label(team) || "—" }
+        td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
         td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
         th(class: "font-mono text-right") { row.points.to_s }
       end
@@ -379,7 +385,7 @@ class Views::Leagues::Show < Views::Base
     leader_points = rows.first.total_points
     has_leader = leader_points.positive?
     div(class: "card bg-base-100 shadow") do
-      div(class: "card-body") do
+      div(class: "card-body p-3 sm:p-6") do
         div(class: "flex flex-wrap gap-3") do
           rows.each_with_index do |row, idx|
             leading = has_leader && row.total_points == leader_points
