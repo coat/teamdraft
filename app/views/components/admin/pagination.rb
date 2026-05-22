@@ -15,9 +15,9 @@ class Views::Components::Admin::Pagination < Views::Base
 
     nav(class: "flex justify-center mt-4", aria_label: "Pagination") do
       div(class: "join") do
-        render_step("«", @pagy.prev)
+        render_step(:chevron_left, @pagy.prev, "Previous page")
         @pagy.series.each { |item| render_item(item) }
-        render_step("»", @pagy.next)
+        render_step(:chevron_right, @pagy.next, "Next page")
       end
     end
   end
@@ -36,11 +36,15 @@ class Views::Components::Admin::Pagination < Views::Base
     end
   end
 
-  def render_step(label, target_page)
+  def render_step(icon, target_page, label)
     if target_page
-      a(href: page_href(target_page), class: "join-item btn btn-sm") { label }
+      a(href: page_href(target_page), class: "join-item btn btn-sm", aria_label: label) do
+        render Views::Components::Icon.new(icon)
+      end
     else
-      span(class: "join-item btn btn-sm btn-disabled", aria_disabled: "true") { label }
+      span(class: "join-item btn btn-sm btn-disabled", aria_disabled: "true", aria_label: label) do
+        render Views::Components::Icon.new(icon)
+      end
     end
   end
 

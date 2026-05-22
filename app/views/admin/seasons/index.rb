@@ -74,7 +74,14 @@ class Views::Admin::Seasons::Index < Views::Base
   end
 
   def date_range(season)
-    return span(class: "opacity-50") { "—" } if season.starts_on.blank? && season.ends_on.blank?
-    "#{season.starts_on&.iso8601 || "?"} → #{season.ends_on&.iso8601 || "?"}"
+    if season.starts_on.blank? && season.ends_on.blank?
+      span(class: "opacity-50") { "—" }
+    else
+      span(class: "inline-flex items-center gap-1") do
+        plain(season.starts_on&.iso8601 || "?")
+        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-60")
+        plain(season.ends_on&.iso8601 || "?")
+      end
+    end
   end
 end

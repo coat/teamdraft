@@ -99,17 +99,16 @@ class Views::Leagues::Show < Views::Base
 
   def render_share_card
     seat = unclaimed_seat
-    invite_url = league_url(@league, invite: @league_season.invite_code)
+    share_url = invite_url(code: @league_season.invite_code)
     div(class: "card bg-primary/10 border border-primary/30 shadow-sm") do
       div(class: "card-body gap-3") do
         div do
           h2(class: "card-title text-base") { "Invite #{seat.display_name}" }
           p(class: "text-sm text-base-content/70") do
-            plain "Share the code so they can claim seat ##{seat.draft_position}. They'll enter it after visiting the league page."
+            plain "Share this link so they can claim seat ##{seat.draft_position}."
           end
         end
-        render_copyable_row(label: "Invite code", value: @league_season.invite_code, button_label: "Copy code")
-        render_copyable_row(label: "Or share a one-click link", value: invite_url, button_label: "Copy link")
+        render_copyable_row(label: "Invite link", value: share_url, button_label: "Copy link")
       end
     end
   end
@@ -373,7 +372,9 @@ class Views::Leagues::Show < Views::Base
       title: "Show scoring breakdown",
       data: {action: "click->disclosure#toggle"}) do
       span(class: "inline-block transition-transform",
-        data: {disclosure_target: "icon"}) { "▸" }
+        data: {disclosure_target: "icon"}) do
+        render Views::Components::Icon.new(:chevron_right)
+      end
     end
   end
 

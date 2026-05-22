@@ -44,7 +44,7 @@ class Views::Admin::Seasons::Show < Views::Base
         dl(class: "grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2 text-sm") do
           stat("Sport", @season.sport.name)
           stat("Year", @season.year.to_s)
-          stat("Dates", date_range)
+          stat("Dates") { render_date_range }
           stat("External", external_label)
         end
       end
@@ -85,16 +85,25 @@ class Views::Admin::Seasons::Show < Views::Base
     {"active" => "badge-success", "upcoming" => "badge-info", "completed" => "badge-ghost"}.fetch(@season.status, "badge-ghost")
   end
 
-  def stat(label_text, value)
+  def stat(label_text, value = nil, &block)
     div do
       dt(class: "text-xs uppercase tracking-wide opacity-60") { label_text }
-      dd(class: "font-medium") { value.to_s }
+      dd(class: "font-medium") do
+        block ? yield : plain(value.to_s)
+      end
     end
   end
 
-  def date_range
-    return "—" if @season.starts_on.blank? && @season.ends_on.blank?
-    "#{@season.starts_on&.iso8601 || "?"} → #{@season.ends_on&.iso8601 || "?"}"
+  def render_date_range
+    if @season.starts_on.blank? && @season.ends_on.blank?
+      plain "—"
+    else
+      span(class: "inline-flex items-center gap-1") do
+        plain(@season.starts_on&.iso8601 || "?")
+        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-60")
+        plain(@season.ends_on&.iso8601 || "?")
+      end
+    end
   end
 
   def external_label
