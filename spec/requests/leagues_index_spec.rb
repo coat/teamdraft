@@ -14,13 +14,15 @@ RSpec.describe "Leagues index (home)", type: :request do
   end
 
   context "visitor with one league via cookie" do
-    it "redirects to that league" do
+    it "renders the leagues index with a new-league link" do
       create_nfl_season(team_count: 4)
       league = create_league_via_http(your_name: "Alice", opponent_name: "Bob")
 
       get root_path
 
-      expect(response).to redirect_to(league_path(league))
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(league.name)
+      expect(response.body).to include("Start a new league")
     end
   end
 

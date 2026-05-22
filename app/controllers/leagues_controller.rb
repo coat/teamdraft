@@ -6,11 +6,8 @@ class LeaguesController < ApplicationController
 
   def index
     participants = participants_for_visitor
-    case participants.size
-    when 0
+    if participants.empty?
       render Views::Pages::Home.new(league: new_league, seasons: selectable_seasons)
-    when 1
-      redirect_to league_path(participants.first.league_season.league)
     else
       render Views::Leagues::Index.new(participants: participants)
     end
