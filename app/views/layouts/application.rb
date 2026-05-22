@@ -61,20 +61,33 @@ class Views::Layouts::Application < Views::Base
   def render_nav_auth
     user = current_user
     if user
-      div(class: "flex items-center gap-2 text-sm") do
+      div(class: "flex items-center gap-1") do
+        a(href: root_path, class: "btn btn-ghost btn-sm") { "Leagues" }
         a(href: rankings_path, class: "btn btn-ghost btn-sm") { "My Rankings" }
-        if user.admin?
-          a(href: admin_root_path, class: "btn btn-ghost btn-sm") { "Admin" }
-        end
-        span(class: "hidden sm:inline opacity-70") { user.email_address }
-        button_to "Sign out", session_path, method: :delete,
-          form: {class: "inline"},
-          class: "btn btn-ghost btn-sm"
+        a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
+        render_user_menu(user)
       end
     else
       div(class: "flex items-center gap-1") do
         a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
         a(href: new_session_path, class: "btn btn-ghost btn-sm") { "Sign in" }
+      end
+    end
+  end
+
+  def render_user_menu(user)
+    div(class: "dropdown dropdown-end") do
+      div(tabindex: 0, role: "button", class: "btn btn-ghost btn-circle", aria_label: "Account menu") do
+        render Views::Components::Icon.new(:user_circle, class_name: "size-6")
+      end
+      ul(tabindex: 0, class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-56 p-2 shadow") do
+        li(class: "menu-title") { span { user.email_address } }
+        if user.admin?
+          li { a(href: admin_root_path) { "Admin" } }
+        end
+        li do
+          a(href: session_path, data: {turbo_method: :delete}) { "Sign out" }
+        end
       end
     end
   end
