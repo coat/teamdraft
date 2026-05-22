@@ -63,7 +63,6 @@ class Views::Layouts::Application < Views::Base
     if user
       div(class: "flex items-center gap-1") do
         a(href: root_path, class: "btn btn-ghost btn-sm") { "Leagues" }
-        a(href: rankings_path, class: "btn btn-ghost btn-sm") { "My Rankings" }
         a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
         render_user_menu(user)
       end
@@ -82,6 +81,7 @@ class Views::Layouts::Application < Views::Base
       end
       ul(tabindex: 0, class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-56 p-2 shadow") do
         li(class: "menu-title") { span { user.email_address } }
+        li { a(href: rankings_path) { "My Rankings" } }
         if user.admin?
           li { a(href: admin_root_path) { "Admin" } }
         end
