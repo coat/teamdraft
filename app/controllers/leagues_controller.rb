@@ -143,8 +143,15 @@ class LeaguesController < ApplicationController
     League.new(
       draft_scheduled_at: 5.minutes.from_now,
       draft_mode: "live",
-      season_id: default_season&.id
+      season_id: default_season&.id,
+      your_name: default_your_name
     )
+  end
+
+  # Prefer a previously-used display name from any prior participant the
+  # visitor owns (via cookie or user account). Returns nil for first-timers.
+  def default_your_name
+    participants_for_visitor.order(created_at: :desc).limit(1).pick(:display_name)
   end
 
   def participants_for_visitor
