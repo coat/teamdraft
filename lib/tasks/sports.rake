@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Idempotent sport installers. Designed to be safe to run in production:
-# existing records are never overwritten — only missing ones are created.
+# existing records are never overwritten - only missing ones are created.
 #
 # Typical use:
 #   bin/rails sports:install[nba]   # add NBA to a running prod env

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // On connect, navigate to the given URL via Turbo. Used on the
 // post-draft "complete" state so every viewer ends up on the standings
-// page after the final pick — even ones that only saw the morph
+// page after the final pick - even ones that only saw the morph
 // (subscribers who weren't the picker themselves don't hit the
 // controller-level redirect in DraftPicksController#create).
 //

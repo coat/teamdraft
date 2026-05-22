@@ -65,4 +65,21 @@ RSpec.describe "League invite verification", type: :request do
 
     expect(bob_seat.reload.joined_at).to be_present
   end
+
+  it "resolves /invite/:code to the matching league with the invite query param" do
+    season = create_nfl_season(team_count: 4)
+    league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season).first
+    code = league.current_league_season.invite_code
+
+    get invite_path(code: code)
+
+    expect(response).to redirect_to(league_path(league, invite: code))
+  end
+
+  it "redirects an unknown /invite/:code to the root with an alert" do
+    get invite_path(code: "not-a-real-code")
+
+    expect(response).to redirect_to(root_path)
+    expect(flash[:alert]).to include("no longer valid")
+  end
 end

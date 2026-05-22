@@ -61,7 +61,7 @@ class LeaguesController < ApplicationController
     # /leagues/:id/draft is the draft room. Send claimed viewers to the
     # draft room once picking has started AND every seat is claimed.
     # An unclaimed seat means the share card is still load-bearing here
-    # — manual drafts in particular flip to `drafting` the moment the
+    # - manual drafts in particular flip to `drafting` the moment the
     # league is created, so the owner would never see the invite code
     # if we redirected on status alone.
     if @league_season&.status == "drafting" &&

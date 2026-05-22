@@ -29,7 +29,7 @@ class League < ApplicationRecord
 
   # Transient form-only accessors. The "Create league" form (`Views::Leagues::Form`)
   # binds these to `form_with(model: @league)` so a fresh League returned from
-  # the controller can carry default values, but they are not persisted — the
+  # the controller can carry default values, but they are not persisted - the
   # controller forwards them into `Leagues::Create`, which writes them to the
   # initial `LeagueSeason`.
   attr_accessor :your_name, :opponent_name, :season_id,

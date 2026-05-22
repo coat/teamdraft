@@ -6,7 +6,7 @@ module Drafts
   #
   # Idempotency: the job is keyed by (league_season_id, expected_pick_number).
   # If the league season's current pick has already advanced past that number
-  # — meaning the human picked in time — the job is a no-op. Multiple stale
+  # - meaning the human picked in time - the job is a no-op. Multiple stale
   # jobs in flight collapse to zero work.
   class PickClockJob < ApplicationJob
     queue_as :default

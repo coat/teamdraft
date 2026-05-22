@@ -4,7 +4,7 @@
 #
 # external_id values are MLB Stats API team ids (statsapi.mlb.com/api/v1/teams?sportId=1),
 # stable integers documented at https://statsapi.mlb.com/. MLB is served by
-# SportsData::MlbStatsApiProvider, not TheSportsDB — see app/lib/sports_data/.
+# SportsData::MlbStatsApiProvider, not TheSportsDB - see app/lib/sports_data/.
 # default_pick_rank: 1 = first AI auto-pick, 30 = last resort; loosely based on
 # 2025 results and 2026 outlook.
 

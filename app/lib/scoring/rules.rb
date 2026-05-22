@@ -58,7 +58,7 @@ module Scoring
       @bye_backfill_rule ||= @rules.find(&:bye_backfill)
     end
 
-    # The round_key whose game triggers the bye backfill — i.e. the round
+    # The round_key whose game triggers the bye backfill - i.e. the round
     # immediately after the bye-backfill rule in display_order.
     def bye_backfill_trigger_round
       return nil unless bye_backfill_rule

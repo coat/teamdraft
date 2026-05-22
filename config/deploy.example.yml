@@ -1,10 +1,10 @@
-# Kamal deploy config — copy to config/deploy.yml and fill in your values.
+# Kamal deploy config - copy to config/deploy.yml and fill in your values.
 # See: https://kamal-deploy.org/docs/configuration
 
 # Name of your service. Used in container names. No dashes, lowercase.
 service: teamdraft
 
-# Docker image — host prefix must match `registry.server` below. Examples:
+# Docker image - host prefix must match `registry.server` below. Examples:
 #   ghcr.io/<your-github-user>/teamdraft     (GitHub Container Registry)
 #   docker.io/<your-dockerhub-user>/teamdraft (Docker Hub)
 #   registry.example.com/teamdraft           (self-hosted)
@@ -33,7 +33,7 @@ proxy:
 
 # Container registry. Works with GHCR, Docker Hub, or any self-hosted
 # Docker Registry v2 endpoint (e.g. nginx-fronted `registry:2`). Both the
-# username and password come from .kamal/secrets — wrapping in a list tells
+# username and password come from .kamal/secrets - wrapping in a list tells
 # Kamal to read from those env vars rather than committing them here.
 registry:
   server: registry.example.com
@@ -81,7 +81,7 @@ logging:
     max-file: "5"
 
 # Postgres accessory. Remove this block if you point at managed Postgres
-# instead — in that case set DB_HOST in env.clear to the managed host.
+# instead - in that case set DB_HOST in env.clear to the managed host.
 accessories:
   postgres:
     image: postgres:17

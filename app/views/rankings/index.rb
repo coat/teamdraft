@@ -100,7 +100,7 @@ class Views::Rankings::Index < Views::Base
       th(class: "font-mono text-sm") { ranking.rank.to_s }
       th { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
-      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
       th(class: "text-right") do
         div(class: "inline-flex gap-1") do
           if first
@@ -171,8 +171,8 @@ class Views::Rankings::Index < Views::Base
     tr do
       th { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
-      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
-      td(class: "font-mono text-sm") { team.default_pick_rank ? "##{team.default_pick_rank}" : "—" }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
+      td(class: "font-mono text-sm") { team.default_pick_rank ? "##{team.default_pick_rank}" : "-" }
       th(class: "text-right") do
         button_to sport_rankings_create_path(@sport.key, team_id: team.id),
           method: :post, form: {class: "inline"},

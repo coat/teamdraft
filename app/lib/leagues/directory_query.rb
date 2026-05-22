@@ -2,7 +2,7 @@
 
 module Leagues
   # Builds the team-directory rows shown on the league page (and powers
-  # the in-app sort + filter UI). Mirrors `Admin::Leagues::ListQuery` —
+  # the in-app sort + filter UI). Mirrors `Admin::Leagues::ListQuery` -
   # whitelisted sort columns + safe filters + a `to_url_params` helper
   # for round-tripping current state through links and forms.
   #
@@ -78,7 +78,7 @@ module Leagues
 
     # True if any team in this season already has scoring events. Used by
     # the draft UI to decide whether to surface a Points column and bias
-    # the default sort toward points-desc — the migration-mid-season case
+    # the default sort toward points-desc - the migration-mid-season case
     # where drafters benefit from seeing actual performance so far.
     def any_scoring_events?
       return @any_scoring_events if defined?(@any_scoring_events)
@@ -174,7 +174,7 @@ module Leagues
     end
 
     # Two-tier sort key so personal-ranked teams sort first (in personal
-    # order), then anything else falls through to the global default — the
+    # order), then anything else falls through to the global default - the
     # same precedence the auto-pick query uses.
     def rank_for(row)
       personal = row.user_rank || Float::INFINITY

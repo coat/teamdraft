@@ -120,7 +120,7 @@ RSpec.describe "League edit", type: :request do
 
   it "blocks non-owners with accounts" do
     # Create league out-of-band so Alice's owner cookie never enters this
-    # test session. Then Bob claims his seat and signs up — only Bob's
+    # test session. Then Bob claims his seat and signs up - only Bob's
     # claim token is in the cookie.
     season = create_nfl_season(team_count: 4)
     league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season).first

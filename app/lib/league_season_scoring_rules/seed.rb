@@ -4,7 +4,7 @@ module LeagueSeasonScoringRules
   # Copies the sport's ScoringRule point values onto a LeagueSeason as
   # LeagueSeasonScoringRule rows. Idempotent: skips rules that already have an
   # override. With `reset: true`, overwrites existing overrides back to the
-  # sport defaults — used by the "Reset to sport defaults" button.
+  # sport defaults - used by the "Reset to sport defaults" button.
   #
   # Called whenever a LeagueSeason is created (see Leagues::Create) and
   # invoked by the backfill migration via the same model so behavior stays

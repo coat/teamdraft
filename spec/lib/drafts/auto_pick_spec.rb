@@ -59,7 +59,7 @@ RSpec.describe Drafts::AutoPick do
     user_top = ranked.last
     Drafts::SubmitPick.call(league_season: ls, season_team: user_top)
     create(:user_team_ranking, user: alice, team: user_top.team, rank: 1)
-    # Alice (pos 1) is on the clock again at pick 3 in linear order? No — size 2 linear cycles 1,2,1,2.
+    # Alice (pos 1) is on the clock again at pick 3 in linear order? No - size 2 linear cycles 1,2,1,2.
     # Pick 2 belongs to Bob; advance through it manually before testing Alice's autopick.
     Drafts::SubmitPick.call(league_season: ls, season_team: ranked[2])
 

@@ -30,7 +30,7 @@ module SportsData
     # Valid round keys (strings) the admin UI may pass via `rounds:`. Each
     # concrete provider chooses its own encoding (TheSportsDB uses intRound
     # codes like "1", "200"; MLB Stats API uses gameType codes like "R",
-    # "W"). The shape is opaque to the controller — values flow back
+    # "W"). The shape is opaque to the controller - values flow back
     # through fetch_games(rounds: …).
     def round_numbers
       raise NotImplementedError

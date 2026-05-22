@@ -24,7 +24,7 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # nginx in front of the host terminates TLS — tell Rails to trust the
+  # nginx in front of the host terminates TLS - tell Rails to trust the
   # X-Forwarded-Proto header rather than treating requests as plain http.
   config.assume_ssl = true
 

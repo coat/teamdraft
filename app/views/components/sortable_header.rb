@@ -18,7 +18,7 @@ class Views::Components::SortableHeader < Views::Base
     th(class: @class_name) do
       # data-turbo-action="advance" pushes the new URL to the address bar
       # when this link updates a surrounding turbo-frame. Without it, the
-      # frame updates but `window.location.href` stays stale — so a
+      # frame updates but `window.location.href` stays stale - so a
       # subsequent Turbo refresh (e.g. from a Cable broadcast) re-fetches
       # the old URL and the user loses their sort state.
       a(href: link_href, class: "link link-hover inline-flex items-center gap-1",

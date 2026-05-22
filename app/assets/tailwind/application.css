@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* daisyUI 5 — standalone plugin files vendored under vendor/javascript/.
+/* daisyUI 5 - standalone plugin files vendored under vendor/javascript/.
    Tailwind v4's @plugin directive loads them at build time, no node_modules
    required. Update the files via:
      curl -fsSL -o vendor/javascript/daisyui.js \
@@ -19,7 +19,7 @@
 @source "../../views";
 @source "../../components";
 
-/* Minimal stand-in for @tailwindcss/typography — covers what the About and
+/* Minimal stand-in for @tailwindcss/typography - covers what the About and
    Privacy pages use. Replace with the real plugin if content grows. */
 @layer components {
   .prose h2 { @apply text-2xl font-semibold mt-6 mb-2; }

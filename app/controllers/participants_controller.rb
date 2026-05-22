@@ -54,7 +54,7 @@ class ParticipantsController < ApplicationController
 
   def redirect_locked
     redirect_to edit_league_draft_path(@league),
-      alert: "Draft has started — the order is locked."
+      alert: "Draft has started - the order is locked."
   end
 
   def adjacent_seat(direction)

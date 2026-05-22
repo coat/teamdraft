@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Shared form fields for both New and Edit. Subclass passes the form_with
-# args (url + method) via the block — keeps the inputs in one place so
+# args (url + method) via the block - keeps the inputs in one place so
 # changes don't drift between new and edit.
 class Views::Admin::Seasons::Form < Views::Base
   include Phlex::Rails::Helpers::FormWith

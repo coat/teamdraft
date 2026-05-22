@@ -17,7 +17,7 @@ RSpec.describe LeagueSeasonScoringRules::Seed do
     end
   end
 
-  it "is idempotent — repeated calls do not duplicate or change overrides" do
+  it "is idempotent - repeated calls do not duplicate or change overrides" do
     sport = create(:sport, :nfl)
     season = create(:season, sport: sport)
     ls = create(:league_season, season: season)

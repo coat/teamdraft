@@ -3,7 +3,7 @@
 module Sync
   # Persists a batch of SportsData::ParsedGame into the games table for a
   # season. Games whose teams can't be resolved (because team external_ids
-  # haven't been mapped yet) are skipped — we don't want a partial sync to
+  # haven't been mapped yet) are skipped - we don't want a partial sync to
   # raise mid-batch and lose progress.
   class ApplyGames
     Result = Data.define(:upserted, :skipped, :final_count)

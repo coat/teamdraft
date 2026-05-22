@@ -10,7 +10,7 @@ class Views::Drafts::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Draft settings — #{@league.name}") do
+    render Views::Layouts::Application.new(title: "Draft settings - #{@league.name}") do
       main(class: "py-6") do
         div(class: "card bg-base-100 shadow") do
           div(class: "card-body") do
@@ -21,7 +21,7 @@ class Views::Drafts::Edit < Views::Base
 
             if @league_season.draft_picks.any?
               div(class: "alert alert-info mt-3") do
-                p { "Draft has started — these settings are locked." }
+                p { "Draft has started - these settings are locked." }
               end
               render_readonly_settings
             else
@@ -50,8 +50,8 @@ class Views::Drafts::Edit < Views::Base
       div(data: {controller: "draft-mode"}, class: "space-y-3") do
         fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
           legend(class: "fieldset-legend text-sm font-medium") { "Draft" }
-          mode_radio("manual", "Manual — record both picks yourself")
-          mode_radio("live", "Live — each player picks on the clock")
+          mode_radio("manual", "Manual - record both picks yourself")
+          mode_radio("live", "Live - each player picks on the clock")
 
           div(class: "space-y-4 #{"hidden" unless @league_season.draft_mode == "live"}".strip,
             data_draft_mode_target: "liveOnly") do
@@ -161,7 +161,7 @@ class Views::Drafts::Edit < Views::Base
       legend(class: "fieldset-legend text-sm font-medium") { "Draft order" }
       locked = @league_season.draft_picks.any?
       if locked
-        p(class: "text-xs opacity-60") { "Locked — the draft is underway." }
+        p(class: "text-xs opacity-60") { "Locked - the draft is underway." }
       else
         p(class: "text-xs opacity-60") do
           plain "Reorder seats before the draft begins. Position #1 picks first."

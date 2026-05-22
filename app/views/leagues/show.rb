@@ -154,7 +154,7 @@ class Views::Leagues::Show < Views::Base
   def render_account_upsell
     div(class: "alert alert-info") do
       p do
-        plain "Save your seat across devices — "
+        plain "Save your seat across devices - "
         a(href: new_registration_path, class: "link link-primary font-medium") { "create an account" }
         plain "."
       end
@@ -337,7 +337,7 @@ class Views::Leagues::Show < Views::Base
     pick = row.pick
     panel_id = "breakdown-#{row.season_team.id}"
 
-    # even:bg-base-200 — daisyUI's table-zebra targets
+    # even:bg-base-200 - daisyUI's table-zebra targets
     # `tbody tr:nth-child(2n)`, which never matches here because each row
     # gets its own <tbody> (required so the Stimulus disclosure
     # controller scopes to a single panel target). Instead, stripe at
@@ -351,7 +351,7 @@ class Views::Leagues::Show < Views::Base
           a(href: season_team_path(@league_season.season, slug: team.slug),
             class: "link link-hover") { team.name }
         end
-        td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
+        td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
         td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
         th(class: "font-mono text-right") { row.points.to_s }
       end

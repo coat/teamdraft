@@ -3,7 +3,7 @@
 module Drafts
   # Recurring safety net for live drafts. Re-enqueues PickClockJob for any
   # league season whose current pick's deadline has elapsed but hasn't
-  # advanced — covering cases where the originally scheduled job was lost
+  # advanced - covering cases where the originally scheduled job was lost
   # (a worker crash, an unlucky deploy, an adapter switch).
   #
   # PickClockJob guards on (league_season_id, expected_pick_number), so a

@@ -124,11 +124,11 @@ RSpec.describe "Admin users", type: :request do
     it "blocks revoking the last remaining admin" do
       admin = sign_in_admin
       other = create(:user, admin: true)
-      # Now make admin try to revoke `other` after demoting itself impossible —
+      # Now make admin try to revoke `other` after demoting itself impossible -
       # simulate by deleting all other admins first, then revoking `other` while
       # signed in as admin. We have two admins (sign_in_admin + other), revoke
       # other to leave only the signed-in admin, then try to revoke the signed-in
-      # admin via another admin's session — which isn't a thing here. So instead:
+      # admin via another admin's session - which isn't a thing here. So instead:
       # delete the signed-in admin's adminness via direct DB, then try to revoke
       # `other`. That leaves zero admins and should be blocked.
       admin.update_column(:admin, false)

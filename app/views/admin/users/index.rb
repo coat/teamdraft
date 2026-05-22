@@ -82,7 +82,7 @@ class Views::Admin::Users::Index < Views::Base
         if user.admin?
           span(class: "badge badge-sm badge-primary") { "admin" }
         else
-          span(class: "opacity-50 text-xs") { "—" }
+          span(class: "opacity-50 text-xs") { "-" }
         end
       end
       td do

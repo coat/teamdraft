@@ -73,7 +73,7 @@ class Views::Admin::Games::Index < Views::Base
   end
 
   def score_display(game)
-    return "—" unless game.home_score && game.away_score
+    return "-" unless game.home_score && game.away_score
     "#{game.away_score}–#{game.home_score}"
   end
 

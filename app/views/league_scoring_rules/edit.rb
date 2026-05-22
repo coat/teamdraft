@@ -11,14 +11,14 @@ class Views::LeagueScoringRules::Edit < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Scoring — #{@league.name}") do
+    render Views::Layouts::Application.new(title: "Scoring - #{@league.name}") do
       main(class: "py-6") do
         div(class: "card bg-base-100 shadow") do
           div(class: "card-body") do
             h1(class: "card-title text-2xl") { "Scoring" }
             p(class: "text-sm text-base-content/70") do
               plain "Customize point values for this league. "
-              plain "Standings update immediately — no recalculation needed."
+              plain "Standings update immediately - no recalculation needed."
             end
 
             render_errors

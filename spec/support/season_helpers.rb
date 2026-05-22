@@ -3,7 +3,7 @@
 # Builders that compose factories into the chunks specs actually need:
 # a season plus a fully populated SeasonTeam roster. Most draft/scoring
 # specs only care that *some* teams exist for the season, not which
-# specific teams — so they call `create_nfl_season` and move on.
+# specific teams - so they call `create_nfl_season` and move on.
 #
 # NFL-keyed because LeaguesController hard-codes that key when picking a
 # default season; non-NFL specs can use raw factories instead.

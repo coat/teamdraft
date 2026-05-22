@@ -18,7 +18,7 @@ class Views::Drafts::Show < Views::Base
   end
 
   def view_template
-    render Views::Layouts::Application.new(title: "Draft — #{@league.name}") do
+    render Views::Layouts::Application.new(title: "Draft - #{@league.name}") do
       turbo_stream_from @league
       main(class: "py-6 space-y-4") do
         render_breadcrumbs
@@ -43,7 +43,7 @@ class Views::Drafts::Show < Views::Base
 
   def render_header
     div(class: "flex items-start justify-between gap-4") do
-      h1(class: "text-2xl font-bold") { "#{@league.name} — Draft" }
+      h1(class: "text-2xl font-bold") { "#{@league.name} - Draft" }
       if @current_participant&.is_owner? && @league_season.draft_picks.none?
         a(href: edit_league_draft_path(@league), class: "btn btn-ghost btn-sm") { "Draft settings" }
       end
@@ -89,7 +89,7 @@ class Views::Drafts::Show < Views::Base
   # When the final pick lands (manual or autopick), the broadcast refresh
   # morphs this page in place. Show a clear "done" state and let the
   # auto-visit controller hand off to the standings page once the morph
-  # finishes — the picker themselves got redirected by the controller,
+  # finishes - the picker themselves got redirected by the controller,
   # but other viewers (notably the league owner spectating someone
   # else's pick) only see the morph and would otherwise be stranded
   # here. A server-side redirect is avoided because morphing across a
@@ -357,8 +357,8 @@ class Views::Drafts::Show < Views::Base
 
   def render_draft_table(query, rows, on_the_clock)
     show_points = query.any_scoring_events?
-    # The Pick column is meaningless under the "Available" filter — every
-    # row would be blank — so collapse it in that case.
+    # The Pick column is meaningless under the "Available" filter - every
+    # row would be blank - so collapse it in that case.
     show_pick = query.status != "available"
     div(class: "overflow-x-auto") do
       table(class: "table table-sm table-zebra table-pin-cols") do
@@ -396,7 +396,7 @@ class Views::Drafts::Show < Views::Base
       th { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
       td(class: "font-mono text-sm") { render_rank_cell(row) }
-      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "—" }
+      td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
       td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) } if show_pick
       td(class: "font-mono text-right") { row.points.to_s } if show_points
       th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
@@ -412,7 +412,7 @@ class Views::Drafts::Show < Views::Base
     elsif row.team.default_pick_rank
       plain row.team.default_pick_rank.to_s
     else
-      plain "—"
+      plain "-"
     end
   end
 

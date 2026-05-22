@@ -86,8 +86,8 @@ class Views::Admin::Leagues::Index < Views::Base
           span(class: "badge badge-sm badge-ghost ml-2") { "private" }
         end
       end
-      td(class: "text-sm") { ls&.season&.label || "—" }
-      td { ls ? render_status(ls.status) : plain("—") }
+      td(class: "text-sm") { ls&.season&.label || "-" }
+      td { ls ? render_status(ls.status) : plain("-") }
       td(class: "text-sm") { owner_label(participants) }
       td { render_user_badge(user_count, participants.size) }
       td(class: "text-sm whitespace-nowrap") { league.created_at.strftime("%Y-%m-%d") }
@@ -119,7 +119,7 @@ class Views::Admin::Leagues::Index < Views::Base
 
   def render_user_badge(user_count, total)
     if total.zero?
-      span(class: "opacity-50") { "—" }
+      span(class: "opacity-50") { "-" }
     elsif user_count.zero?
       span(class: "badge badge-sm badge-warning") { "anonymous" }
     else
@@ -130,7 +130,7 @@ class Views::Admin::Leagues::Index < Views::Base
 
   def owner_label(participants)
     owner = participants.find { |p| p.is_owner }
-    return span(class: "opacity-50") { "—" } unless owner
+    return span(class: "opacity-50") { "-" } unless owner
     owner.user&.email_address || owner.display_name
   end
 end

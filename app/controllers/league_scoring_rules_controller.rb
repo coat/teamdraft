@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Owner-only editor for a LeagueSeason's per-rule point overrides. Mirrors
-# DraftsController's permission pattern. Edits are allowed at any time —
+# DraftsController's permission pattern. Edits are allowed at any time -
 # Standings::Calculate resolves points through these overrides at read time,
 # so the new values take effect on the next standings render with no recalc
 # job to enqueue.

@@ -20,7 +20,7 @@ class Views::Admin::Leagues::Edit < Views::Base
     ) do
       render Views::Components::Admin::PageHeader.new(
         title: "Edit #{@league.name}",
-        subtitle: "Current season: #{@league_season&.season&.label || "—"}"
+        subtitle: "Current season: #{@league_season&.season&.label || "-"}"
       )
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do

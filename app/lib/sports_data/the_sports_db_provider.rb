@@ -59,12 +59,12 @@ module SportsData
         },
         season_format: ->(year) { "#{year}-#{year + 1}" }
       ),
-      # MLB regular-season events all carry intRound="0" — there's no per-week
+      # MLB regular-season events all carry intRound="0" - there's no per-week
       # structure. On the free tier eventsday.php caps at ~3 events per call,
       # so date-based ingestion was infeasible; on the paid tier the cap
       # lifts and the recurring date-based sync (Sync::RefreshActiveSeasonsJob)
       # can pull a full day's slate. Listing "0" here lets parse_event label
-      # those games as regular_season — the round-based "fetch all rounds"
+      # those games as regular_season - the round-based "fetch all rounds"
       # path will also attempt r=0, which on paid tier returns the season
       # opener chunk and on free tier returns null (a no-op, not an error).
       # MLB happens to share NFL's playoff intRound encoding.

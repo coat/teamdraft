@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Per-league_season copy of a sport's scoring_rules. Each LeagueSeason gets one
-# row per sport ScoringRule, owning only the point value — labels, kind,
+# row per sport ScoringRule, owning only the point value - labels, kind,
 # round_key, and bye_backfill stay sport-controlled. Lets owners customize
 # point values without forking ScoringEvents per league: Standings::Calculate
 # resolves points through these overrides at read time.

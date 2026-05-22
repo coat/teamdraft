@@ -21,6 +21,8 @@ class Views::Sessions::New < Views::Base
             p(class: "mt-4 text-sm") {
               a(href: new_password_path, class: "link link-hover") { "Forgot password?" }
             }
+            div(class: "divider text-xs opacity-60") { "New here?" }
+            a(href: new_registration_path, class: "btn btn-outline btn-block") { "Create an account" }
           end
         end
       end

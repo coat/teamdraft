@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Shared rendering helpers for the team directory table — the same picker
+# Shared rendering helpers for the team directory table - the same picker
 # is used by the draft room (Views::Drafts::Show) and the post-draft
 # standings (Views::Leagues::Show). Anything that's identical between the
 # two phases lives here; per-phase column sets and filter form actions
@@ -23,7 +23,7 @@ module Views::Components::TeamDirectoryHelpers
 
   def render_directory_pick_cell(pick)
     if pick.nil?
-      span(class: "opacity-50") { "—" }
+      span(class: "opacity-50") { "-" }
     else
       span(class: "font-mono mr-1") { "##{pick.pick_number}" }
       span { pick.participant.display_name }

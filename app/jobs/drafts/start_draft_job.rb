@@ -2,7 +2,7 @@
 
 module Drafts
   # Fired at draft_scheduled_at to flip a ready league season into "drafting".
-  # Idempotent — StartIfReady no-ops when the league season is already
+  # Idempotent - StartIfReady no-ops when the league season is already
   # drafting, missing seats, etc.
   class StartDraftJob < ApplicationJob
     queue_as :default

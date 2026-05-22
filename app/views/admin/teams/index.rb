@@ -70,8 +70,8 @@ class Views::Admin::Teams::Index < Views::Base
       td(class: "font-medium") { team.name }
       td { team.abbreviation }
       td { "#{team.conference}/#{team.division}" }
-      td { team.external_id.presence || span(class: "opacity-50") { "—" } }
-      td { team.default_pick_rank&.to_s || span(class: "opacity-50") { "—" } }
+      td { team.external_id.presence || span(class: "opacity-50") { "-" } }
+      td { team.default_pick_rank&.to_s || span(class: "opacity-50") { "-" } }
       td(class: "w-4 text-center") do
         if team.default_pick_rank.nil? || @top_ids.include?(team.id)
           span(class: "btn btn-ghost btn-xs btn-disabled px-0.5", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_up) }

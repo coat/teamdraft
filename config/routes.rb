@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   get "privacy" => "pages#privacy"
 
   root "leagues#index"
+  get "invite/:code" => "invites#show", as: :invite, constraints: {code: /[^\/]+/}
   resources :leagues, only: [:index, :new, :create, :show, :edit, :update], param: :id do
     resource :draft, only: [:show, :edit, :update] do
       resources :picks, only: [:create], controller: "draft_picks"

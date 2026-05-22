@@ -96,7 +96,7 @@ class Views::Admin::Seasons::Show < Views::Base
 
   def render_date_range
     if @season.starts_on.blank? && @season.ends_on.blank?
-      plain "—"
+      plain "-"
     else
       span(class: "inline-flex items-center gap-1") do
         plain(@season.starts_on&.iso8601 || "?")
@@ -107,7 +107,7 @@ class Views::Admin::Seasons::Show < Views::Base
   end
 
   def external_label
-    return "—" if @season.external_id.blank?
+    return "-" if @season.external_id.blank?
     "#{@season.external_provider.presence || "?"} · #{@season.external_id}"
   end
 end

@@ -46,7 +46,7 @@ class Views::Leagues::Edit < Views::Base
       end
       label(class: "label cursor-pointer justify-start gap-3") do
         form.check_box :private, class: "checkbox checkbox-primary"
-        span(class: "label-text") { "Private — hide this league from public season listings" }
+        span(class: "label-text") { "Private - hide this league from public season listings" }
       end
     end
   end

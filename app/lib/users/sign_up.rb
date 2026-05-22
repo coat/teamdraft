@@ -3,7 +3,7 @@
 module Users
   # Creates a User and links any Participants whose claim tokens already
   # live in the visitor's cookie. That's the "save your seat" upgrade
-  # flow — the freshly-signed-up user inherits the seats they were already
+  # flow - the freshly-signed-up user inherits the seats they were already
   # holding anonymously.
   class SignUp
     def self.call(...) = new(...).call

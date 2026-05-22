@@ -4,11 +4,11 @@ module Drafts
   # Transitions a draft from draft_pending → drafting when it's ready to go.
   #
   # Live drafts wait for both seats to be claimed and (optionally) for a
-  # scheduled start time. Manual drafts — where the owner records both
-  # players' picks — don't need either, since picks can be entered solo
+  # scheduled start time. Manual drafts - where the owner records both
+  # players' picks - don't need either, since picks can be entered solo
   # offline. They start as soon as the league season is created.
   #
-  # Idempotent — safe to call from create, claim, and scheduled-job paths.
+  # Idempotent - safe to call from create, claim, and scheduled-job paths.
   class StartIfReady
     def self.call(...) = new(...).call
 

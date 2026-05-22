@@ -18,7 +18,7 @@ RSpec.describe "Draft picks", type: :request do
 
   it "non-owner gets bounced in manual mode" do
     # Create league out-of-band so this test session has no owner cookie,
-    # then claim Bob's seat — Bob becomes the only authenticated participant.
+    # then claim Bob's seat - Bob becomes the only authenticated participant.
     season = create_nfl_season(team_count: 4)
     league = Leagues::Create.call(your_name: "Alice", opponent_name: "Bob", season: season, draft_mode: "manual").first
     bob_seat = league.participants.find_by(draft_position: 2)

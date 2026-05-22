@@ -84,7 +84,7 @@ module Scoring
       )
     end
 
-    # The final playoff round for the sport — whichever round_key the
+    # The final playoff round for the sport - whichever round_key the
     # championship_win event is paired with. We infer it by finding the
     # last-display_order playoff_appearance rule.
     def championship_round_key

@@ -17,7 +17,7 @@ namespace :mlb do
   desc "Swap MLB integration from TheSportsDB to MLB Stats API (destructive: wipes MLB games)"
   task swap_to_stats_api: :environment do
     sport = Sport.find_by(key: "mlb")
-    abort "No MLB sport installed — run bin/rails sports:install[mlb] first." unless sport
+    abort "No MLB sport installed - run bin/rails sports:install[mlb] first." unless sport
 
     Rake::Task["sports:realign_external_ids"].invoke("mlb")
 

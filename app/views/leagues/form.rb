@@ -74,8 +74,8 @@ class Views::Leagues::Form < Views::Base
   def render_mode_fieldset(form)
     fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do
       legend(class: "fieldset-legend text-sm font-medium") { "Draft style" }
-      mode_radio(form, "live", "Live — each player picks on the clock")
-      mode_radio(form, "manual", "Manual — I'll record both picks myself")
+      mode_radio(form, "live", "Live - each player picks on the clock")
+      mode_radio(form, "manual", "Manual - I'll record both picks myself")
 
       div(class: "space-y-4 #{"hidden" unless @league.draft_mode == "live"}".strip,
         data_draft_mode_target: "liveOnly") do

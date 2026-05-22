@@ -44,7 +44,7 @@ export default class extends Controller {
   }
 
   // When the tab regains focus after a phone lock or app switch, JS timers
-  // were paused — so the displayed clock is stale and the next Cable
+  // were paused - so the displayed clock is stale and the next Cable
   // broadcast may be minutes away. If the deadline has already passed,
   // pull a fresh page so the user sees the real draft state.
   connect() {

@@ -7,7 +7,7 @@
 # previous tick. Idempotent end-to-end: Sync::ApplyGames upserts by
 # (season_id, external_id), so overlapping ticks are safe.
 #
-# Seasons without an external_id are skipped — the provider would no-op
+# Seasons without an external_id are skipped - the provider would no-op
 # anyway, and logging the skip keeps the recurring tick's output tidy.
 
 module Sync

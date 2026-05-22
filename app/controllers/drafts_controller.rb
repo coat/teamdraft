@@ -13,7 +13,7 @@ class DraftsController < ApplicationController
       @league_season.reload
     end
 
-    # Don't redirect finished drafts away from /draft — the auto-pick
+    # Don't redirect finished drafts away from /draft - the auto-pick
     # broadcast fires a Turbo refresh of the *current* URL, and Turbo
     # morphing across a redirect-to-a-different-page leaves stale UI
     # (the "auto-picking…" clock stays on screen). Render an in-place
@@ -33,7 +33,7 @@ class DraftsController < ApplicationController
 
   def update
     if @league_season.draft_picks.any?
-      redirect_to league_path(@league), alert: "Draft has started — settings are locked."
+      redirect_to league_path(@league), alert: "Draft has started - settings are locked."
       return
     end
 

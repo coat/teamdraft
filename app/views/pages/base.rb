@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Shared chrome for static pages — card-on-base-100 inside the app layout.
+# Shared chrome for static pages - card-on-base-100 inside the app layout.
 # Subclasses override `page_title` and `body` to fill in content.
 class Views::Pages::Base < Views::Base
   def view_template

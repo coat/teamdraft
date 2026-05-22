@@ -43,6 +43,6 @@ RSpec.describe "Teams", type: :request do
     get season_team_path(season, slug: a.team.slug)
 
     expect(response.body).to include("scheduled")
-    expect(response.body).to include("—")
+    expect(response.body).to include("-")
   end
 end

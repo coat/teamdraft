@@ -7,7 +7,7 @@ class DraftPicksController < ApplicationController
   def create
     season_team = @league_season.season.season_teams.find(params[:season_team_id])
     Drafts::SubmitPick.call(league_season: @league_season, season_team:)
-    # The final pick flips status to in_season — at that point the
+    # The final pick flips status to in_season - at that point the
     # standings page is the right destination, not the draft room.
     redirect_to post_pick_path
   rescue ActiveRecord::RecordInvalid => e

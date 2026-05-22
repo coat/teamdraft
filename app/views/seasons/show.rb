@@ -132,7 +132,7 @@ class Views::Seasons::Show < Views::Base
                   plain row.league_season.league.name
                 end
               end
-              td { plain(row.top_participant&.display_name || "—") }
+              td { plain(row.top_participant&.display_name || "-") }
               td(class: "text-right font-mono font-semibold") { row.top_score.to_s }
               td(class: "text-right text-sm opacity-60") { "#{row.filled_seats}/#{row.total_seats}" }
             end
@@ -147,7 +147,7 @@ class Views::Seasons::Show < Views::Base
   end
 
   def playoff_cell(row)
-    return "—" if row.po_w.zero? && row.po_l.zero? && row.po_t.zero?
+    return "-" if row.po_w.zero? && row.po_l.zero? && row.po_t.zero?
     format_record(row.po_w, row.po_l, row.po_t)
   end
 

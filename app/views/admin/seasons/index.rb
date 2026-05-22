@@ -51,7 +51,7 @@ class Views::Admin::Seasons::Index < Views::Base
         if season.external_id.present?
           plain "#{season.external_provider.presence || "?"} · #{season.external_id}"
         else
-          span(class: "opacity-50") { "—" }
+          span(class: "opacity-50") { "-" }
         end
       end
       td(class: "flex flex-wrap gap-1 justify-end") do
@@ -75,7 +75,7 @@ class Views::Admin::Seasons::Index < Views::Base
 
   def date_range(season)
     if season.starts_on.blank? && season.ends_on.blank?
-      span(class: "opacity-50") { "—" }
+      span(class: "opacity-50") { "-" }
     else
       span(class: "inline-flex items-center gap-1") do
         plain(season.starts_on&.iso8601 || "?")

@@ -4,7 +4,7 @@
 # can work on scoring, leagues, and rosters without hitting thesportsdb.
 # Idempotent: games are upserted by (season_id, external_id).
 #
-# Note: regular-season games are NOT bundled — TheSportsDB's free tier caps
+# Note: regular-season games are NOT bundled - TheSportsDB's free tier caps
 # its per-day / per-season endpoints at ~3 events per call against MLB, which
 # makes a full 2,430-game pull infeasible from that provider. See the MLB
 # entry in app/lib/sports_data/the_sports_db_provider.rb for context.
