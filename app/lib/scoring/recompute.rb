@@ -31,10 +31,41 @@ module Scoring
             score_playoff_game(game)
           end
         end
+        apply_default_pick_ranks
       end
     end
 
     private
+
+    # Re-derive Team.default_pick_rank for every team in this season's sport
+    # from the points just upserted above. Season participants come first,
+    # ordered by total default points DESC, then team name ASC. Teams in the
+    # sport but not in this season come after, ordered by name ASC, so they
+    # keep a deterministic rank for any other league using this sport.
+    def apply_default_pick_ranks
+      sport = @season.sport
+
+      participant_rows = @season.season_teams.includes(:team, :scoring_events).map do |st|
+        total = st.scoring_events.sum { |e| @rules.points_for(e.event_type) }
+        [st.team, total]
+      end
+      participant_ids = participant_rows
+        .sort_by { |team, total| [-total, team.name] }
+        .map { |team, _| team.id }
+
+      participant_id_set = participant_ids.to_set
+      non_participant_ids = sport.teams
+        .where.not(id: participant_id_set.to_a)
+        .order(:name)
+        .pluck(:id)
+
+      ordered_ids = participant_ids + non_participant_ids
+
+      Team.where(sport_id: sport.id).update_all(default_pick_rank: nil)
+      ordered_ids.each_with_index do |team_id, idx|
+        Team.where(id: team_id).update_all(default_pick_rank: idx + 1)
+      end
+    end
 
     def score_regular_season(game)
       event_type = @rules.regular_win_event

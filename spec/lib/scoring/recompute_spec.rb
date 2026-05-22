@@ -81,4 +81,83 @@ RSpec.describe Scoring::Recompute do
 
     expect { Scoring::Recompute.call(season: season) }.not_to change(ScoringEvent, :count)
   end
+
+  it "re-ranks season teams by default-scoring points DESC" do
+    season = create_nfl_season(team_count: 3)
+    a, b, c = season.season_teams.first(3)
+    create(:game, :final, season: season, home_season_team: a, away_season_team: b,
+      home_score: 24, away_score: 10)
+    create(:game, :final, season: season, home_season_team: a, away_season_team: c,
+      home_score: 17, away_score: 7)
+    create(:game, :final, season: season, home_season_team: b, away_season_team: c,
+      home_score: 21, away_score: 14)
+
+    Scoring::Recompute.call(season: season)
+
+    expect([a.team, b.team, c.team].map { |t| t.reload.default_pick_rank }).to eq([1, 2, 3])
+  end
+
+  it "breaks ties alphabetically by team name" do
+    season = create_nfl_season(team_count: 2)
+    home, away = season.season_teams.first(2)
+    home.team.update!(name: "Zebras")
+    away.team.update!(name: "Antelopes")
+
+    Scoring::Recompute.call(season: season)
+
+    expect(away.team.reload.default_pick_rank).to eq(1)
+    expect(home.team.reload.default_pick_rank).to eq(2)
+  end
+
+  it "ranks sport teams not in the season after participants, alphabetically" do
+    season = create_nfl_season(team_count: 2)
+    sport = season.sport
+    home, away = season.season_teams.first(2)
+    home.team.update!(name: "Bears")
+    away.team.update!(name: "Cougars")
+    create(:game, :final, season: season, home_season_team: home, away_season_team: away,
+      home_score: 21, away_score: 10)
+    create(:team, sport: sport, name: "Aardvarks")
+    create(:team, sport: sport, name: "Dingoes")
+
+    Scoring::Recompute.call(season: season)
+
+    ranked = sport.teams.order(:default_pick_rank).pluck(:name, :default_pick_rank)
+    expect(ranked).to eq([
+      ["Bears", 1],
+      ["Cougars", 2],
+      ["Aardvarks", 3],
+      ["Dingoes", 4]
+    ])
+  end
+
+  it "overwrites pre-existing admin-set default_pick_rank values" do
+    season = create_nfl_season(team_count: 2)
+    home, away = season.season_teams.first(2)
+    home.team.update!(name: "Owls")
+    away.team.update!(name: "Foxes")
+    create(:game, :final, season: season, home_season_team: home, away_season_team: away,
+      home_score: 28, away_score: 0)
+
+    Scoring::Recompute.call(season: season)
+
+    expect(home.team.reload.default_pick_rank).to eq(1)
+    expect(away.team.reload.default_pick_rank).to eq(2)
+  end
+
+  it "produces stable ranks across repeated recomputes" do
+    season = create_nfl_season(team_count: 3)
+    a, b, c = season.season_teams.first(3)
+    create(:game, :final, season: season, home_season_team: a, away_season_team: b,
+      home_score: 30, away_score: 7)
+    create(:game, :final, season: season, home_season_team: b, away_season_team: c,
+      home_score: 21, away_score: 14)
+
+    Scoring::Recompute.call(season: season)
+    first = [a.team, b.team, c.team].map { |t| t.reload.default_pick_rank }
+    Scoring::Recompute.call(season: season)
+    second = [a.team, b.team, c.team].map { |t| t.reload.default_pick_rank }
+
+    expect(second).to eq(first)
+  end
 end
