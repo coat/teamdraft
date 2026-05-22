@@ -56,7 +56,10 @@ class Views::Leagues::Edit < Views::Base
     div(class: "mt-4") do
       a(href: edit_league_draft_path(@league),
         class: "btn btn-ghost w-full justify-between") do
-        span { "Draft settings →" }
+        span(class: "inline-flex items-center gap-1") do
+          plain "Draft settings"
+          render Views::Components::Icon.new(:chevron_right)
+        end
         span(class: "text-xs opacity-60") { draft_settings_summary }
       end
     end
@@ -67,7 +70,10 @@ class Views::Leagues::Edit < Views::Base
     div(class: "mt-2") do
       a(href: edit_league_scoring_rules_path(@league),
         class: "btn btn-ghost w-full justify-between") do
-        span { "Scoring →" }
+        span(class: "inline-flex items-center gap-1") do
+          plain "Scoring"
+          render Views::Components::Icon.new(:chevron_right)
+        end
         span(class: "text-xs opacity-60") { scoring_summary }
       end
     end

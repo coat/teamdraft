@@ -39,7 +39,10 @@ class Views::Rankings::Index < Views::Base
           "Auto-picks for your seats use this order first, then the global default."
         end
       end
-      a(href: rankings_path, class: "btn btn-ghost btn-sm") { "← All sports" }
+      a(href: rankings_path, class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+        render Views::Components::Icon.new(:chevron_left)
+        plain "All sports"
+      end
     end
   end
 

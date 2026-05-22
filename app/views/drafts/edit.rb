@@ -31,7 +31,10 @@ class Views::Drafts::Edit < Views::Base
             render_participant_order_section
 
             div(class: "mt-4") do
-              a(href: league_path(@league), class: "btn btn-ghost btn-sm") { "← Back to league" }
+              a(href: league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+                render Views::Components::Icon.new(:chevron_left)
+                plain "Back to league"
+              end
             end
           end
         end

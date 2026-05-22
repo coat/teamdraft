@@ -100,7 +100,10 @@ class Views::Drafts::Show < Views::Base
       h2(class: "card-title") { "Draft complete" }
       p(class: "text-base-content/70") { "All #{@league_season.total_picks} picks are in. Taking you to the standings…" }
       div(class: "card-actions") do
-        a(href: league_path(@league), class: "btn btn-primary") { "View standings →" }
+        a(href: league_path(@league), class: "btn btn-primary inline-flex items-center gap-1") do
+          plain "View standings"
+          render Views::Components::Icon.new(:chevron_right)
+        end
       end
     end
   end

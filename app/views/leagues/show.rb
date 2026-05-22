@@ -201,7 +201,10 @@ class Views::Leagues::Show < Views::Base
         h2(class: "card-title") { draft_cta_title }
         p(class: "text-base-content/70") { draft_cta_subtitle } if draft_cta_subtitle
         div(class: "card-actions") do
-          a(href: league_draft_path(@league), class: "btn btn-primary") { draft_cta_button_label }
+          a(href: league_draft_path(@league), class: "btn btn-primary inline-flex items-center gap-1") do
+            plain draft_cta_button_label
+            render Views::Components::Icon.new(:chevron_right)
+          end
         end
       end
     end
@@ -224,7 +227,7 @@ class Views::Leagues::Show < Views::Base
   end
 
   def draft_cta_button_label
-    (@league_season.status == "drafting") ? "Go to the draft room →" : "Open the draft room →"
+    (@league_season.status == "drafting") ? "Go to the draft room" : "Open the draft room"
   end
 
   def render_post_draft_directory

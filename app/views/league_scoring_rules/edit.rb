@@ -91,7 +91,10 @@ class Views::LeagueScoringRules::Edit < Views::Base
 
   def render_back
     div(class: "mt-4") do
-      a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm") { "← Back to league settings" }
+      a(href: edit_league_path(@league), class: "btn btn-ghost btn-sm inline-flex items-center gap-1") do
+        render Views::Components::Icon.new(:chevron_left)
+        plain "Back to league settings"
+      end
     end
   end
 
