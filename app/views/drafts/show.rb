@@ -112,7 +112,14 @@ class Views::Drafts::Show < Views::Base
     if current_user
       render_directory_and_rankings_tabs(on_the_clock)
     else
-      render_team_directory(on_the_clock)
+      # Anonymous viewers don't get the rankings tab, but the directory
+      # still needs a bg-base-100 panel surface so daisyUI's table-zebra
+      # (which alternates rows to base-200) has contrast against the
+      # page background. Mirrors the signed-in tab-content treatment
+      # without the tab strip.
+      div(class: "mt-4 -mx-4 sm:mx-0 bg-base-100 sm:rounded-box sm:border sm:border-base-300 p-3 sm:p-4") do
+        render_team_directory(on_the_clock)
+      end
     end
   end
 
