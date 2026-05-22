@@ -88,6 +88,10 @@
               ''
             else null;
 
+          # `relock` regenerates Gemfile.lock + nix/gemset.nix + the composed
+          # ruby-lsp gemset. Exposed on PATH so it works from any subdir.
+          relockBin = pkgs.writers.writeRubyBin "relock" {} (builtins.readFile ./nix/relock);
+
           servicesModule = {
             services.postgres."pg" = {
               enable = true;
@@ -166,6 +170,7 @@
                 rubyLspWrapper
                 rubyLspEnv.env
               ]
+              ++ [relockBin]
               ++ (with pkgs; [
                 bundix
                 tailwindcss_4
