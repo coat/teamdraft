@@ -13,7 +13,7 @@ module Drafts
 
     def perform(league_season_id, expected_pick_number)
       ls = LeagueSeason.find(league_season_id)
-      return unless ls.draft_mode == "live"
+      return unless ls.live_mode?
       return unless %w[draft_pending drafting].include?(ls.status)
       return unless ls.current_pick_number == expected_pick_number
 

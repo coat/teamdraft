@@ -24,23 +24,12 @@ class DraftPicksController < ApplicationController
     participant = current_participant_for(@league)
     return unauthorized!("Claim a seat to draft.") unless participant
 
-    case @league_season.draft_mode
-    when "manual"
+    if @league_season.manual_mode?
       unauthorized!("Only the league owner can record picks in a manual draft.") unless participant.is_owner?
-    when "live"
-      on_clock = clock_participant
+    elsif @league_season.live_mode?
+      on_clock = @league_season.current_picker
       unauthorized!("It's not your turn yet.") unless on_clock && participant.id == on_clock.id
     end
-  end
-
-  def clock_participant
-    return nil if @league_season.current_pick_number > @league_season.total_picks
-    pos = Drafts::Order.position_for(
-      pick_number: @league_season.current_pick_number,
-      size: @league_season.size,
-      style: @league_season.draft_order_style
-    )
-    @league_season.participants.find_by(draft_position: pos)
   end
 
   def unauthorized!(message)

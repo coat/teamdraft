@@ -54,7 +54,8 @@ module Leagues
 
     # Live drafts need a clock for the auto-pick job to fire on a schedule;
     # default to LeagueSeason::DEFAULT_PICK_CLOCK_SECONDS when the caller
-    # doesn't specify one. Manual drafts stay clockless.
+    # doesn't specify one. Manual drafts stay clockless — the LeagueSeason
+    # `before_validation` also nils any stray clock value defensively.
     def resolve_pick_clock(value)
       return nil unless @draft_mode == "live"
       value.presence&.to_i || LeagueSeason::DEFAULT_PICK_CLOCK_SECONDS

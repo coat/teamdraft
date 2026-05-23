@@ -32,10 +32,8 @@ module Drafts
     private
 
     def ready?
-      manual? ? owner_joined? : seats_filled?
+      @league_season.manual_mode? ? owner_joined? : seats_filled?
     end
-
-    def manual? = @league_season.draft_mode == "manual"
 
     def owner_joined?
       @league_season.participants.where(is_owner: true).where.not(joined_at: nil).exists?
@@ -47,7 +45,7 @@ module Drafts
     end
 
     def scheduled_in_future?
-      !manual? &&
+      @league_season.live_mode? &&
         @league_season.draft_scheduled_at.present? &&
         @league_season.draft_scheduled_at > Time.current
     end
@@ -59,7 +57,7 @@ module Drafts
     end
 
     def schedule_first_clock
-      return unless @league_season.draft_mode == "live" && @league_season.pick_clock_seconds.present?
+      return unless @league_season.live_mode? && @league_season.pick_clock_seconds.present?
       Drafts::PickClockJob
         .set(wait: @league_season.pick_clock_seconds.seconds)
         .perform_later(@league_season.id, @league_season.current_pick_number)
