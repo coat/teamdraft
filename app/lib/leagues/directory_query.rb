@@ -14,6 +14,17 @@ module Leagues
     Row = Data.define(:season_team, :team, :pick, :points, :events, :user_rank)
 
     SORTS = %w[rank name division pick points].freeze
+    URL_PARAM_KEYS = %i[sort dir status division].freeze
+
+    # Whitelists the directory-related params off a request before building
+    # the query, so controllers don't each re-permit the same keys.
+    def self.from_request(league_season:, params:, user: nil)
+      new(
+        league_season: league_season,
+        params: params.permit(*URL_PARAM_KEYS),
+        user: user
+      )
+    end
 
     def initialize(league_season:, params: {}, user: nil)
       @league_season = league_season

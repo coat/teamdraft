@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 class ParticipantsController < ApplicationController
+  include LeagueContext
+
+  self.owner_alert = "Only the league owner can change the draft order."
+
   before_action :load_league
+  before_action :load_league_season
   before_action :require_owner
   before_action :load_participant
 
@@ -30,19 +35,6 @@ class ParticipantsController < ApplicationController
   end
 
   private
-
-  def load_league
-    @league = League.friendly.find(params[:league_id])
-    @league_season = @league.current_league_season
-  end
-
-  def require_owner
-    participant = current_participant_for(@league)
-    unless participant&.is_owner?
-      redirect_to league_path(@league),
-        alert: "Only the league owner can change the draft order."
-    end
-  end
 
   def load_participant
     @participant = @league_season.participants.find(params[:id])

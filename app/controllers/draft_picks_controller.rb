@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class DraftPicksController < ApplicationController
+  include LeagueContext
+
+  before_action :load_league
   before_action :load_league_season
   before_action :require_authorized_picker
 
@@ -16,11 +19,6 @@ class DraftPicksController < ApplicationController
   end
 
   private
-
-  def load_league_season
-    @league = League.friendly.find(params[:league_id])
-    @league_season = @league.current_league_season
-  end
 
   def require_authorized_picker
     participant = current_participant_for(@league)
@@ -50,7 +48,7 @@ class DraftPicksController < ApplicationController
   end
 
   def directory_url_params
-    params.permit(:sort, :dir, :status, :division).to_h.compact_blank.symbolize_keys
+    params.permit(*Leagues::DirectoryQuery::URL_PARAM_KEYS).to_h.compact_blank.symbolize_keys
   end
 
   def post_pick_path
