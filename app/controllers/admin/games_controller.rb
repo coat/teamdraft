@@ -41,10 +41,9 @@ class Admin::GamesController < Admin::BaseController
     @game = Game.find(params[:id])
   end
 
+  # Blank score fields ride through as empty strings; ActiveRecord's integer
+  # type-cast nils them on assignment, so no manual `.presence` is needed.
   def game_params
-    permitted = params.require(:game).permit(:status, :home_score, :away_score, :round, :week, :kickoff_at, :completed_at)
-    permitted[:home_score] = permitted[:home_score].presence
-    permitted[:away_score] = permitted[:away_score].presence
-    permitted
+    params.require(:game).permit(:status, :home_score, :away_score, :round, :week, :kickoff_at, :completed_at)
   end
 end

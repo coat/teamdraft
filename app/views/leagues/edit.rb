@@ -95,13 +95,10 @@ class Views::Leagues::Edit < Views::Base
   end
 
   def render_errors
-    return unless @league.errors.any? || @league_season&.errors&.any?
-    div(class: "alert alert-error mt-3", role: "alert") do
-      ul(class: "list-disc list-inside") do
-        @league.errors.full_messages.each { |msg| li { msg } }
-        @league_season&.errors&.full_messages&.each { |msg| li { msg } }
-      end
-    end
+    render Views::Components::ErrorAlert.new(
+      records: [@league, @league_season],
+      class_name: "mt-3"
+    )
   end
 
   def history_hint
