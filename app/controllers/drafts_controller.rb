@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DraftsController < ApplicationController
+  include LeagueContext
+
   before_action :load_league
   before_action :load_league_season
   before_action :require_owner, only: [:edit, :update]
@@ -39,9 +41,9 @@ class DraftsController < ApplicationController
 
     attrs = league_season_params.to_h
     if attrs[:draft_scheduled_at].present?
-      attrs[:draft_scheduled_at] = parsed_local_datetime(
+      attrs[:draft_scheduled_at] = LocalDatetime.parse(
         attrs[:draft_scheduled_at],
-        params.dig(:league_season, :time_zone)
+        zone: params.dig(:league_season, :time_zone)
       )
     end
     @league_season.assign_attributes(attrs)
@@ -54,25 +56,6 @@ class DraftsController < ApplicationController
   end
 
   private
-
-  def load_league
-    @league = League.friendly.find(params[:league_id])
-  end
-
-  def load_league_season
-    @league_season = @league.current_league_season
-    unless @league_season
-      redirect_to league_path(@league), alert: "No active season for this league."
-    end
-  end
-
-  def require_owner
-    participant = current_participant_for(@league)
-    unless participant&.is_owner?
-      redirect_to league_path(@league),
-        alert: "Only the league owner can edit this league."
-    end
-  end
 
   def league_season_params
     params.require(:league_season).permit(:draft_mode, :draft_order_style,
@@ -87,19 +70,10 @@ class DraftsController < ApplicationController
     end
   end
 
-  def parsed_local_datetime(value, zone)
-    return nil if value.blank?
-    if zone.present?
-      ActiveSupport::TimeZone[zone]&.parse(value) || value
-    else
-      value
-    end
-  end
-
   def build_directory_query
-    Leagues::DirectoryQuery.new(
+    Leagues::DirectoryQuery.from_request(
       league_season: @league_season,
-      params: params.permit(:sort, :dir, :status, :division),
+      params: params,
       user: current_user
     )
   end

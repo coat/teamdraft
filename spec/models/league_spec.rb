@@ -41,6 +41,26 @@ RSpec.describe League do
     end
   end
 
+  describe "#destroy" do
+    it "cascades through league_seasons even when participants own draft_picks" do
+      season = create_nfl_season(team_count: 2)
+      league = League.create!(name: "Cascade Test")
+      ls = create(:league_season, league: league, season: season)
+      alice = create(:participant, :owner, league_season: ls, display_name: "Alice", draft_position: 1)
+      bob = create(:participant, league_season: ls, display_name: "Bob", draft_position: 2)
+      alice_team, bob_team = season.season_teams.first(2)
+      DraftPick.create!(league_season: ls, participant: alice, season_team: alice_team, pick_number: 1)
+      DraftPick.create!(league_season: ls, participant: bob, season_team: bob_team, pick_number: 2)
+
+      league.destroy!
+
+      expect(League.where(id: league.id)).to be_empty
+      expect(LeagueSeason.where(id: ls.id)).to be_empty
+      expect(Participant.where(league_season_id: ls.id)).to be_empty
+      expect(DraftPick.where(league_season_id: ls.id)).to be_empty
+    end
+  end
+
   describe "slug generation" do
     it "derives the slug from the name with a random suffix" do
       league = League.create!(name: "Al vs Doug")

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class LeaguesController < ApplicationController
+  include LeagueContext
+
   before_action :load_league, only: [:show, :claim, :edit, :update, :history, :verify_invite]
+  before_action :enforce_canonical_url, only: :show
   before_action :require_owner, only: [:edit, :update]
 
   def index
@@ -25,9 +28,9 @@ class LeaguesController < ApplicationController
       your_name: params.dig(:league, :your_name),
       opponent_name: params.dig(:league, :opponent_name),
       season:,
-      draft_scheduled_at: parsed_local_datetime(
+      draft_scheduled_at: LocalDatetime.parse(
         params.dig(:league, :draft_scheduled_at),
-        params.dig(:league, :time_zone)
+        zone: params.dig(:league, :time_zone)
       ),
       draft_mode: params.dig(:league, :draft_mode).presence || "live",
       pick_clock_seconds: params.dig(:league, :pick_clock_seconds).presence,
@@ -160,19 +163,11 @@ class LeaguesController < ApplicationController
     Participant.where(id: (user_ids + token_ids).uniq).includes(league_season: [:league, :season])
   end
 
-  def load_league
-    @league = League.friendly.find(params[:id])
-    return unless action_name == "show"
+  # `friendly_id` lets old slugs keep resolving; redirect to the current slug
+  # so canonical URLs are stable.
+  def enforce_canonical_url
     return if request.path == league_path(@league)
     redirect_to league_path(@league), status: :moved_permanently
-  end
-
-  def require_owner
-    participant = current_participant_for(@league)
-    unless participant&.is_owner?
-      redirect_to league_path(@league),
-        alert: "Only the league owner can edit this league."
-    end
   end
 
   # Seasons offered in the league-creation dropdown: upcoming first (soonest
@@ -213,27 +208,15 @@ class LeaguesController < ApplicationController
     params.require(:league).permit(:name, :private)
   end
 
-  # Parse a "YYYY-MM-DDTHH:MM" string from a datetime-local input using the
-  # browser-provided IANA timezone. Without a zone, falls through to the
-  # Rails default zone (UTC), matching the legacy behavior.
-  def parsed_local_datetime(value, zone)
-    return nil if value.blank?
-    if zone.present?
-      ActiveSupport::TimeZone[zone]&.parse(value) || value
-    else
-      value
-    end
-  end
-
   def render_no_season
     render plain: "No upcoming or active seasons are seeded. Run bin/rails db:seed.", status: :service_unavailable
   end
 
   def build_directory_query
     return nil unless @league_season
-    Leagues::DirectoryQuery.new(
+    Leagues::DirectoryQuery.from_request(
       league_season: @league_season,
-      params: params.permit(:sort, :dir, :status, :division),
+      params: params,
       user: current_user
     )
   end

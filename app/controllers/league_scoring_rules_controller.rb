@@ -6,6 +6,8 @@
 # so the new values take effect on the next standings render with no recalc
 # job to enqueue.
 class LeagueScoringRulesController < ApplicationController
+  include LeagueContext
+
   before_action :load_league
   before_action :load_league_season
   before_action :require_owner
@@ -40,25 +42,6 @@ class LeagueScoringRulesController < ApplicationController
   end
 
   private
-
-  def load_league
-    @league = League.friendly.find(params[:league_id])
-  end
-
-  def load_league_season
-    @league_season = @league.current_league_season
-    unless @league_season
-      redirect_to league_path(@league), alert: "No active season for this league."
-    end
-  end
-
-  def require_owner
-    participant = current_participant_for(@league)
-    unless participant&.is_owner?
-      redirect_to league_path(@league),
-        alert: "Only the league owner can edit this league."
-    end
-  end
 
   def ordered_overrides
     @league_season.scoring_rule_overrides.includes(:scoring_rule).ordered.to_a
