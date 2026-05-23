@@ -20,41 +20,11 @@ class Admin::TeamsController < Admin::BaseController
   end
 
   def move_up
-    if @team.default_pick_rank.nil?
-      return redirect_to admin_teams_path(list_params), alert: "Cannot move a team without a pick rank."
-    end
-
-    swap_with = Team.where(sport_id: @team.sport_id)
-      .where.not(id: @team.id)
-      .where(default_pick_rank: ...@team.default_pick_rank)
-      .order(default_pick_rank: :desc)
-      .first
-
-    if swap_with
-      swap_ranks(@team, swap_with)
-      redirect_to admin_teams_path(list_params), notice: "Moved #{@team.name} up."
-    else
-      redirect_to admin_teams_path(list_params), alert: "#{@team.name} is already at the top."
-    end
+    move(:up, edge: "top")
   end
 
   def move_down
-    if @team.default_pick_rank.nil?
-      return redirect_to admin_teams_path(list_params), alert: "Cannot move a team without a pick rank."
-    end
-
-    swap_with = Team.where(sport_id: @team.sport_id)
-      .where.not(id: @team.id)
-      .where(default_pick_rank: (@team.default_pick_rank + 1)..)
-      .order(default_pick_rank: :asc)
-      .first
-
-    if swap_with
-      swap_ranks(@team, swap_with)
-      redirect_to admin_teams_path(list_params), notice: "Moved #{@team.name} down."
-    else
-      redirect_to admin_teams_path(list_params), alert: "#{@team.name} is already at the bottom."
-    end
+    move(:down, edge: "bottom")
   end
 
   def update
@@ -93,13 +63,19 @@ class Admin::TeamsController < Admin::BaseController
     @team = Team.find(params[:id])
   end
 
-  def swap_ranks(a, b)
-    Team.transaction do
-      a_rank = a.default_pick_rank
-      b_rank = b.default_pick_rank
-      a.update!(default_pick_rank: nil)
-      b.update!(default_pick_rank: a_rank)
-      a.update!(default_pick_rank: b_rank)
+  def move(direction, edge:)
+    if @team.default_pick_rank.nil?
+      return redirect_to admin_teams_path(list_params),
+        alert: "Cannot move a team without a pick rank."
+    end
+
+    moved = (direction == :up) ? @team.move_pick_rank_up! : @team.move_pick_rank_down!
+    if moved
+      redirect_to admin_teams_path(list_params),
+        notice: "Moved #{@team.name} #{direction}."
+    else
+      redirect_to admin_teams_path(list_params),
+        alert: "#{@team.name} is already at the #{edge}."
     end
   end
 
