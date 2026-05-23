@@ -8,8 +8,8 @@ class LeagueSeason < ApplicationRecord
 
   belongs_to :league, inverse_of: :league_seasons
   belongs_to :season
-  has_many :participants, -> { order(:draft_position) }, dependent: :destroy, inverse_of: :league_season
   has_many :draft_picks, -> { order(:pick_number) }, dependent: :destroy, inverse_of: :league_season
+  has_many :participants, -> { order(:draft_position) }, dependent: :destroy, inverse_of: :league_season
   has_many :scoring_rule_overrides, class_name: "LeagueSeasonScoringRule", dependent: :destroy
 
   broadcasts_refreshes_to ->(ls) { ls.league }
