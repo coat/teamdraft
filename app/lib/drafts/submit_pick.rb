@@ -56,7 +56,7 @@ module Drafts
     private
 
     def schedule_next_clock(ls)
-      return unless ls.draft_mode == "live"
+      return unless ls.live_mode?
       return unless ls.pick_clock_seconds.present?
       return unless ls.status == "drafting"
 

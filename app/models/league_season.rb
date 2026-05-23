@@ -15,6 +15,7 @@ class LeagueSeason < ApplicationRecord
   broadcasts_refreshes_to ->(ls) { ls.league }
 
   before_validation :assign_invite_code, on: :create
+  before_validation :normalize_for_draft_mode
 
   validates :season_id, uniqueness: {scope: :league_id}
   validates :size, numericality: {only_integer: true, greater_than_or_equal_to: 2, less_than_or_equal_to: 8}
@@ -45,6 +46,27 @@ class LeagueSeason < ApplicationRecord
     %w[in_season completed].include?(status)
   end
 
+  def started?
+    draft_picks.any?
+  end
+
+  def manual_mode? = draft_mode == "manual"
+
+  def live_mode? = draft_mode == "live"
+
+  # The participant whose turn it is, or nil if the draft is complete.
+  # Pure function of `current_pick_number`, `size`, and `draft_order_style`;
+  # encapsulates the Drafts::Order lookup so callers don't repeat it.
+  def current_picker
+    return nil if current_pick_number > total_picks
+    pos = Drafts::Order.position_for(
+      pick_number: current_pick_number,
+      size: size,
+      style: draft_order_style
+    )
+    participants.find_by(draft_position: pos)
+  end
+
   def picks_per_participant
     season.season_teams.count / size
   end
@@ -57,5 +79,14 @@ class LeagueSeason < ApplicationRecord
 
   def assign_invite_code
     self.invite_code ||= self.class.generate_unique_invite_code
+  end
+
+  # Manual drafts have no clock and no scheduled start. Clearing on save
+  # keeps stale "live"-mode values from sneaking through if the owner
+  # switches the draft from live to manual.
+  def normalize_for_draft_mode
+    return unless manual_mode?
+    self.pick_clock_seconds = nil
+    self.draft_scheduled_at = nil
   end
 end

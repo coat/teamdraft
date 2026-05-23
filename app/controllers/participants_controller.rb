@@ -38,7 +38,7 @@ class ParticipantsController < ApplicationController
   end
 
   def draft_started?
-    @league_season.draft_picks.any?
+    @league_season.started?
   end
 
   def redirect_locked

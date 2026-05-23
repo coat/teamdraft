@@ -34,7 +34,7 @@ class DraftsController < ApplicationController
   end
 
   def update
-    if @league_season.draft_picks.any?
+    if @league_season.started?
       redirect_to league_path(@league), alert: "Draft has started - settings are locked."
       return
     end
@@ -46,9 +46,7 @@ class DraftsController < ApplicationController
         zone: params.dig(:league_season, :time_zone)
       )
     end
-    @league_season.assign_attributes(attrs)
-    normalize_draft_mode_switch(@league_season)
-    @league_season.save!
+    @league_season.update!(attrs)
     redirect_to league_path(@league), notice: "Draft settings updated."
   rescue ActiveRecord::RecordInvalid
     render Views::Drafts::Edit.new(league: @league, league_season: @league_season),
@@ -60,14 +58,6 @@ class DraftsController < ApplicationController
   def league_season_params
     params.require(:league_season).permit(:draft_mode, :draft_order_style,
       :draft_scheduled_at, :pick_clock_seconds)
-  end
-
-  def normalize_draft_mode_switch(league_season)
-    case league_season.draft_mode
-    when "manual"
-      league_season.pick_clock_seconds = nil
-      league_season.draft_scheduled_at = nil
-    end
   end
 
   def build_directory_query
