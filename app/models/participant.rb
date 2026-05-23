@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Participant < ApplicationRecord
+  include Positional
+
   CLAIM_TOKEN_BYTES = 24
 
   belongs_to :league_season, inverse_of: :participants
@@ -10,6 +12,8 @@ class Participant < ApplicationRecord
   delegate :league, to: :league_season
 
   broadcasts_refreshes_to ->(p) { p.league }
+
+  acts_positional column: :draft_position, scope: :league_season_id
 
   before_validation :assign_claim_token, on: :create
 
@@ -30,5 +34,11 @@ class Participant < ApplicationRecord
   def draft_position_within_league_size
     return if league_season.blank? || draft_position.blank?
     errors.add(:draft_position, "exceeds league size") if draft_position > league_season.size
+  end
+
+  # `update_columns` in the Positional swap skips the `broadcasts_refreshes_to`
+  # callback, so the league UI would stay stale after a reorder.
+  def after_position_swap
+    Turbo::StreamsChannel.broadcast_refresh_later_to(league)
   end
 end
