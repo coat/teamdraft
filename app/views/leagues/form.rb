@@ -96,10 +96,6 @@ class Views::Leagues::Form < Views::Base
   end
 
   def render_errors
-    div(class: "alert alert-error mb-4", role: "alert") do
-      ul(class: "list-disc list-inside") do
-        @errors.each { |msg| li { msg } }
-      end
-    end
+    render Views::Components::ErrorAlert.new(messages: @errors, class_name: "mb-4")
   end
 end

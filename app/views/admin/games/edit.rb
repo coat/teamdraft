@@ -24,13 +24,7 @@ class Views::Admin::Games::Edit < Views::Base
       )
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
-          if @game.errors.any?
-            div(class: "alert alert-error", role: "alert") do
-              ul(class: "list-disc list-inside") {
-                @game.errors.full_messages.each { |m| li { m } }
-              }
-            end
-          end
+          render Views::Components::ErrorAlert.new(records: @game)
 
           rounds = [Game::REGULAR_SEASON] +
             @game.season.sport.scoring_rules.where(kind: "playoff_appearance").ordered.pluck(:round_key)

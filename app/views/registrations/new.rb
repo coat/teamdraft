@@ -51,10 +51,6 @@ class Views::Registrations::New < Views::Base
   end
 
   def render_errors
-    div(class: "alert alert-error mt-3", role: "alert") do
-      ul(class: "list-disc list-inside") do
-        @user.errors.full_messages.each { |msg| li { msg } }
-      end
-    end
+    render Views::Components::ErrorAlert.new(records: @user, class_name: "mt-3")
   end
 end

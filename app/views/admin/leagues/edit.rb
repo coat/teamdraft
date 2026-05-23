@@ -26,14 +26,7 @@ class Views::Admin::Leagues::Edit < Views::Base
         div(class: "card-body") do
           render_participants
 
-          if @league.errors.any? || @league_season&.errors&.any?
-            div(class: "alert alert-error", role: "alert") do
-              ul(class: "list-disc list-inside") {
-                @league.errors.full_messages.each { |m| li { m } }
-                @league_season&.errors&.full_messages&.each { |m| li { m } }
-              }
-            end
-          end
+          render Views::Components::ErrorAlert.new(records: [@league, @league_season])
 
           form_with(url: admin_league_path(@league), method: :patch, class: "space-y-3 mt-3") do |f|
             fieldset(class: "fieldset border border-base-300 rounded-lg p-4 space-y-3") do

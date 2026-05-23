@@ -22,9 +22,9 @@ class LeagueScoringRulesController < ApplicationController
 
   def update
     ApplicationRecord.transaction do
-      overrides_params.each do |id, attrs|
+      overrides_params.each do |id, points|
         override = @league_season.scoring_rule_overrides.find(id)
-        override.update!(points: attrs[:points])
+        override.update!(points: points)
       end
     end
     redirect_to edit_league_scoring_rules_path(@league), notice: "Scoring updated."
@@ -47,7 +47,12 @@ class LeagueScoringRulesController < ApplicationController
     @league_season.scoring_rule_overrides.includes(:scoring_rule).ordered.to_a
   end
 
+  # Form posts `overrides[<id>][points]=<value>`. Override IDs are dynamic
+  # keys, so each value is permitted individually rather than declaring one
+  # outer shape. Returns `{id_string => points_string}`.
   def overrides_params
-    params.require(:overrides).to_unsafe_h.transform_values { |v| v.slice(:points) }
+    params.require(:overrides).each_pair.to_h do |id, attrs|
+      [id, attrs.permit(:points)[:points]]
+    end
   end
 end

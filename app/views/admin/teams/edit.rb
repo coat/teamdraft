@@ -16,13 +16,7 @@ class Views::Admin::Teams::Edit < Views::Base
       render Views::Components::Admin::PageHeader.new(title: "Edit #{@team.name}")
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
-          if @team.errors.any?
-            div(class: "alert alert-error", role: "alert") do
-              ul(class: "list-disc list-inside") {
-                @team.errors.full_messages.each { |m| li { m } }
-              }
-            end
-          end
+          render Views::Components::ErrorAlert.new(records: @team)
 
           form_with(model: @team, url: admin_team_path(@team), method: :patch, class: "space-y-3") do |f|
             text_field_row(f, :name, "Name", required: true)

@@ -21,13 +21,7 @@ class Views::Admin::Users::Edit < Views::Base
 
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body") do
-          if @user.errors.any?
-            div(class: "alert alert-error", role: "alert") do
-              ul(class: "list-disc list-inside") do
-                @user.errors.full_messages.each { |m| li { m } }
-              end
-            end
-          end
+          render Views::Components::ErrorAlert.new(records: @user)
 
           form_with(url: admin_user_path(@user), method: :patch, scope: :user, class: "space-y-3") do |f|
             div(class: "space-y-1") do

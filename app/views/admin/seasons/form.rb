@@ -14,13 +14,7 @@ class Views::Admin::Seasons::Form < Views::Base
   end
 
   def view_template
-    if @season.errors.any?
-      div(class: "alert alert-error", role: "alert") do
-        ul(class: "list-disc list-inside") {
-          @season.errors.full_messages.each { |m| li { m } }
-        }
-      end
-    end
+    render Views::Components::ErrorAlert.new(records: @season)
 
     form_with(model: @season, url: @url, method: @method, scope: :season, class: "space-y-3") do |f|
       select_row(f, :sport_id, "Sport", @sports, required: true)
