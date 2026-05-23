@@ -44,58 +44,33 @@ class RankingsController < ApplicationController
 
   def destroy
     ranking = current_user.team_rankings.find(params[:id])
-    removed_rank = ranking.rank
-    UserTeamRanking.transaction do
-      UserTeamRanking.connection.execute("SET CONSTRAINTS ALL DEFERRED")
-      ranking.destroy!
-      current_user.team_rankings
-        .where(sport_id: @sport.id)
-        .where("rank > ?", removed_rank)
-        .update_all("rank = rank - 1")
-    end
+    ranking.destroy!
     redirect_to sport_rankings_path(@sport.key), notice: "Removed #{ranking.team.name}."
   end
 
   def move_up
-    ranking = current_user.team_rankings.find(params[:id])
-    neighbor = current_user.team_rankings
-      .where(sport_id: @sport.id)
-      .where(rank: ...ranking.rank)
-      .order(rank: :desc).first
-    if neighbor
-      swap_ranks(ranking, neighbor)
-      redirect_to sport_rankings_path(@sport.key), notice: "Moved #{ranking.team.name} up."
-    else
-      redirect_to sport_rankings_path(@sport.key), alert: "#{ranking.team.name} is already first."
-    end
+    move(:up, edge: "first")
   end
 
   def move_down
-    ranking = current_user.team_rankings.find(params[:id])
-    neighbor = current_user.team_rankings
-      .where(sport_id: @sport.id)
-      .where("rank > ?", ranking.rank)
-      .order(rank: :asc).first
-    if neighbor
-      swap_ranks(ranking, neighbor)
-      redirect_to sport_rankings_path(@sport.key), notice: "Moved #{ranking.team.name} down."
-    else
-      redirect_to sport_rankings_path(@sport.key), alert: "#{ranking.team.name} is already last."
-    end
+    move(:down, edge: "last")
   end
 
   private
 
-  def load_sport
-    @sport = Sport.find_by!(key: params[:sport_slug])
+  def move(direction, edge:)
+    ranking = current_user.team_rankings.find(params[:id])
+    moved = (direction == :up) ? ranking.move_up! : ranking.move_down!
+    if moved
+      redirect_to sport_rankings_path(@sport.key),
+        notice: "Moved #{ranking.team.name} #{direction}."
+    else
+      redirect_to sport_rankings_path(@sport.key),
+        alert: "#{ranking.team.name} is already #{edge}."
+    end
   end
 
-  def swap_ranks(a, b)
-    UserTeamRanking.transaction do
-      UserTeamRanking.connection.execute("SET CONSTRAINTS ALL DEFERRED")
-      a_rank = a.rank
-      a.update_columns(rank: b.rank)
-      b.update_columns(rank: a_rank)
-    end
+  def load_sport
+    @sport = Sport.find_by!(key: params[:sport_slug])
   end
 end
