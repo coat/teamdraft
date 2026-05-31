@@ -16,8 +16,8 @@ RSpec.describe "League show scoring breakdown", type: :request do
     get league_path(ls.league)
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Regular-season wins")
-    expect(response.body).to include("Super Bowl win")
+    expect(response.body).to include("Regular-season win")
+    expect(response.body).to include("Won the Super Bowl")
     expect(response.body).to include("breakdown-#{alice_team.id}")
     expect(response.body).to include(season_team_path(season, slug: alice_team.team.slug))
   end

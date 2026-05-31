@@ -31,6 +31,14 @@ module Scoring
       @points_override = points_override
     end
 
+    # The sport's ScoringRule records in canonical display order. Used by
+    # views that want to render a per-event breakdown with human-readable
+    # labels - point values are still resolved through `points_for` so
+    # league-specific overrides win.
+    def ordered_rules
+      @rules
+    end
+
     def points_for(event_type)
       return Integer(@points_override[event_type] || 0) if @points_override
       rule = by_event_type[event_type]
