@@ -16,7 +16,7 @@ class Views::Layouts::Application < Views::Base
 
   def view_template(&)
     doctype
-    html(lang: "en", data_theme: "light") do
+    html(lang: "en") do
       head do
         title { @title }
         meta(name: "viewport", content: "width=device-width,initial-scale=1")
