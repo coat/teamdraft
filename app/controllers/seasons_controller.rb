@@ -8,11 +8,11 @@ class SeasonsController < ApplicationController
 
   def show
     season = Season.includes(:sport, season_teams: :team).find(params[:id])
-    standings = Seasons::TeamStandings.call(season: season)
+    standings_query = Seasons::StandingsQuery.from_request(season: season, params: params)
     league_leaders = Seasons::LeagueLeaders.call(season: season)
     render Views::Seasons::Show.new(
       season: season,
-      standings: standings,
+      standings_query: standings_query,
       league_leaders: league_leaders
     )
   end
