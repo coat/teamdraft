@@ -6,7 +6,7 @@ module Seasons
   # ScoringRule values (no league-specific overrides). Rows are ordered by
   # default points DESC, then regular-season wins DESC.
   class TeamStandings
-    Row = Data.define(:season_team, :team, :reg_w, :reg_l, :reg_t, :po_w, :po_l, :po_t, :points)
+    Row = Data.define(:season_team, :team, :reg_w, :reg_l, :reg_t, :po_w, :po_l, :po_t, :points, :events)
 
     def self.call(...) = new(...).call
 
@@ -51,14 +51,17 @@ module Seasons
         end
       end
 
-      points = season_team.scoring_events.sum { |e| rules.points_for(e.event_type) }
+      events_breakdown = season_team.scoring_events.group_by(&:event_type)
+        .transform_values { |list| list.sum { |e| rules.points_for(e.event_type) } }
+      points = events_breakdown.values.sum
 
       Row.new(
         season_team: season_team,
         team: season_team.team,
         reg_w: reg_w, reg_l: reg_l, reg_t: reg_t,
         po_w: po_w, po_l: po_l, po_t: po_t,
-        points: points
+        points: points,
+        events: events_breakdown
       )
     end
   end
