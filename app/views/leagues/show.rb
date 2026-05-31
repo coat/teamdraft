@@ -7,6 +7,7 @@ class Views::Leagues::Show < Views::Base
   include Phlex::Rails::Helpers::TurboStreamFrom
   include Components::Helpers::CurrentUser
   include Views::Components::TeamDirectoryHelpers
+  include Views::Components::ScoringBreakdownHelpers
 
   STANDINGS_COLUMNS = 6
 
@@ -358,7 +359,7 @@ class Views::Leagues::Show < Views::Base
       if pick
         tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
           td(colspan: STANDINGS_COLUMNS.to_s, class: "bg-base-200/50") do
-            render_breakdown(row.events)
+            render_scoring_breakdown(scoring_rules, row.events)
           end
         end
       end
@@ -409,28 +410,7 @@ class Views::Leagues::Show < Views::Base
     end
   end
 
-  EVENT_LABELS = {
-    "regular_win" => "Regular-season wins",
-    "playoff_appearance" => "Playoff appearance",
-    "divisional_appearance" => "Divisional round",
-    "conference_appearance" => "Conference championship",
-    "championship_appearance" => "Super Bowl appearance",
-    "championship_win" => "Super Bowl win"
-  }.freeze
-
-  def render_breakdown(events)
-    nonzero = events.reject { |_, points| points.zero? }
-    if nonzero.empty?
-      p(class: "text-sm text-base-content/60 py-2") { "No scoring yet." }
-    else
-      dl(class: "grid grid-cols-2 gap-x-4 gap-y-1 text-sm py-2") do
-        EVENT_LABELS.each do |event_type, label|
-          points = nonzero[event_type]
-          next unless points
-          dt(class: "opacity-70") { label }
-          dd(class: "text-right font-mono") { points.to_s }
-        end
-      end
-    end
+  def scoring_rules
+    @scoring_rules ||= Scoring::Rules.for_league_season(@league_season)
   end
 end
