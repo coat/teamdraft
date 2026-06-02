@@ -125,6 +125,18 @@ RSpec.describe SportsData::MlbStatsApiProvider do
       .to raise_error(SportsData::Provider::FetchFailed)
   end
 
+  it "sends a non-bot-flagged User-Agent and JSON Accept header" do
+    sport = create(:sport, :mlb)
+    season = create(:season, sport: sport, year: 2025, external_provider: "mlb_stats_api")
+    stub = stub_request(:get, schedule_url(season: "2025", gameTypes: "R,F,D,L,W"))
+      .with(headers: {"User-Agent" => "Mozilla/5.0 (compatible; teamdraft/1.0)", "Accept" => "application/json"})
+      .to_return(json_body("dates" => []))
+
+    SportsData::MlbStatsApiProvider.new(season: season).fetch_games
+
+    expect(stub).to have_been_requested
+  end
+
   it "exposes MLB round labels keyed by gameType" do
     sport = create(:sport, :mlb)
     season = create(:season, sport: sport, year: 2025, external_provider: "mlb_stats_api")

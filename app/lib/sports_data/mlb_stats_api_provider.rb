@@ -21,7 +21,7 @@ module SportsData
   class MlbStatsApiProvider < Provider
     BASE_URL = "https://statsapi.mlb.com/api/v1"
     SPORT_ID = 1
-    USER_AGENT = "td-app/1.0 (+https://github.com/anthropics/td)"
+    USER_AGENT = "Mozilla/5.0 (compatible; teamdraft/1.0)"
 
     GAME_TYPE_TO_ROUND = {
       "R" => "regular_season",
