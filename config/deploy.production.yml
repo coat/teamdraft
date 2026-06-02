@@ -1,0 +1,88 @@
+# Canonical production Kamal config for teamdraft.party. Used by the
+# release workflow (.github/workflows/release.yml), which copies this file
+# to config/deploy.yml before running `kamal deploy`. Laptop deploys
+# continue to read their own gitignored config/deploy.yml.
+#
+# Forks: see config/deploy.example.yml for a generic template. This file
+# is teamdraft.party-specific and the deploy job is gated on
+# github.repository == 'coat/teamdraft', so forks won't use it by accident.
+
+service: teamdraft
+
+# GHCR is the source of truth for images. CI publishes on tags and Kamal
+# pulls the same image during deploys.
+image: ghcr.io/coat/teamdraft
+
+servers:
+  web:
+    hosts:
+      - teamdraft.party
+
+# kamal-proxy sits between the host's nginx and the app container, doing
+# the rolling-deploy traffic switch so we get zero-downtime handoffs.
+# nginx terminates TLS on :443 and proxy_passes to 127.0.0.1:8080; the
+# proxy keeps connections to the old container alive until the new one
+# passes its healthcheck, then swaps.
+proxy:
+  ssl: false        # nginx handles TLS
+  app_port: 3000    # Puma inside the container
+  healthcheck:
+    path: /up
+  run:
+    http_port: 8080 # listen on 8080 (default is 80)
+
+# In CI, github.actor + GITHUB_TOKEN are written into .kamal/secrets by
+# the workflow. On a laptop, use your GitHub login + a PAT with
+# read:packages (write:packages if you also build/push from the laptop).
+registry:
+  server: ghcr.io
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Laptop builds locally. CI passes --skip-push so this is bypassed
+# (image is already in GHCR from the publish job).
+builder:
+  arch: amd64
+  local: true
+
+ssh:
+  user: teamdraft
+
+env:
+  clear:
+    SOLID_QUEUE_IN_PUMA: "1"
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    # With the bundled accessory, Kamal puts both containers on the same
+    # Docker network and the accessory is reachable as `teamdraft-postgres`.
+    DB_HOST: teamdraft-postgres
+  secret:
+    - RAILS_MASTER_KEY
+    - TEAMDRAFT_DATABASE_PASSWORD
+    - THESPORTSDB_KEY
+
+# Force json-file logging - the server's Docker daemon defaults to
+# journald, which rejects Kamal's default `max-size` log option.
+logging:
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+accessories:
+  postgres:
+    image: postgres:17
+    host: teamdraft.party
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: teamdraft
+        POSTGRES_DB: teamdraft_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+
+asset_path: /rails/public/assets

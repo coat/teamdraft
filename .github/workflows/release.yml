@@ -48,3 +48,63 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: publish
+    # Skips on forks — the canonical repo is the only one allowed to deploy
+    # to teamdraft.party. Forks that want CI-driven deploys should change
+    # this to their own slug and populate the secrets listed in README.
+    if: github.repository == 'coat/teamdraft' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency: deploy-production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Trust prod host keys
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      # config/deploy.yml is gitignored so each deployer (and forks) can keep
+      # their own. Install the committed canonical prod config in its place.
+      - name: Install production Kamal config
+        run: cp config/deploy.production.yml config/deploy.yml
+
+      # The file contains only $VAR references — real values stay in env vars
+      # and are interpolated by Kamal's dotenv parser at deploy time. Secret
+      # values never touch disk on the runner.
+      - name: Write .kamal/secrets shim
+        run: |
+          umask 077
+          mkdir -p .kamal
+          cat > .kamal/secrets <<'EOF'
+          KAMAL_REGISTRY_USERNAME=$KAMAL_REGISTRY_USERNAME
+          KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD
+          RAILS_MASTER_KEY=$RAILS_MASTER_KEY
+          TEAMDRAFT_DATABASE_PASSWORD=$TEAMDRAFT_DATABASE_PASSWORD
+          POSTGRES_PASSWORD=$TEAMDRAFT_DATABASE_PASSWORD
+          THESPORTSDB_KEY=$THESPORTSDB_KEY
+          EOF
+
+      - name: Kamal deploy
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          TEAMDRAFT_DATABASE_PASSWORD: ${{ secrets.TEAMDRAFT_DATABASE_PASSWORD }}
+          THESPORTSDB_KEY: ${{ secrets.THESPORTSDB_KEY }}
+        run: bundle exec kamal deploy --skip-push --version=${{ github.ref_name }}
