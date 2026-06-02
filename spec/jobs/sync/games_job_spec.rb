@@ -27,5 +27,7 @@ RSpec.describe Sync::GamesJob do
     expect { Sync::GamesJob.perform_now(season.id) }
       .to change(Game, :count).by(1)
       .and have_enqueued_job(Scoring::RecomputeJob).with(season.id)
+
+    expect(season.reload.last_synced_at).to be_within(5.seconds).of(Time.current)
   end
 end

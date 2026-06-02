@@ -3,6 +3,14 @@
 class Season < ApplicationRecord
   STATUSES = %w[upcoming active completed].freeze
 
+  # Tuning knobs for Sync::RefreshActiveSeasonsJob's per-season gating.
+  # The pre-window covers warm-up; the post-window covers the longest games
+  # plus a tail for stat corrections. The fallback guarantees we still poll a
+  # few times overnight in case a final score is adjusted hours later.
+  SYNC_WINDOW_BEFORE = 30.minutes
+  SYNC_WINDOW_AFTER = 6.hours
+  SYNC_OVERNIGHT_FALLBACK = 3.hours
+
   scope :active, -> { where(status: "active") }
 
   belongs_to :sport
@@ -18,6 +26,18 @@ class Season < ApplicationRecord
   validates :label, presence: true
   validates :status, inclusion: {in: STATUSES}
   validate :ends_after_starts
+
+  # Returns the gating reason for Sync::RefreshActiveSeasonsJob, or nil if the
+  # season can be skipped on this tick. Reasons: :window (a game is about to
+  # start, in play, or just finished), :live (in_progress safety net),
+  # :fallback (no relevant games but we haven't synced in a while).
+  def score_sync_reason(now: Time.current)
+    window = (now - SYNC_WINDOW_AFTER)..(now + SYNC_WINDOW_BEFORE)
+    return :window if games.where(kickoff_at: window).exists?
+    return :live if games.where(status: "in_progress").exists?
+    return :fallback if last_synced_at.nil? || last_synced_at < now - SYNC_OVERNIGHT_FALLBACK
+    nil
+  end
 
   private
 

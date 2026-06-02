@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_21_213040) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -189,6 +189,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_213040) do
     t.string "external_id"
     t.string "external_provider"
     t.string "label", null: false
+    t.datetime "last_synced_at"
     t.bigint "sport_id", null: false
     t.date "starts_on"
     t.string "status", default: "upcoming", null: false
