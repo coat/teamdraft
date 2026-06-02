@@ -187,14 +187,15 @@ module SportsData
       nil
     end
 
+    # Postponed/cancelled events come back with strStatus="Match Finished"
+    # but blank scores, which then trips the Game model's "scores required
+    # for final" validation. Require scores to be present before calling a
+    # game final; everything else stays scheduled so the row still upserts.
     def status_for(event)
       home = event["intHomeScore"]
       away = event["intAwayScore"]
-      if event["strStatus"] == "Match Finished" || (home.present? && away.present?)
-        "final"
-      else
-        "scheduled"
-      end
+      return "final" if home.present? && away.present?
+      "scheduled"
     end
 
     def parse_kickoff(event)

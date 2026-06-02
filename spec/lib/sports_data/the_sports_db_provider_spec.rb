@@ -33,6 +33,19 @@ RSpec.describe SportsData::TheSportsDbProvider do
     expect(sched.home_score).to be_nil
   end
 
+  it "treats postponed/cancelled games (Match Finished with no scores) as scheduled" do
+    season = create_nfl_season(team_count: 2)
+    stub_all_rounds(season, events_by_round: {
+      "1" => [event(id: "1099", round: "1", home_score: nil, away_score: nil, status: "Match Finished")]
+    })
+    provider = SportsData::TheSportsDbProvider.new(season: season, api_key: "test-key")
+
+    games = provider.fetch_games
+
+    expect(games.first.status).to eq("scheduled")
+    expect(games.first.home_score).to be_nil
+  end
+
   it "maps the championship round to championship" do
     season = create_nfl_season(team_count: 2)
     stub_all_rounds(season, events_by_round: {
