@@ -24,7 +24,8 @@ module Sports
           current_season: ->(today) {
             year = (today.month >= 10) ? today.year : today.year - 1
             {year: year, label: "#{year}-#{year + 1} NBA Season",
-             starts_on: Date.new(year, 10, 1), ends_on: Date.new(year + 1, 6, 30)}
+             starts_on: Date.new(year, 10, 1), ends_on: Date.new(year + 1, 6, 30),
+             external_provider: "nba_stats_api", external_id: year.to_s}
           }
         )
       end
