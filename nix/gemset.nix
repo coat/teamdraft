@@ -246,12 +246,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "1i5nn4750jnsd3gs0ca9zbiq1aglvzasp6j6f2s7kli4hm27gdin";
+      sha256 = "0jhnvalyqhjv10y2m804z2s9wabmys4a4di6187jjch3qy4an2y6";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "1.24.5";
+    version = "1.24.6";
   };
   brakeman = {
     dependencies = ["racc"];
@@ -819,12 +819,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0cnpnbn2yivj9gxkh8mjklbgnpx6nf7b8j2hky01dl0040hy0k76";
+      sha256 = "0v68nyl07xira30iyhn3118a4g59ar5748laq0cx2pwnsdy7ivrz";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "1.8.0";
+    version = "1.8.1";
   };
   net-imap = {
     dependencies = ["date" "net-protocol"];
@@ -968,12 +968,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0nffc5r8dwx0cdl8qkqrydr1z5zb4kxpgl75myxwbjp0n6k3zprb";
+      sha256 = "0j15864cks256hsi1b9x6pimc7vzay4nj8iwa3inc69sv8v06yc6";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "43.5.4";
+    version = "43.5.5";
   };
   parallel = {
     groups = ["default" "development" "test"];
@@ -1495,12 +1495,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0q04dcz4kph9843xcv3f3y64nm9vx90q93glg9idamd4653sas51";
+      sha256 = "1d996bw1iaf2gdslmg0hzbaqf3r9x8366sl7xfay2dmzyq76hyc3";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "3.0.12";
+    version = "4.0.0";
   };
   solid_cache = {
     dependencies = ["activejob" "activerecord" "railties"];
@@ -1860,15 +1860,15 @@
     version = "0.4.0";
   };
   zeitwerk = {
-    groups = ["default"];
+    groups = ["default" "development" "test"];
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "1pbkiwwla5gldgb3saamn91058nl1sq1344l5k36xsh9ih995nnq";
+      sha256 = "04hx33lsnp4q0qf8982mz0acs1dap5s2bsmihi0n0g08249sc4kj";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "2.7.5";
+    version = "2.8.2";
   };
 }
