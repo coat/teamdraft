@@ -27,7 +27,7 @@ RSpec.describe Sync::ApplyGames do
       home_team_external_id: "UNKNOWN-1",
       away_team_external_id: "UNKNOWN-2",
       home_score: nil, away_score: nil,
-      kickoff_at: Time.current, round: "regular_season", week: 1, status: "scheduled"
+      starts_at: Time.current, round: "regular_season", week: 1, status: "scheduled"
     )
 
     result = Sync::ApplyGames.call(season: season, parsed_games: [parsed])
@@ -43,7 +43,7 @@ RSpec.describe Sync::ApplyGames do
       away_team_external_id: away_team.external_id,
       home_score: home_score,
       away_score: away_score,
-      kickoff_at: 1.day.ago,
+      starts_at: 1.day.ago,
       round: "regular_season",
       week: 1,
       status: status

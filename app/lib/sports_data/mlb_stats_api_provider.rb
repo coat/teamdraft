@@ -119,7 +119,7 @@ module SportsData
         away_team_external_id: game.dig("teams", "away", "team", "id").to_s,
         home_score: game.dig("teams", "home", "score"),
         away_score: game.dig("teams", "away", "score"),
-        kickoff_at: parse_kickoff(game["gameDate"]),
+        starts_at: parse_start(game["gameDate"]),
         round: round,
         week: nil,
         status: status_for(game)
@@ -140,7 +140,7 @@ module SportsData
       "scheduled"
     end
 
-    def parse_kickoff(value)
+    def parse_start(value)
       return nil if value.blank?
       Time.iso8601(value)
     rescue ArgumentError

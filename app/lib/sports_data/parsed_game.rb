@@ -10,7 +10,7 @@ module SportsData
     :away_team_external_id,
     :home_score,
     :away_score,
-    :kickoff_at,
+    :starts_at,
     :round,
     :week,
     :status

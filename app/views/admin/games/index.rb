@@ -57,7 +57,7 @@ class Views::Admin::Games::Index < Views::Base
 
   def render_row(game)
     tr do
-      td(class: "whitespace-nowrap") { game.kickoff_at&.strftime("%a %b %-d %-l:%M%P") }
+      td(class: "whitespace-nowrap") { game.starts_at&.strftime("%a %b %-d %-l:%M%P") }
       td { game.round }
       td { game.week&.to_s }
       td { "#{game.away_season_team.team.abbreviation} @ #{game.home_season_team.team.abbreviation}" }

@@ -132,7 +132,7 @@ module Scoring
     end
 
     def occurred_at(game)
-      game.completed_at || game.kickoff_at
+      game.completed_at || game.starts_at
     end
 
     def upsert_event(season_team:, game:, event_type:, occurred_at:)

@@ -36,7 +36,7 @@ RSpec.describe Sync::RefreshActiveSeasonsJob do
     season = create_nfl_season(status: "active", external_id: "n-2026", last_synced_at: 10.minutes.ago)
     home, away = season.season_teams.first(2)
     create(:game, season: season, home_season_team: home, away_season_team: away,
-      kickoff_at: 3.days.from_now)
+      starts_at: 3.days.from_now)
 
     Sync::RefreshActiveSeasonsJob.perform_now
 
@@ -47,18 +47,18 @@ RSpec.describe Sync::RefreshActiveSeasonsJob do
     season = create_nfl_season(status: "active", external_id: "n-2026", last_synced_at: 4.hours.ago)
     home, away = season.season_teams.first(2)
     create(:game, season: season, home_season_team: home, away_season_team: away,
-      kickoff_at: 3.days.from_now)
+      starts_at: 3.days.from_now)
 
     Sync::RefreshActiveSeasonsJob.perform_now
 
     expect(enqueued_games_jobs.map { |j| j[:args].first }).to contain_exactly(season.id)
   end
 
-  it "enqueues a season with a game inside the kickoff window even when recently synced" do
+  it "enqueues a season with a game inside the start window even when recently synced" do
     season = create_nfl_season(status: "active", external_id: "n-2026", last_synced_at: 1.minute.ago)
     home, away = season.season_teams.first(2)
     create(:game, season: season, home_season_team: home, away_season_team: away,
-      kickoff_at: 15.minutes.from_now)
+      starts_at: 15.minutes.from_now)
 
     Sync::RefreshActiveSeasonsJob.perform_now
 

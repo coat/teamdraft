@@ -10,7 +10,7 @@ class Game < ApplicationRecord
   has_many :scoring_events, dependent: :destroy
 
   validates :status, inclusion: {in: STATUSES}
-  validates :kickoff_at, presence: true
+  validates :starts_at, presence: true
   validates :external_id, uniqueness: {scope: :season_id, allow_nil: true}
   validate :round_is_known_for_sport
   validate :distinct_teams

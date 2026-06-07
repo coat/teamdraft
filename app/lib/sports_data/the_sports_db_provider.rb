@@ -163,7 +163,7 @@ module SportsData
         away_team_external_id: event["idAwayTeam"],
         home_score: parse_int(event["intHomeScore"]),
         away_score: parse_int(event["intAwayScore"]),
-        kickoff_at: parse_kickoff(event),
+        starts_at: parse_start(event),
         round:,
         week: parsed_week_for(round, event["intRound"]),
         status: status_for(event)
@@ -198,7 +198,7 @@ module SportsData
       "scheduled"
     end
 
-    def parse_kickoff(event)
+    def parse_start(event)
       date = event["dateEvent"]
       time = event["strTime"].presence || "00:00:00"
       Time.parse("#{date} #{time} UTC")

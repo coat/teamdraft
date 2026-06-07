@@ -33,7 +33,7 @@ class Season < ApplicationRecord
   # :fallback (no relevant games but we haven't synced in a while).
   def score_sync_reason(now: Time.current)
     window = (now - SYNC_WINDOW_AFTER)..(now + SYNC_WINDOW_BEFORE)
-    return :window if games.where(kickoff_at: window).exists?
+    return :window if games.where(starts_at: window).exists?
     return :live if games.where(status: "in_progress").exists?
     return :fallback if last_synced_at.nil? || last_synced_at < now - SYNC_OVERNIGHT_FALLBACK
     nil

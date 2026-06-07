@@ -56,7 +56,7 @@ module Sync
       game.assign_attributes(
         home_season_team: home,
         away_season_team: away,
-        kickoff_at: pg.kickoff_at,
+        starts_at: pg.starts_at,
         round: pg.round,
         week: pg.week,
         home_score: pg.home_score,

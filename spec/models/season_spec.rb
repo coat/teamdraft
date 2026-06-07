@@ -4,11 +4,11 @@ require "rails_helper"
 
 RSpec.describe Season do
   describe "#score_sync_reason" do
-    it "returns :window when a game's kickoff_at is inside the pre/post window" do
+    it "returns :window when a game's starts_at is inside the pre/post window" do
       season = create_nfl_season(last_synced_at: 1.minute.ago)
       home, away = season.season_teams.first(2)
       create(:game, season: season, home_season_team: home, away_season_team: away,
-        kickoff_at: 10.minutes.from_now)
+        starts_at: 10.minutes.from_now)
 
       expect(season.score_sync_reason).to eq(:window)
     end
@@ -17,16 +17,16 @@ RSpec.describe Season do
       season = create_nfl_season(last_synced_at: 1.minute.ago)
       home, away = season.season_teams.first(2)
       create(:game, :final, season: season, home_season_team: home, away_season_team: away,
-        kickoff_at: 4.hours.ago)
+        starts_at: 4.hours.ago)
 
       expect(season.score_sync_reason).to eq(:window)
     end
 
-    it "returns :live when any game is in_progress, even outside the kickoff window" do
+    it "returns :live when any game is in_progress, even outside the start window" do
       season = create_nfl_season(last_synced_at: 1.minute.ago)
       home, away = season.season_teams.first(2)
       create(:game, season: season, home_season_team: home, away_season_team: away,
-        status: "in_progress", kickoff_at: 12.hours.ago)
+        status: "in_progress", starts_at: 12.hours.ago)
 
       expect(season.score_sync_reason).to eq(:live)
     end
@@ -35,7 +35,7 @@ RSpec.describe Season do
       season = create_nfl_season(last_synced_at: 4.hours.ago)
       home, away = season.season_teams.first(2)
       create(:game, season: season, home_season_team: home, away_season_team: away,
-        kickoff_at: 3.days.from_now)
+        starts_at: 3.days.from_now)
 
       expect(season.score_sync_reason).to eq(:fallback)
     end
@@ -50,7 +50,7 @@ RSpec.describe Season do
       season = create_nfl_season(last_synced_at: 10.minutes.ago)
       home, away = season.season_teams.first(2)
       create(:game, season: season, home_season_team: home, away_season_team: away,
-        kickoff_at: 3.days.from_now)
+        starts_at: 3.days.from_now)
 
       expect(season.score_sync_reason).to be_nil
     end

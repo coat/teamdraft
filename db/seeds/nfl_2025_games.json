@@ -7,7 +7,7 @@
         "home_abbr": "PHI",
         "away_score": 20,
         "home_score": 24,
-        "kickoff_at": "2025-09-05T00:20:00Z",
+        "starts_at": "2025-09-05T00:20:00Z",
         "external_id": "2261187"
     },
     {
@@ -18,7 +18,7 @@
         "home_abbr": "LAC",
         "away_score": 21,
         "home_score": 27,
-        "kickoff_at": "2025-09-06T00:00:00Z",
+        "starts_at": "2025-09-06T00:00:00Z",
         "external_id": "2261188"
     },
     {
@@ -29,7 +29,7 @@
         "home_abbr": "ATL",
         "away_score": 23,
         "home_score": 20,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261189"
     },
     {
@@ -40,7 +40,7 @@
         "home_abbr": "CLE",
         "away_score": 17,
         "home_score": 16,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261190"
     },
     {
@@ -51,7 +51,7 @@
         "home_abbr": "IND",
         "away_score": 8,
         "home_score": 33,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261191"
     },
     {
@@ -62,7 +62,7 @@
         "home_abbr": "NE",
         "away_score": 20,
         "home_score": 13,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261192"
     },
     {
@@ -73,7 +73,7 @@
         "home_abbr": "NO",
         "away_score": 20,
         "home_score": 13,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261193"
     },
     {
@@ -84,7 +84,7 @@
         "home_abbr": "NYJ",
         "away_score": 34,
         "home_score": 32,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261194"
     },
     {
@@ -95,7 +95,7 @@
         "home_abbr": "WAS",
         "away_score": 6,
         "home_score": 21,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261195"
     },
     {
@@ -106,7 +106,7 @@
         "home_abbr": "JAX",
         "away_score": 10,
         "home_score": 26,
-        "kickoff_at": "2025-09-07T17:00:00Z",
+        "starts_at": "2025-09-07T17:00:00Z",
         "external_id": "2261196"
     },
     {
@@ -117,7 +117,7 @@
         "home_abbr": "DEN",
         "away_score": 12,
         "home_score": 20,
-        "kickoff_at": "2025-09-07T20:05:00Z",
+        "starts_at": "2025-09-07T20:05:00Z",
         "external_id": "2261197"
     },
     {
@@ -128,7 +128,7 @@
         "home_abbr": "SEA",
         "away_score": 17,
         "home_score": 13,
-        "kickoff_at": "2025-09-07T20:05:00Z",
+        "starts_at": "2025-09-07T20:05:00Z",
         "external_id": "2261198"
     },
     {
@@ -139,7 +139,7 @@
         "home_abbr": "GB",
         "away_score": 13,
         "home_score": 27,
-        "kickoff_at": "2025-09-07T20:25:00Z",
+        "starts_at": "2025-09-07T20:25:00Z",
         "external_id": "2261199"
     },
     {
@@ -150,7 +150,7 @@
         "home_abbr": "LAR",
         "away_score": 9,
         "home_score": 14,
-        "kickoff_at": "2025-09-07T20:25:00Z",
+        "starts_at": "2025-09-07T20:25:00Z",
         "external_id": "2261200"
     },
     {
@@ -161,7 +161,7 @@
         "home_abbr": "BUF",
         "away_score": 40,
         "home_score": 41,
-        "kickoff_at": "2025-09-08T00:20:00Z",
+        "starts_at": "2025-09-08T00:20:00Z",
         "external_id": "2261201"
     },
     {
@@ -172,7 +172,7 @@
         "home_abbr": "CHI",
         "away_score": 27,
         "home_score": 24,
-        "kickoff_at": "2025-09-09T00:15:00Z",
+        "starts_at": "2025-09-09T00:15:00Z",
         "external_id": "2261202"
     },
     {
@@ -183,7 +183,7 @@
         "home_abbr": "GB",
         "away_score": 18,
         "home_score": 27,
-        "kickoff_at": "2025-09-12T00:15:00Z",
+        "starts_at": "2025-09-12T00:15:00Z",
         "external_id": "2261203"
     },
     {
@@ -194,7 +194,7 @@
         "home_abbr": "CIN",
         "away_score": 27,
         "home_score": 31,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261204"
     },
     {
@@ -205,7 +205,7 @@
         "home_abbr": "DAL",
         "away_score": 37,
         "home_score": 40,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261205"
     },
     {
@@ -216,7 +216,7 @@
         "home_abbr": "TEN",
         "away_score": 33,
         "home_score": 19,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261207"
     },
     {
@@ -227,7 +227,7 @@
         "home_abbr": "MIA",
         "away_score": 33,
         "home_score": 27,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261208"
     },
     {
@@ -238,7 +238,7 @@
         "home_abbr": "NYJ",
         "away_score": 30,
         "home_score": 10,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261210"
     },
     {
@@ -249,7 +249,7 @@
         "home_abbr": "PIT",
         "away_score": 31,
         "home_score": 17,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261211"
     },
     {
@@ -260,7 +260,7 @@
         "home_abbr": "BAL",
         "away_score": 17,
         "home_score": 41,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2261212"
     },
     {
@@ -271,7 +271,7 @@
         "home_abbr": "DET",
         "away_score": 21,
         "home_score": 52,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2374285"
     },
     {
@@ -282,7 +282,7 @@
         "home_abbr": "NO",
         "away_score": 26,
         "home_score": 21,
-        "kickoff_at": "2025-09-14T17:00:00Z",
+        "starts_at": "2025-09-14T17:00:00Z",
         "external_id": "2374286"
     },
     {
@@ -293,7 +293,7 @@
         "home_abbr": "IND",
         "away_score": 28,
         "home_score": 29,
-        "kickoff_at": "2025-09-14T20:05:00Z",
+        "starts_at": "2025-09-14T20:05:00Z",
         "external_id": "2261213"
     },
     {
@@ -304,7 +304,7 @@
         "home_abbr": "ARI",
         "away_score": 22,
         "home_score": 27,
-        "kickoff_at": "2025-09-14T20:05:00Z",
+        "starts_at": "2025-09-14T20:05:00Z",
         "external_id": "2261214"
     },
     {
@@ -315,7 +315,7 @@
         "home_abbr": "KC",
         "away_score": 20,
         "home_score": 17,
-        "kickoff_at": "2025-09-14T20:25:00Z",
+        "starts_at": "2025-09-14T20:25:00Z",
         "external_id": "2261215"
     },
     {
@@ -326,7 +326,7 @@
         "home_abbr": "MIN",
         "away_score": 22,
         "home_score": 6,
-        "kickoff_at": "2025-09-15T00:20:00Z",
+        "starts_at": "2025-09-15T00:20:00Z",
         "external_id": "2261216"
     },
     {
@@ -337,7 +337,7 @@
         "home_abbr": "HOU",
         "away_score": 20,
         "home_score": 19,
-        "kickoff_at": "2025-09-15T23:00:00Z",
+        "starts_at": "2025-09-15T23:00:00Z",
         "external_id": "2261217"
     },
     {
@@ -348,7 +348,7 @@
         "home_abbr": "LV",
         "away_score": 20,
         "home_score": 9,
-        "kickoff_at": "2025-09-16T02:00:00Z",
+        "starts_at": "2025-09-16T02:00:00Z",
         "external_id": "2261218"
     },
     {
@@ -359,7 +359,7 @@
         "home_abbr": "BUF",
         "away_score": 21,
         "home_score": 31,
-        "kickoff_at": "2025-09-19T00:15:00Z",
+        "starts_at": "2025-09-19T00:15:00Z",
         "external_id": "2261219"
     },
     {
@@ -370,7 +370,7 @@
         "home_abbr": "CLE",
         "away_score": 10,
         "home_score": 13,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261220"
     },
     {
@@ -381,7 +381,7 @@
         "home_abbr": "TEN",
         "away_score": 41,
         "home_score": 20,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261221"
     },
     {
@@ -392,7 +392,7 @@
         "home_abbr": "MIN",
         "away_score": 10,
         "home_score": 48,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261222"
     },
     {
@@ -403,7 +403,7 @@
         "home_abbr": "NE",
         "away_score": 21,
         "home_score": 14,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261223"
     },
     {
@@ -414,7 +414,7 @@
         "home_abbr": "PHI",
         "away_score": 26,
         "home_score": 33,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261224"
     },
     {
@@ -425,7 +425,7 @@
         "home_abbr": "TB",
         "away_score": 27,
         "home_score": 29,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261225"
     },
     {
@@ -436,7 +436,7 @@
         "home_abbr": "WAS",
         "away_score": 24,
         "home_score": 41,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261226"
     },
     {
@@ -447,7 +447,7 @@
         "home_abbr": "CAR",
         "away_score": 0,
         "home_score": 30,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261227"
     },
     {
@@ -458,7 +458,7 @@
         "home_abbr": "JAX",
         "away_score": 10,
         "home_score": 17,
-        "kickoff_at": "2025-09-21T17:00:00Z",
+        "starts_at": "2025-09-21T17:00:00Z",
         "external_id": "2261228"
     },
     {
@@ -469,7 +469,7 @@
         "home_abbr": "LAC",
         "away_score": 20,
         "home_score": 23,
-        "kickoff_at": "2025-09-21T20:05:00Z",
+        "starts_at": "2025-09-21T20:05:00Z",
         "external_id": "2261229"
     },
     {
@@ -480,7 +480,7 @@
         "home_abbr": "SEA",
         "away_score": 13,
         "home_score": 44,
-        "kickoff_at": "2025-09-21T20:05:00Z",
+        "starts_at": "2025-09-21T20:05:00Z",
         "external_id": "2261230"
     },
     {
@@ -491,7 +491,7 @@
         "home_abbr": "CHI",
         "away_score": 14,
         "home_score": 31,
-        "kickoff_at": "2025-09-21T20:25:00Z",
+        "starts_at": "2025-09-21T20:25:00Z",
         "external_id": "2261231"
     },
     {
@@ -502,7 +502,7 @@
         "home_abbr": "SF",
         "away_score": 15,
         "home_score": 16,
-        "kickoff_at": "2025-09-21T20:25:00Z",
+        "starts_at": "2025-09-21T20:25:00Z",
         "external_id": "2261232"
     },
     {
@@ -513,7 +513,7 @@
         "home_abbr": "NYG",
         "away_score": 22,
         "home_score": 9,
-        "kickoff_at": "2025-09-22T00:20:00Z",
+        "starts_at": "2025-09-22T00:20:00Z",
         "external_id": "2261233"
     },
     {
@@ -524,7 +524,7 @@
         "home_abbr": "BAL",
         "away_score": 38,
         "home_score": 30,
-        "kickoff_at": "2025-09-23T00:15:00Z",
+        "starts_at": "2025-09-23T00:15:00Z",
         "external_id": "2261234"
     },
     {
@@ -535,7 +535,7 @@
         "home_abbr": "ARI",
         "away_score": 23,
         "home_score": 20,
-        "kickoff_at": "2025-09-26T00:15:00Z",
+        "starts_at": "2025-09-26T00:15:00Z",
         "external_id": "2261235"
     },
     {
@@ -546,7 +546,7 @@
         "home_abbr": "PIT",
         "away_score": 21,
         "home_score": 24,
-        "kickoff_at": "2025-09-28T13:30:00Z",
+        "starts_at": "2025-09-28T13:30:00Z",
         "external_id": "2261236"
     },
     {
@@ -557,7 +557,7 @@
         "home_abbr": "ATL",
         "away_score": 27,
         "home_score": 34,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261237"
     },
     {
@@ -568,7 +568,7 @@
         "home_abbr": "BUF",
         "away_score": 19,
         "home_score": 31,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261238"
     },
     {
@@ -579,7 +579,7 @@
         "home_abbr": "DET",
         "away_score": 10,
         "home_score": 34,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261239"
     },
     {
@@ -590,7 +590,7 @@
         "home_abbr": "NE",
         "away_score": 13,
         "home_score": 42,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261240"
     },
     {
@@ -601,7 +601,7 @@
         "home_abbr": "NYG",
         "away_score": 18,
         "home_score": 21,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261241"
     },
     {
@@ -612,7 +612,7 @@
         "home_abbr": "TB",
         "away_score": 31,
         "home_score": 25,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261242"
     },
     {
@@ -623,7 +623,7 @@
         "home_abbr": "HOU",
         "away_score": 0,
         "home_score": 26,
-        "kickoff_at": "2025-09-28T17:00:00Z",
+        "starts_at": "2025-09-28T17:00:00Z",
         "external_id": "2261243"
     },
     {
@@ -634,7 +634,7 @@
         "home_abbr": "LAR",
         "away_score": 20,
         "home_score": 27,
-        "kickoff_at": "2025-09-28T20:05:00Z",
+        "starts_at": "2025-09-28T20:05:00Z",
         "external_id": "2261244"
     },
     {
@@ -645,7 +645,7 @@
         "home_abbr": "SF",
         "away_score": 26,
         "home_score": 21,
-        "kickoff_at": "2025-09-28T20:05:00Z",
+        "starts_at": "2025-09-28T20:05:00Z",
         "external_id": "2261245"
     },
     {
@@ -656,7 +656,7 @@
         "home_abbr": "KC",
         "away_score": 20,
         "home_score": 37,
-        "kickoff_at": "2025-09-28T20:25:00Z",
+        "starts_at": "2025-09-28T20:25:00Z",
         "external_id": "2261246"
     },
     {
@@ -667,7 +667,7 @@
         "home_abbr": "LV",
         "away_score": 25,
         "home_score": 24,
-        "kickoff_at": "2025-09-28T20:25:00Z",
+        "starts_at": "2025-09-28T20:25:00Z",
         "external_id": "2261247"
     },
     {
@@ -678,7 +678,7 @@
         "home_abbr": "DAL",
         "away_score": 40,
         "home_score": 40,
-        "kickoff_at": "2025-09-29T00:20:00Z",
+        "starts_at": "2025-09-29T00:20:00Z",
         "external_id": "2261248"
     },
     {
@@ -689,7 +689,7 @@
         "home_abbr": "MIA",
         "away_score": 21,
         "home_score": 27,
-        "kickoff_at": "2025-09-29T23:15:00Z",
+        "starts_at": "2025-09-29T23:15:00Z",
         "external_id": "2261249"
     },
     {
@@ -700,7 +700,7 @@
         "home_abbr": "DEN",
         "away_score": 3,
         "home_score": 28,
-        "kickoff_at": "2025-09-30T00:15:00Z",
+        "starts_at": "2025-09-30T00:15:00Z",
         "external_id": "2261250"
     },
     {
@@ -711,7 +711,7 @@
         "home_abbr": "LAR",
         "away_score": 26,
         "home_score": 23,
-        "kickoff_at": "2025-10-03T00:15:00Z",
+        "starts_at": "2025-10-03T00:15:00Z",
         "external_id": "2261251"
     },
     {
@@ -722,7 +722,7 @@
         "home_abbr": "CLE",
         "away_score": 21,
         "home_score": 17,
-        "kickoff_at": "2025-10-05T13:30:00Z",
+        "starts_at": "2025-10-05T13:30:00Z",
         "external_id": "2261252"
     },
     {
@@ -733,7 +733,7 @@
         "home_abbr": "IND",
         "away_score": 6,
         "home_score": 40,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261253"
     },
     {
@@ -744,7 +744,7 @@
         "home_abbr": "NO",
         "away_score": 14,
         "home_score": 26,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261254"
     },
     {
@@ -755,7 +755,7 @@
         "home_abbr": "NYJ",
         "away_score": 37,
         "home_score": 22,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261255"
     },
     {
@@ -766,7 +766,7 @@
         "home_abbr": "PHI",
         "away_score": 21,
         "home_score": 17,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261256"
     },
     {
@@ -777,7 +777,7 @@
         "home_abbr": "CAR",
         "away_score": 24,
         "home_score": 27,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261257"
     },
     {
@@ -788,7 +788,7 @@
         "home_abbr": "BAL",
         "away_score": 44,
         "home_score": 10,
-        "kickoff_at": "2025-10-05T17:00:00Z",
+        "starts_at": "2025-10-05T17:00:00Z",
         "external_id": "2261258"
     },
     {
@@ -799,7 +799,7 @@
         "home_abbr": "ARI",
         "away_score": 22,
         "home_score": 21,
-        "kickoff_at": "2025-10-05T20:05:00Z",
+        "starts_at": "2025-10-05T20:05:00Z",
         "external_id": "2261259"
     },
     {
@@ -810,7 +810,7 @@
         "home_abbr": "SEA",
         "away_score": 38,
         "home_score": 35,
-        "kickoff_at": "2025-10-05T20:05:00Z",
+        "starts_at": "2025-10-05T20:05:00Z",
         "external_id": "2261260"
     },
     {
@@ -821,7 +821,7 @@
         "home_abbr": "CIN",
         "away_score": 37,
         "home_score": 24,
-        "kickoff_at": "2025-10-05T20:25:00Z",
+        "starts_at": "2025-10-05T20:25:00Z",
         "external_id": "2261261"
     },
     {
@@ -832,7 +832,7 @@
         "home_abbr": "LAC",
         "away_score": 27,
         "home_score": 10,
-        "kickoff_at": "2025-10-05T20:25:00Z",
+        "starts_at": "2025-10-05T20:25:00Z",
         "external_id": "2261262"
     },
     {
@@ -843,7 +843,7 @@
         "home_abbr": "BUF",
         "away_score": 23,
         "home_score": 20,
-        "kickoff_at": "2025-10-06T00:20:00Z",
+        "starts_at": "2025-10-06T00:20:00Z",
         "external_id": "2261263"
     },
     {
@@ -854,7 +854,7 @@
         "home_abbr": "JAX",
         "away_score": 28,
         "home_score": 31,
-        "kickoff_at": "2025-10-07T00:15:00Z",
+        "starts_at": "2025-10-07T00:15:00Z",
         "external_id": "2261264"
     },
     {
@@ -865,7 +865,7 @@
         "home_abbr": "NYG",
         "away_score": 17,
         "home_score": 34,
-        "kickoff_at": "2025-10-10T00:15:00Z",
+        "starts_at": "2025-10-10T00:15:00Z",
         "external_id": "2261265"
     },
     {
@@ -876,7 +876,7 @@
         "home_abbr": "NYJ",
         "away_score": 13,
         "home_score": 11,
-        "kickoff_at": "2025-10-12T13:30:00Z",
+        "starts_at": "2025-10-12T13:30:00Z",
         "external_id": "2261266"
     },
     {
@@ -887,7 +887,7 @@
         "home_abbr": "IND",
         "away_score": 27,
         "home_score": 31,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261267"
     },
     {
@@ -898,7 +898,7 @@
         "home_abbr": "MIA",
         "away_score": 29,
         "home_score": 27,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261268"
     },
     {
@@ -909,7 +909,7 @@
         "home_abbr": "PIT",
         "away_score": 9,
         "home_score": 23,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261269"
     },
     {
@@ -920,7 +920,7 @@
         "home_abbr": "CAR",
         "away_score": 27,
         "home_score": 30,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261271"
     },
     {
@@ -931,7 +931,7 @@
         "home_abbr": "JAX",
         "away_score": 20,
         "home_score": 12,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261272"
     },
     {
@@ -942,7 +942,7 @@
         "home_abbr": "BAL",
         "away_score": 17,
         "home_score": 3,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261273"
     },
     {
@@ -953,7 +953,7 @@
         "home_abbr": "NO",
         "away_score": 25,
         "home_score": 19,
-        "kickoff_at": "2025-10-12T17:00:00Z",
+        "starts_at": "2025-10-12T17:00:00Z",
         "external_id": "2261276"
     },
     {
@@ -964,7 +964,7 @@
         "home_abbr": "LV",
         "away_score": 10,
         "home_score": 20,
-        "kickoff_at": "2025-10-12T20:05:00Z",
+        "starts_at": "2025-10-12T20:05:00Z",
         "external_id": "2261274"
     },
     {
@@ -975,7 +975,7 @@
         "home_abbr": "TB",
         "away_score": 19,
         "home_score": 30,
-        "kickoff_at": "2025-10-12T20:25:00Z",
+        "starts_at": "2025-10-12T20:25:00Z",
         "external_id": "2261270"
     },
     {
@@ -986,7 +986,7 @@
         "home_abbr": "GB",
         "away_score": 18,
         "home_score": 27,
-        "kickoff_at": "2025-10-12T20:25:00Z",
+        "starts_at": "2025-10-12T20:25:00Z",
         "external_id": "2261275"
     },
     {
@@ -997,7 +997,7 @@
         "home_abbr": "KC",
         "away_score": 17,
         "home_score": 30,
-        "kickoff_at": "2025-10-13T00:20:00Z",
+        "starts_at": "2025-10-13T00:20:00Z",
         "external_id": "2261277"
     },
     {
@@ -1008,7 +1008,7 @@
         "home_abbr": "ATL",
         "away_score": 14,
         "home_score": 24,
-        "kickoff_at": "2025-10-13T23:15:00Z",
+        "starts_at": "2025-10-13T23:15:00Z",
         "external_id": "2261278"
     },
     {
@@ -1019,7 +1019,7 @@
         "home_abbr": "WAS",
         "away_score": 25,
         "home_score": 24,
-        "kickoff_at": "2025-10-14T00:15:00Z",
+        "starts_at": "2025-10-14T00:15:00Z",
         "external_id": "2261279"
     },
     {
@@ -1030,7 +1030,7 @@
         "home_abbr": "CIN",
         "away_score": 31,
         "home_score": 33,
-        "kickoff_at": "2025-10-17T00:15:00Z",
+        "starts_at": "2025-10-17T00:15:00Z",
         "external_id": "2261280"
     },
     {
@@ -1041,7 +1041,7 @@
         "home_abbr": "JAX",
         "away_score": 35,
         "home_score": 7,
-        "kickoff_at": "2025-10-19T13:30:00Z",
+        "starts_at": "2025-10-19T13:30:00Z",
         "external_id": "2261281"
     },
     {
@@ -1052,7 +1052,7 @@
         "home_abbr": "CHI",
         "away_score": 14,
         "home_score": 26,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261282"
     },
     {
@@ -1063,7 +1063,7 @@
         "home_abbr": "CLE",
         "away_score": 6,
         "home_score": 31,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261283"
     },
     {
@@ -1074,7 +1074,7 @@
         "home_abbr": "TEN",
         "away_score": 31,
         "home_score": 13,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261284"
     },
     {
@@ -1085,7 +1085,7 @@
         "home_abbr": "KC",
         "away_score": 0,
         "home_score": 31,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261285"
     },
     {
@@ -1096,7 +1096,7 @@
         "home_abbr": "MIN",
         "away_score": 28,
         "home_score": 22,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261286"
     },
     {
@@ -1107,7 +1107,7 @@
         "home_abbr": "NYJ",
         "away_score": 13,
         "home_score": 6,
-        "kickoff_at": "2025-10-19T17:00:00Z",
+        "starts_at": "2025-10-19T17:00:00Z",
         "external_id": "2261287"
     },
     {
@@ -1118,7 +1118,7 @@
         "home_abbr": "DEN",
         "away_score": 32,
         "home_score": 33,
-        "kickoff_at": "2025-10-19T20:05:00Z",
+        "starts_at": "2025-10-19T20:05:00Z",
         "external_id": "2261288"
     },
     {
@@ -1129,7 +1129,7 @@
         "home_abbr": "LAC",
         "away_score": 38,
         "home_score": 24,
-        "kickoff_at": "2025-10-19T20:05:00Z",
+        "starts_at": "2025-10-19T20:05:00Z",
         "external_id": "2261289"
     },
     {
@@ -1140,7 +1140,7 @@
         "home_abbr": "DAL",
         "away_score": 22,
         "home_score": 44,
-        "kickoff_at": "2025-10-19T20:25:00Z",
+        "starts_at": "2025-10-19T20:25:00Z",
         "external_id": "2261290"
     },
     {
@@ -1151,7 +1151,7 @@
         "home_abbr": "ARI",
         "away_score": 27,
         "home_score": 23,
-        "kickoff_at": "2025-10-19T20:25:00Z",
+        "starts_at": "2025-10-19T20:25:00Z",
         "external_id": "2261291"
     },
     {
@@ -1162,7 +1162,7 @@
         "home_abbr": "SF",
         "away_score": 10,
         "home_score": 20,
-        "kickoff_at": "2025-10-20T00:20:00Z",
+        "starts_at": "2025-10-20T00:20:00Z",
         "external_id": "2261292"
     },
     {
@@ -1173,7 +1173,7 @@
         "home_abbr": "DET",
         "away_score": 9,
         "home_score": 24,
-        "kickoff_at": "2025-10-20T23:00:00Z",
+        "starts_at": "2025-10-20T23:00:00Z",
         "external_id": "2261293"
     },
     {
@@ -1184,7 +1184,7 @@
         "home_abbr": "SEA",
         "away_score": 19,
         "home_score": 27,
-        "kickoff_at": "2025-10-21T02:00:00Z",
+        "starts_at": "2025-10-21T02:00:00Z",
         "external_id": "2261294"
     },
     {
@@ -1195,7 +1195,7 @@
         "home_abbr": "LAC",
         "away_score": 10,
         "home_score": 37,
-        "kickoff_at": "2025-10-24T00:15:00Z",
+        "starts_at": "2025-10-24T00:15:00Z",
         "external_id": "2261295"
     },
     {
@@ -1206,7 +1206,7 @@
         "home_abbr": "ATL",
         "away_score": 34,
         "home_score": 10,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261296"
     },
     {
@@ -1217,7 +1217,7 @@
         "home_abbr": "CIN",
         "away_score": 39,
         "home_score": 38,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261297"
     },
     {
@@ -1228,7 +1228,7 @@
         "home_abbr": "NE",
         "away_score": 13,
         "home_score": 32,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261298"
     },
     {
@@ -1239,7 +1239,7 @@
         "home_abbr": "PHI",
         "away_score": 20,
         "home_score": 38,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261299"
     },
     {
@@ -1250,7 +1250,7 @@
         "home_abbr": "CAR",
         "away_score": 40,
         "home_score": 9,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261300"
     },
     {
@@ -1261,7 +1261,7 @@
         "home_abbr": "BAL",
         "away_score": 16,
         "home_score": 30,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261301"
     },
     {
@@ -1272,7 +1272,7 @@
         "home_abbr": "HOU",
         "away_score": 15,
         "home_score": 26,
-        "kickoff_at": "2025-10-26T17:00:00Z",
+        "starts_at": "2025-10-26T17:00:00Z",
         "external_id": "2261302"
     },
     {
@@ -1283,7 +1283,7 @@
         "home_abbr": "NO",
         "away_score": 23,
         "home_score": 3,
-        "kickoff_at": "2025-10-26T20:05:00Z",
+        "starts_at": "2025-10-26T20:05:00Z",
         "external_id": "2261303"
     },
     {
@@ -1294,7 +1294,7 @@
         "home_abbr": "DEN",
         "away_score": 24,
         "home_score": 44,
-        "kickoff_at": "2025-10-26T20:25:00Z",
+        "starts_at": "2025-10-26T20:25:00Z",
         "external_id": "2261304"
     },
     {
@@ -1305,7 +1305,7 @@
         "home_abbr": "IND",
         "away_score": 14,
         "home_score": 38,
-        "kickoff_at": "2025-10-26T20:25:00Z",
+        "starts_at": "2025-10-26T20:25:00Z",
         "external_id": "2261305"
     },
     {
@@ -1316,7 +1316,7 @@
         "home_abbr": "PIT",
         "away_score": 35,
         "home_score": 25,
-        "kickoff_at": "2025-10-27T00:20:00Z",
+        "starts_at": "2025-10-27T00:20:00Z",
         "external_id": "2261306"
     },
     {
@@ -1327,7 +1327,7 @@
         "home_abbr": "KC",
         "away_score": 7,
         "home_score": 28,
-        "kickoff_at": "2025-10-28T00:15:00Z",
+        "starts_at": "2025-10-28T00:15:00Z",
         "external_id": "2261307"
     },
     {
@@ -1338,7 +1338,7 @@
         "home_abbr": "MIA",
         "away_score": 28,
         "home_score": 6,
-        "kickoff_at": "2025-10-31T00:15:00Z",
+        "starts_at": "2025-10-31T00:15:00Z",
         "external_id": "2261308"
     },
     {
@@ -1349,7 +1349,7 @@
         "home_abbr": "CIN",
         "away_score": 47,
         "home_score": 42,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261309"
     },
     {
@@ -1360,7 +1360,7 @@
         "home_abbr": "DET",
         "away_score": 27,
         "home_score": 24,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261310"
     },
     {
@@ -1371,7 +1371,7 @@
         "home_abbr": "GB",
         "away_score": 16,
         "home_score": 13,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261311"
     },
     {
@@ -1382,7 +1382,7 @@
         "home_abbr": "TEN",
         "away_score": 27,
         "home_score": 20,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261312"
     },
     {
@@ -1393,7 +1393,7 @@
         "home_abbr": "NE",
         "away_score": 23,
         "home_score": 24,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261313"
     },
     {
@@ -1404,7 +1404,7 @@
         "home_abbr": "NYG",
         "away_score": 34,
         "home_score": 24,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261314"
     },
     {
@@ -1415,7 +1415,7 @@
         "home_abbr": "PIT",
         "away_score": 20,
         "home_score": 27,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261315"
     },
     {
@@ -1426,7 +1426,7 @@
         "home_abbr": "HOU",
         "away_score": 18,
         "home_score": 15,
-        "kickoff_at": "2025-11-02T18:00:00Z",
+        "starts_at": "2025-11-02T18:00:00Z",
         "external_id": "2261316"
     },
     {
@@ -1437,7 +1437,7 @@
         "home_abbr": "LV",
         "away_score": 30,
         "home_score": 29,
-        "kickoff_at": "2025-11-02T21:05:00Z",
+        "starts_at": "2025-11-02T21:05:00Z",
         "external_id": "2261317"
     },
     {
@@ -1448,7 +1448,7 @@
         "home_abbr": "LAR",
         "away_score": 10,
         "home_score": 34,
-        "kickoff_at": "2025-11-02T21:05:00Z",
+        "starts_at": "2025-11-02T21:05:00Z",
         "external_id": "2261318"
     },
     {
@@ -1459,7 +1459,7 @@
         "home_abbr": "BUF",
         "away_score": 21,
         "home_score": 28,
-        "kickoff_at": "2025-11-02T21:25:00Z",
+        "starts_at": "2025-11-02T21:25:00Z",
         "external_id": "2261319"
     },
     {
@@ -1470,7 +1470,7 @@
         "home_abbr": "WAS",
         "away_score": 38,
         "home_score": 14,
-        "kickoff_at": "2025-11-03T01:20:00Z",
+        "starts_at": "2025-11-03T01:20:00Z",
         "external_id": "2261320"
     },
     {
@@ -1481,7 +1481,7 @@
         "home_abbr": "DAL",
         "away_score": 27,
         "home_score": 17,
-        "kickoff_at": "2025-11-04T01:15:00Z",
+        "starts_at": "2025-11-04T01:15:00Z",
         "external_id": "2261321"
     },
     {
@@ -1492,7 +1492,7 @@
         "home_abbr": "DEN",
         "away_score": 7,
         "home_score": 10,
-        "kickoff_at": "2025-11-07T01:15:00Z",
+        "starts_at": "2025-11-07T01:15:00Z",
         "external_id": "2261322"
     },
     {
@@ -1503,7 +1503,7 @@
         "home_abbr": "IND",
         "away_score": 25,
         "home_score": 31,
-        "kickoff_at": "2025-11-09T14:30:00Z",
+        "starts_at": "2025-11-09T14:30:00Z",
         "external_id": "2261323"
     },
     {
@@ -1514,7 +1514,7 @@
         "home_abbr": "CHI",
         "away_score": 20,
         "home_score": 24,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261324"
     },
     {
@@ -1525,7 +1525,7 @@
         "home_abbr": "MIA",
         "away_score": 13,
         "home_score": 30,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261325"
     },
     {
@@ -1536,7 +1536,7 @@
         "home_abbr": "MIN",
         "away_score": 27,
         "home_score": 19,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261326"
     },
     {
@@ -1547,7 +1547,7 @@
         "home_abbr": "NYJ",
         "away_score": 20,
         "home_score": 27,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261327"
     },
     {
@@ -1558,7 +1558,7 @@
         "home_abbr": "TB",
         "away_score": 28,
         "home_score": 23,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261328"
     },
     {
@@ -1569,7 +1569,7 @@
         "home_abbr": "CAR",
         "away_score": 17,
         "home_score": 7,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261329"
     },
     {
@@ -1580,7 +1580,7 @@
         "home_abbr": "HOU",
         "away_score": 29,
         "home_score": 36,
-        "kickoff_at": "2025-11-09T18:00:00Z",
+        "starts_at": "2025-11-09T18:00:00Z",
         "external_id": "2261330"
     },
     {
@@ -1591,7 +1591,7 @@
         "home_abbr": "SEA",
         "away_score": 22,
         "home_score": 44,
-        "kickoff_at": "2025-11-09T21:05:00Z",
+        "starts_at": "2025-11-09T21:05:00Z",
         "external_id": "2261331"
     },
     {
@@ -1602,7 +1602,7 @@
         "home_abbr": "SF",
         "away_score": 42,
         "home_score": 26,
-        "kickoff_at": "2025-11-09T21:25:00Z",
+        "starts_at": "2025-11-09T21:25:00Z",
         "external_id": "2261332"
     },
     {
@@ -1613,7 +1613,7 @@
         "home_abbr": "WAS",
         "away_score": 44,
         "home_score": 22,
-        "kickoff_at": "2025-11-09T21:25:00Z",
+        "starts_at": "2025-11-09T21:25:00Z",
         "external_id": "2261333"
     },
     {
@@ -1624,7 +1624,7 @@
         "home_abbr": "LAC",
         "away_score": 10,
         "home_score": 25,
-        "kickoff_at": "2025-11-10T01:20:00Z",
+        "starts_at": "2025-11-10T01:20:00Z",
         "external_id": "2261334"
     },
     {
@@ -1635,7 +1635,7 @@
         "home_abbr": "GB",
         "away_score": 10,
         "home_score": 7,
-        "kickoff_at": "2025-11-11T01:15:00Z",
+        "starts_at": "2025-11-11T01:15:00Z",
         "external_id": "2261335"
     },
     {
@@ -1646,7 +1646,7 @@
         "home_abbr": "NE",
         "away_score": 14,
         "home_score": 27,
-        "kickoff_at": "2025-11-14T01:15:00Z",
+        "starts_at": "2025-11-14T01:15:00Z",
         "external_id": "2261336"
     },
     {
@@ -1657,7 +1657,7 @@
         "home_abbr": "MIA",
         "away_score": 13,
         "home_score": 16,
-        "kickoff_at": "2025-11-16T14:30:00Z",
+        "starts_at": "2025-11-16T14:30:00Z",
         "external_id": "2261337"
     },
     {
@@ -1668,7 +1668,7 @@
         "home_abbr": "ATL",
         "away_score": 30,
         "home_score": 27,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261338"
     },
     {
@@ -1679,7 +1679,7 @@
         "home_abbr": "BUF",
         "away_score": 32,
         "home_score": 44,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261339"
     },
     {
@@ -1690,7 +1690,7 @@
         "home_abbr": "TEN",
         "away_score": 16,
         "home_score": 13,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261340"
     },
     {
@@ -1701,7 +1701,7 @@
         "home_abbr": "MIN",
         "away_score": 19,
         "home_score": 17,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261341"
     },
     {
@@ -1712,7 +1712,7 @@
         "home_abbr": "NYG",
         "away_score": 27,
         "home_score": 20,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261342"
     },
     {
@@ -1723,7 +1723,7 @@
         "home_abbr": "PIT",
         "away_score": 12,
         "home_score": 34,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261343"
     },
     {
@@ -1734,7 +1734,7 @@
         "home_abbr": "JAX",
         "away_score": 6,
         "home_score": 35,
-        "kickoff_at": "2025-11-16T18:00:00Z",
+        "starts_at": "2025-11-16T18:00:00Z",
         "external_id": "2261344"
     },
     {
@@ -1745,7 +1745,7 @@
         "home_abbr": "LAR",
         "away_score": 19,
         "home_score": 21,
-        "kickoff_at": "2025-11-16T21:05:00Z",
+        "starts_at": "2025-11-16T21:05:00Z",
         "external_id": "2261345"
     },
     {
@@ -1756,7 +1756,7 @@
         "home_abbr": "ARI",
         "away_score": 41,
         "home_score": 22,
-        "kickoff_at": "2025-11-16T21:05:00Z",
+        "starts_at": "2025-11-16T21:05:00Z",
         "external_id": "2261346"
     },
     {
@@ -1767,7 +1767,7 @@
         "home_abbr": "CLE",
         "away_score": 23,
         "home_score": 16,
-        "kickoff_at": "2025-11-16T21:25:00Z",
+        "starts_at": "2025-11-16T21:25:00Z",
         "external_id": "2261347"
     },
     {
@@ -1778,7 +1778,7 @@
         "home_abbr": "DEN",
         "away_score": 19,
         "home_score": 22,
-        "kickoff_at": "2025-11-16T21:25:00Z",
+        "starts_at": "2025-11-16T21:25:00Z",
         "external_id": "2261348"
     },
     {
@@ -1789,7 +1789,7 @@
         "home_abbr": "PHI",
         "away_score": 9,
         "home_score": 16,
-        "kickoff_at": "2025-11-17T01:20:00Z",
+        "starts_at": "2025-11-17T01:20:00Z",
         "external_id": "2261349"
     },
     {
@@ -1800,7 +1800,7 @@
         "home_abbr": "LV",
         "away_score": 33,
         "home_score": 16,
-        "kickoff_at": "2025-11-18T01:15:00Z",
+        "starts_at": "2025-11-18T01:15:00Z",
         "external_id": "2261350"
     },
     {
@@ -1811,7 +1811,7 @@
         "home_abbr": "HOU",
         "away_score": 19,
         "home_score": 23,
-        "kickoff_at": "2025-11-21T01:15:00Z",
+        "starts_at": "2025-11-21T01:15:00Z",
         "external_id": "2261351"
     },
     {
@@ -1822,7 +1822,7 @@
         "home_abbr": "CHI",
         "away_score": 28,
         "home_score": 31,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261352"
     },
     {
@@ -1833,7 +1833,7 @@
         "home_abbr": "CIN",
         "away_score": 26,
         "home_score": 20,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261353"
     },
     {
@@ -1844,7 +1844,7 @@
         "home_abbr": "DET",
         "away_score": 27,
         "home_score": 34,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261354"
     },
     {
@@ -1855,7 +1855,7 @@
         "home_abbr": "GB",
         "away_score": 6,
         "home_score": 23,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261355"
     },
     {
@@ -1866,7 +1866,7 @@
         "home_abbr": "TEN",
         "away_score": 30,
         "home_score": 24,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261356"
     },
     {
@@ -1877,7 +1877,7 @@
         "home_abbr": "KC",
         "away_score": 20,
         "home_score": 23,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261357"
     },
     {
@@ -1888,7 +1888,7 @@
         "home_abbr": "BAL",
         "away_score": 10,
         "home_score": 23,
-        "kickoff_at": "2025-11-23T18:00:00Z",
+        "starts_at": "2025-11-23T18:00:00Z",
         "external_id": "2261358"
     },
     {
@@ -1899,7 +1899,7 @@
         "home_abbr": "LV",
         "away_score": 24,
         "home_score": 10,
-        "kickoff_at": "2025-11-23T21:05:00Z",
+        "starts_at": "2025-11-23T21:05:00Z",
         "external_id": "2261359"
     },
     {
@@ -1910,7 +1910,7 @@
         "home_abbr": "ARI",
         "away_score": 27,
         "home_score": 24,
-        "kickoff_at": "2025-11-23T21:05:00Z",
+        "starts_at": "2025-11-23T21:05:00Z",
         "external_id": "2261360"
     },
     {
@@ -1921,7 +1921,7 @@
         "home_abbr": "DAL",
         "away_score": 21,
         "home_score": 24,
-        "kickoff_at": "2025-11-23T21:25:00Z",
+        "starts_at": "2025-11-23T21:25:00Z",
         "external_id": "2261361"
     },
     {
@@ -1932,7 +1932,7 @@
         "home_abbr": "NO",
         "away_score": 24,
         "home_score": 10,
-        "kickoff_at": "2025-11-23T21:25:00Z",
+        "starts_at": "2025-11-23T21:25:00Z",
         "external_id": "2261362"
     },
     {
@@ -1943,7 +1943,7 @@
         "home_abbr": "LAR",
         "away_score": 7,
         "home_score": 34,
-        "kickoff_at": "2025-11-24T01:20:00Z",
+        "starts_at": "2025-11-24T01:20:00Z",
         "external_id": "2261363"
     },
     {
@@ -1954,7 +1954,7 @@
         "home_abbr": "SF",
         "away_score": 9,
         "home_score": 20,
-        "kickoff_at": "2025-11-25T01:15:00Z",
+        "starts_at": "2025-11-25T01:15:00Z",
         "external_id": "2261364"
     },
     {
@@ -1965,7 +1965,7 @@
         "home_abbr": "DET",
         "away_score": 31,
         "home_score": 24,
-        "kickoff_at": "2025-11-27T18:00:00Z",
+        "starts_at": "2025-11-27T18:00:00Z",
         "external_id": "2261365"
     },
     {
@@ -1976,7 +1976,7 @@
         "home_abbr": "DAL",
         "away_score": 28,
         "home_score": 31,
-        "kickoff_at": "2025-11-27T21:30:00Z",
+        "starts_at": "2025-11-27T21:30:00Z",
         "external_id": "2261366"
     },
     {
@@ -1987,7 +1987,7 @@
         "home_abbr": "BAL",
         "away_score": 32,
         "home_score": 14,
-        "kickoff_at": "2025-11-28T01:20:00Z",
+        "starts_at": "2025-11-28T01:20:00Z",
         "external_id": "2261367"
     },
     {
@@ -1998,7 +1998,7 @@
         "home_abbr": "PHI",
         "away_score": 24,
         "home_score": 15,
-        "kickoff_at": "2025-11-28T20:00:00Z",
+        "starts_at": "2025-11-28T20:00:00Z",
         "external_id": "2261368"
     },
     {
@@ -2009,7 +2009,7 @@
         "home_abbr": "CLE",
         "away_score": 26,
         "home_score": 8,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261369"
     },
     {
@@ -2020,7 +2020,7 @@
         "home_abbr": "TEN",
         "away_score": 25,
         "home_score": 3,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261370"
     },
     {
@@ -2031,7 +2031,7 @@
         "home_abbr": "IND",
         "away_score": 20,
         "home_score": 16,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261371"
     },
     {
@@ -2042,7 +2042,7 @@
         "home_abbr": "MIA",
         "away_score": 17,
         "home_score": 21,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261372"
     },
     {
@@ -2053,7 +2053,7 @@
         "home_abbr": "NYJ",
         "away_score": 24,
         "home_score": 27,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261373"
     },
     {
@@ -2064,7 +2064,7 @@
         "home_abbr": "TB",
         "away_score": 17,
         "home_score": 20,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261374"
     },
     {
@@ -2075,7 +2075,7 @@
         "home_abbr": "CAR",
         "away_score": 28,
         "home_score": 31,
-        "kickoff_at": "2025-11-30T18:00:00Z",
+        "starts_at": "2025-11-30T18:00:00Z",
         "external_id": "2261375"
     },
     {
@@ -2086,7 +2086,7 @@
         "home_abbr": "SEA",
         "away_score": 0,
         "home_score": 26,
-        "kickoff_at": "2025-11-30T21:05:00Z",
+        "starts_at": "2025-11-30T21:05:00Z",
         "external_id": "2261376"
     },
     {
@@ -2097,7 +2097,7 @@
         "home_abbr": "PIT",
         "away_score": 26,
         "home_score": 7,
-        "kickoff_at": "2025-11-30T21:25:00Z",
+        "starts_at": "2025-11-30T21:25:00Z",
         "external_id": "2261377"
     },
     {
@@ -2108,7 +2108,7 @@
         "home_abbr": "LAC",
         "away_score": 14,
         "home_score": 31,
-        "kickoff_at": "2025-11-30T21:25:00Z",
+        "starts_at": "2025-11-30T21:25:00Z",
         "external_id": "2261378"
     },
     {
@@ -2119,7 +2119,7 @@
         "home_abbr": "WAS",
         "away_score": 27,
         "home_score": 26,
-        "kickoff_at": "2025-12-01T01:20:00Z",
+        "starts_at": "2025-12-01T01:20:00Z",
         "external_id": "2261379"
     },
     {
@@ -2130,7 +2130,7 @@
         "home_abbr": "NE",
         "away_score": 15,
         "home_score": 33,
-        "kickoff_at": "2025-12-02T01:15:00Z",
+        "starts_at": "2025-12-02T01:15:00Z",
         "external_id": "2261380"
     },
     {
@@ -2141,7 +2141,7 @@
         "home_abbr": "DET",
         "away_score": 30,
         "home_score": 44,
-        "kickoff_at": "2025-12-05T01:15:00Z",
+        "starts_at": "2025-12-05T01:15:00Z",
         "external_id": "2261381"
     },
     {
@@ -2152,7 +2152,7 @@
         "home_abbr": "ATL",
         "away_score": 37,
         "home_score": 9,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261382"
     },
     {
@@ -2163,7 +2163,7 @@
         "home_abbr": "CLE",
         "away_score": 31,
         "home_score": 29,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261383"
     },
     {
@@ -2174,7 +2174,7 @@
         "home_abbr": "MIN",
         "away_score": 0,
         "home_score": 31,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261385"
     },
     {
@@ -2185,7 +2185,7 @@
         "home_abbr": "NYJ",
         "away_score": 34,
         "home_score": 10,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261386"
     },
     {
@@ -2196,7 +2196,7 @@
         "home_abbr": "TB",
         "away_score": 24,
         "home_score": 20,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261387"
     },
     {
@@ -2207,7 +2207,7 @@
         "home_abbr": "JAX",
         "away_score": 19,
         "home_score": 36,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261388"
     },
     {
@@ -2218,7 +2218,7 @@
         "home_abbr": "BAL",
         "away_score": 27,
         "home_score": 22,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261389"
     },
     {
@@ -2229,7 +2229,7 @@
         "home_abbr": "BUF",
         "away_score": 34,
         "home_score": 39,
-        "kickoff_at": "2025-12-07T18:00:00Z",
+        "starts_at": "2025-12-07T18:00:00Z",
         "external_id": "2261391"
     },
     {
@@ -2240,7 +2240,7 @@
         "home_abbr": "LV",
         "away_score": 24,
         "home_score": 17,
-        "kickoff_at": "2025-12-07T21:05:00Z",
+        "starts_at": "2025-12-07T21:05:00Z",
         "external_id": "2261390"
     },
     {
@@ -2251,7 +2251,7 @@
         "home_abbr": "GB",
         "away_score": 21,
         "home_score": 28,
-        "kickoff_at": "2025-12-07T21:25:00Z",
+        "starts_at": "2025-12-07T21:25:00Z",
         "external_id": "2261384"
     },
     {
@@ -2262,7 +2262,7 @@
         "home_abbr": "ARI",
         "away_score": 45,
         "home_score": 17,
-        "kickoff_at": "2025-12-07T21:25:00Z",
+        "starts_at": "2025-12-07T21:25:00Z",
         "external_id": "2261392"
     },
     {
@@ -2273,7 +2273,7 @@
         "home_abbr": "KC",
         "away_score": 20,
         "home_score": 10,
-        "kickoff_at": "2025-12-08T01:20:00Z",
+        "starts_at": "2025-12-08T01:20:00Z",
         "external_id": "2261393"
     },
     {
@@ -2284,7 +2284,7 @@
         "home_abbr": "LAC",
         "away_score": 19,
         "home_score": 22,
-        "kickoff_at": "2025-12-09T01:15:00Z",
+        "starts_at": "2025-12-09T01:15:00Z",
         "external_id": "2261394"
     },
     {
@@ -2295,7 +2295,7 @@
         "home_abbr": "TB",
         "away_score": 29,
         "home_score": 28,
-        "kickoff_at": "2025-12-12T01:15:00Z",
+        "starts_at": "2025-12-12T01:15:00Z",
         "external_id": "2261395"
     },
     {
@@ -2306,7 +2306,7 @@
         "home_abbr": "CHI",
         "away_score": 3,
         "home_score": 31,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261396"
     },
     {
@@ -2317,7 +2317,7 @@
         "home_abbr": "CIN",
         "away_score": 24,
         "home_score": 0,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261397"
     },
     {
@@ -2328,7 +2328,7 @@
         "home_abbr": "KC",
         "away_score": 16,
         "home_score": 13,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261398"
     },
     {
@@ -2339,7 +2339,7 @@
         "home_abbr": "NE",
         "away_score": 35,
         "home_score": 31,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261399"
     },
     {
@@ -2350,7 +2350,7 @@
         "home_abbr": "NYG",
         "away_score": 29,
         "home_score": 21,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261400"
     },
     {
@@ -2361,7 +2361,7 @@
         "home_abbr": "PHI",
         "away_score": 0,
         "home_score": 31,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261401"
     },
     {
@@ -2372,7 +2372,7 @@
         "home_abbr": "JAX",
         "away_score": 20,
         "home_score": 48,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261402"
     },
     {
@@ -2383,7 +2383,7 @@
         "home_abbr": "HOU",
         "away_score": 20,
         "home_score": 40,
-        "kickoff_at": "2025-12-14T18:00:00Z",
+        "starts_at": "2025-12-14T18:00:00Z",
         "external_id": "2261403"
     },
     {
@@ -2394,7 +2394,7 @@
         "home_abbr": "DEN",
         "away_score": 26,
         "home_score": 34,
-        "kickoff_at": "2025-12-14T21:25:00Z",
+        "starts_at": "2025-12-14T21:25:00Z",
         "external_id": "2261404"
     },
     {
@@ -2405,7 +2405,7 @@
         "home_abbr": "LAR",
         "away_score": 34,
         "home_score": 41,
-        "kickoff_at": "2025-12-14T21:25:00Z",
+        "starts_at": "2025-12-14T21:25:00Z",
         "external_id": "2261405"
     },
     {
@@ -2416,7 +2416,7 @@
         "home_abbr": "NO",
         "away_score": 17,
         "home_score": 20,
-        "kickoff_at": "2025-12-14T21:25:00Z",
+        "starts_at": "2025-12-14T21:25:00Z",
         "external_id": "2261406"
     },
     {
@@ -2427,7 +2427,7 @@
         "home_abbr": "SF",
         "away_score": 24,
         "home_score": 37,
-        "kickoff_at": "2025-12-14T21:25:00Z",
+        "starts_at": "2025-12-14T21:25:00Z",
         "external_id": "2261407"
     },
     {
@@ -2438,7 +2438,7 @@
         "home_abbr": "SEA",
         "away_score": 16,
         "home_score": 18,
-        "kickoff_at": "2025-12-14T21:25:00Z",
+        "starts_at": "2025-12-14T21:25:00Z",
         "external_id": "2261408"
     },
     {
@@ -2449,7 +2449,7 @@
         "home_abbr": "DAL",
         "away_score": 34,
         "home_score": 26,
-        "kickoff_at": "2025-12-15T01:20:00Z",
+        "starts_at": "2025-12-15T01:20:00Z",
         "external_id": "2261409"
     },
     {
@@ -2460,7 +2460,7 @@
         "home_abbr": "PIT",
         "away_score": 15,
         "home_score": 28,
-        "kickoff_at": "2025-12-16T01:15:00Z",
+        "starts_at": "2025-12-16T01:15:00Z",
         "external_id": "2261410"
     },
     {
@@ -2471,7 +2471,7 @@
         "home_abbr": "SEA",
         "away_score": 37,
         "home_score": 38,
-        "kickoff_at": "2025-12-19T01:15:00Z",
+        "starts_at": "2025-12-19T01:15:00Z",
         "external_id": "2261411"
     },
     {
@@ -2482,7 +2482,7 @@
         "home_abbr": "WAS",
         "away_score": 29,
         "home_score": 18,
-        "kickoff_at": "2025-12-20T22:00:00Z",
+        "starts_at": "2025-12-20T22:00:00Z",
         "external_id": "2261413"
     },
     {
@@ -2493,7 +2493,7 @@
         "home_abbr": "CHI",
         "away_score": 16,
         "home_score": 22,
-        "kickoff_at": "2025-12-21T01:20:00Z",
+        "starts_at": "2025-12-21T01:20:00Z",
         "external_id": "2261412"
     },
     {
@@ -2504,7 +2504,7 @@
         "home_abbr": "CLE",
         "away_score": 23,
         "home_score": 20,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261414"
     },
     {
@@ -2515,7 +2515,7 @@
         "home_abbr": "DAL",
         "away_score": 34,
         "home_score": 17,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261415"
     },
     {
@@ -2526,7 +2526,7 @@
         "home_abbr": "TEN",
         "away_score": 9,
         "home_score": 26,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261416"
     },
     {
@@ -2537,7 +2537,7 @@
         "home_abbr": "NO",
         "away_score": 6,
         "home_score": 29,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261417"
     },
     {
@@ -2548,7 +2548,7 @@
         "home_abbr": "NYG",
         "away_score": 16,
         "home_score": 13,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261418"
     },
     {
@@ -2559,7 +2559,7 @@
         "home_abbr": "CAR",
         "away_score": 20,
         "home_score": 23,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261419"
     },
     {
@@ -2570,7 +2570,7 @@
         "home_abbr": "MIA",
         "away_score": 45,
         "home_score": 21,
-        "kickoff_at": "2025-12-21T18:00:00Z",
+        "starts_at": "2025-12-21T18:00:00Z",
         "external_id": "2261425"
     },
     {
@@ -2581,7 +2581,7 @@
         "home_abbr": "DEN",
         "away_score": 34,
         "home_score": 20,
-        "kickoff_at": "2025-12-21T21:05:00Z",
+        "starts_at": "2025-12-21T21:05:00Z",
         "external_id": "2261421"
     },
     {
@@ -2592,7 +2592,7 @@
         "home_abbr": "ARI",
         "away_score": 26,
         "home_score": 19,
-        "kickoff_at": "2025-12-21T21:05:00Z",
+        "starts_at": "2025-12-21T21:05:00Z",
         "external_id": "2261422"
     },
     {
@@ -2603,7 +2603,7 @@
         "home_abbr": "DET",
         "away_score": 29,
         "home_score": 24,
-        "kickoff_at": "2025-12-21T21:25:00Z",
+        "starts_at": "2025-12-21T21:25:00Z",
         "external_id": "2261423"
     },
     {
@@ -2614,7 +2614,7 @@
         "home_abbr": "HOU",
         "away_score": 21,
         "home_score": 23,
-        "kickoff_at": "2025-12-21T21:25:00Z",
+        "starts_at": "2025-12-21T21:25:00Z",
         "external_id": "2261424"
     },
     {
@@ -2625,7 +2625,7 @@
         "home_abbr": "BAL",
         "away_score": 28,
         "home_score": 24,
-        "kickoff_at": "2025-12-22T01:20:00Z",
+        "starts_at": "2025-12-22T01:20:00Z",
         "external_id": "2261420"
     },
     {
@@ -2636,7 +2636,7 @@
         "home_abbr": "IND",
         "away_score": 48,
         "home_score": 27,
-        "kickoff_at": "2025-12-23T01:15:00Z",
+        "starts_at": "2025-12-23T01:15:00Z",
         "external_id": "2261426"
     },
     {
@@ -2647,7 +2647,7 @@
         "home_abbr": "WAS",
         "away_score": 30,
         "home_score": 23,
-        "kickoff_at": "2025-12-25T18:00:00Z",
+        "starts_at": "2025-12-25T18:00:00Z",
         "external_id": "2261427"
     },
     {
@@ -2658,7 +2658,7 @@
         "home_abbr": "MIN",
         "away_score": 10,
         "home_score": 23,
-        "kickoff_at": "2025-12-25T21:30:00Z",
+        "starts_at": "2025-12-25T21:30:00Z",
         "external_id": "2261428"
     },
     {
@@ -2669,7 +2669,7 @@
         "home_abbr": "KC",
         "away_score": 20,
         "home_score": 13,
-        "kickoff_at": "2025-12-26T01:15:00Z",
+        "starts_at": "2025-12-26T01:15:00Z",
         "external_id": "2261429"
     },
     {
@@ -2680,7 +2680,7 @@
         "home_abbr": "LAC",
         "away_score": 20,
         "home_score": 16,
-        "kickoff_at": "2025-12-27T21:30:00Z",
+        "starts_at": "2025-12-27T21:30:00Z",
         "external_id": "2261433"
     },
     {
@@ -2691,7 +2691,7 @@
         "home_abbr": "GB",
         "away_score": 41,
         "home_score": 24,
-        "kickoff_at": "2025-12-28T01:00:00Z",
+        "starts_at": "2025-12-28T01:00:00Z",
         "external_id": "2261431"
     },
     {
@@ -2702,7 +2702,7 @@
         "home_abbr": "CIN",
         "away_score": 14,
         "home_score": 37,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261430"
     },
     {
@@ -2713,7 +2713,7 @@
         "home_abbr": "CAR",
         "away_score": 27,
         "home_score": 10,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261434"
     },
     {
@@ -2724,7 +2724,7 @@
         "home_abbr": "CLE",
         "away_score": 6,
         "home_score": 13,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261435"
     },
     {
@@ -2735,7 +2735,7 @@
         "home_abbr": "TEN",
         "away_score": 34,
         "home_score": 26,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261436"
     },
     {
@@ -2746,7 +2746,7 @@
         "home_abbr": "IND",
         "away_score": 23,
         "home_score": 17,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261437"
     },
     {
@@ -2757,7 +2757,7 @@
         "home_abbr": "MIA",
         "away_score": 17,
         "home_score": 20,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261438"
     },
     {
@@ -2768,7 +2768,7 @@
         "home_abbr": "NYJ",
         "away_score": 42,
         "home_score": 10,
-        "kickoff_at": "2025-12-28T18:00:00Z",
+        "starts_at": "2025-12-28T18:00:00Z",
         "external_id": "2261439"
     },
     {
@@ -2779,7 +2779,7 @@
         "home_abbr": "LV",
         "away_score": 34,
         "home_score": 10,
-        "kickoff_at": "2025-12-28T21:05:00Z",
+        "starts_at": "2025-12-28T21:05:00Z",
         "external_id": "2261432"
     },
     {
@@ -2790,7 +2790,7 @@
         "home_abbr": "BUF",
         "away_score": 13,
         "home_score": 12,
-        "kickoff_at": "2025-12-28T21:25:00Z",
+        "starts_at": "2025-12-28T21:25:00Z",
         "external_id": "2261440"
     },
     {
@@ -2801,7 +2801,7 @@
         "home_abbr": "SF",
         "away_score": 38,
         "home_score": 42,
-        "kickoff_at": "2025-12-29T01:20:00Z",
+        "starts_at": "2025-12-29T01:20:00Z",
         "external_id": "2261441"
     },
     {
@@ -2812,7 +2812,7 @@
         "home_abbr": "ATL",
         "away_score": 24,
         "home_score": 27,
-        "kickoff_at": "2025-12-30T01:15:00Z",
+        "starts_at": "2025-12-30T01:15:00Z",
         "external_id": "2261442"
     },
     {
@@ -2823,7 +2823,7 @@
         "home_abbr": "TB",
         "away_score": 14,
         "home_score": 16,
-        "kickoff_at": "2026-01-03T21:30:00Z",
+        "starts_at": "2026-01-03T21:30:00Z",
         "external_id": "2261456"
     },
     {
@@ -2834,7 +2834,7 @@
         "home_abbr": "SF",
         "away_score": 13,
         "home_score": 3,
-        "kickoff_at": "2026-01-04T01:00:00Z",
+        "starts_at": "2026-01-04T01:00:00Z",
         "external_id": "2261455"
     },
     {
@@ -2845,7 +2845,7 @@
         "home_abbr": "ATL",
         "away_score": 17,
         "home_score": 19,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261443"
     },
     {
@@ -2856,7 +2856,7 @@
         "home_abbr": "CIN",
         "away_score": 20,
         "home_score": 18,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261446"
     },
     {
@@ -2867,7 +2867,7 @@
         "home_abbr": "MIN",
         "away_score": 3,
         "home_score": 16,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261450"
     },
     {
@@ -2878,7 +2878,7 @@
         "home_abbr": "NYG",
         "away_score": 17,
         "home_score": 34,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261452"
     },
     {
@@ -2889,7 +2889,7 @@
         "home_abbr": "JAX",
         "away_score": 7,
         "home_score": 41,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261457"
     },
     {
@@ -2900,7 +2900,7 @@
         "home_abbr": "HOU",
         "away_score": 30,
         "home_score": 38,
-        "kickoff_at": "2026-01-04T18:00:00Z",
+        "starts_at": "2026-01-04T18:00:00Z",
         "external_id": "2261458"
     },
     {
@@ -2911,7 +2911,7 @@
         "home_abbr": "BUF",
         "away_score": 8,
         "home_score": 35,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261444"
     },
     {
@@ -2922,7 +2922,7 @@
         "home_abbr": "CHI",
         "away_score": 19,
         "home_score": 16,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261445"
     },
     {
@@ -2933,7 +2933,7 @@
         "home_abbr": "DEN",
         "away_score": 3,
         "home_score": 19,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261447"
     },
     {
@@ -2944,7 +2944,7 @@
         "home_abbr": "LV",
         "away_score": 12,
         "home_score": 14,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261448"
     },
     {
@@ -2955,7 +2955,7 @@
         "home_abbr": "LAR",
         "away_score": 20,
         "home_score": 37,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261449"
     },
     {
@@ -2966,7 +2966,7 @@
         "home_abbr": "NE",
         "away_score": 10,
         "home_score": 38,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261451"
     },
     {
@@ -2977,7 +2977,7 @@
         "home_abbr": "PHI",
         "away_score": 24,
         "home_score": 17,
-        "kickoff_at": "2026-01-04T21:25:00Z",
+        "starts_at": "2026-01-04T21:25:00Z",
         "external_id": "2261453"
     },
     {
@@ -2988,7 +2988,7 @@
         "home_abbr": "PIT",
         "away_score": 24,
         "home_score": 26,
-        "kickoff_at": "2026-01-05T01:20:00Z",
+        "starts_at": "2026-01-05T01:20:00Z",
         "external_id": "2408981"
     },
     {
@@ -2999,7 +2999,7 @@
         "home_abbr": "CAR",
         "away_score": 34,
         "home_score": 31,
-        "kickoff_at": "2026-01-10T21:30:00Z",
+        "starts_at": "2026-01-10T21:30:00Z",
         "external_id": "2408991"
     },
     {
@@ -3010,7 +3010,7 @@
         "home_abbr": "CHI",
         "away_score": 27,
         "home_score": 31,
-        "kickoff_at": "2026-01-11T01:00:00Z",
+        "starts_at": "2026-01-11T01:00:00Z",
         "external_id": "2408992"
     },
     {
@@ -3021,7 +3021,7 @@
         "home_abbr": "JAX",
         "away_score": 27,
         "home_score": 24,
-        "kickoff_at": "2026-01-11T18:00:00Z",
+        "starts_at": "2026-01-11T18:00:00Z",
         "external_id": "2408993"
     },
     {
@@ -3032,7 +3032,7 @@
         "home_abbr": "PHI",
         "away_score": 23,
         "home_score": 19,
-        "kickoff_at": "2026-01-11T21:30:00Z",
+        "starts_at": "2026-01-11T21:30:00Z",
         "external_id": "2408994"
     },
     {
@@ -3043,7 +3043,7 @@
         "home_abbr": "NE",
         "away_score": 3,
         "home_score": 16,
-        "kickoff_at": "2026-01-12T01:15:00Z",
+        "starts_at": "2026-01-12T01:15:00Z",
         "external_id": "2408995"
     },
     {
@@ -3054,7 +3054,7 @@
         "home_abbr": "PIT",
         "away_score": 30,
         "home_score": 6,
-        "kickoff_at": "2026-01-13T01:15:00Z",
+        "starts_at": "2026-01-13T01:15:00Z",
         "external_id": "2408996"
     },
     {
@@ -3065,7 +3065,7 @@
         "home_abbr": "DEN",
         "away_score": 30,
         "home_score": 33,
-        "kickoff_at": "2026-01-17T21:30:00Z",
+        "starts_at": "2026-01-17T21:30:00Z",
         "external_id": "2415345"
     },
     {
@@ -3076,7 +3076,7 @@
         "home_abbr": "SEA",
         "away_score": 6,
         "home_score": 41,
-        "kickoff_at": "2026-01-18T01:00:00Z",
+        "starts_at": "2026-01-18T01:00:00Z",
         "external_id": "2415346"
     },
     {
@@ -3087,7 +3087,7 @@
         "home_abbr": "NE",
         "away_score": 16,
         "home_score": 28,
-        "kickoff_at": "2026-01-18T20:00:00Z",
+        "starts_at": "2026-01-18T20:00:00Z",
         "external_id": "2415851"
     },
     {
@@ -3098,7 +3098,7 @@
         "home_abbr": "CHI",
         "away_score": 20,
         "home_score": 17,
-        "kickoff_at": "2026-01-18T23:30:00Z",
+        "starts_at": "2026-01-18T23:30:00Z",
         "external_id": "2415347"
     },
     {
@@ -3109,7 +3109,7 @@
         "home_abbr": "DEN",
         "away_score": 10,
         "home_score": 7,
-        "kickoff_at": "2026-01-25T20:00:00Z",
+        "starts_at": "2026-01-25T20:00:00Z",
         "external_id": "2420687"
     },
     {
@@ -3120,7 +3120,7 @@
         "home_abbr": "SEA",
         "away_score": 27,
         "home_score": 31,
-        "kickoff_at": "2026-01-25T23:30:00Z",
+        "starts_at": "2026-01-25T23:30:00Z",
         "external_id": "2420688"
     },
     {
@@ -3131,7 +3131,7 @@
         "home_abbr": "NE",
         "away_score": 29,
         "home_score": 13,
-        "kickoff_at": "2026-02-08T23:30:00Z",
+        "starts_at": "2026-02-08T23:30:00Z",
         "external_id": "2423873"
     }
 ]

@@ -44,8 +44,8 @@ module Seeds
       games.each do |row|
         home_id = season_team_ids.fetch(row.fetch("home_abbr"))
         away_id = season_team_ids.fetch(row.fetch("away_abbr"))
-        kickoff = Time.iso8601(row.fetch("kickoff_at"))
-        completed = (row["status"] == "final") ? kickoff + 3.hours : nil
+        starts_at = Time.iso8601(row.fetch("starts_at"))
+        completed = (row["status"] == "final") ? starts_at + 3.hours : nil
         game = season.games.find_or_initialize_by(external_id: row.fetch("external_id"))
         existed = game.persisted?
         game.assign_attributes(
@@ -56,7 +56,7 @@ module Seeds
           status: row.fetch("status"),
           home_score: row["home_score"],
           away_score: row["away_score"],
-          kickoff_at: kickoff,
+          starts_at: starts_at,
           completed_at: completed
         )
         next unless game.changed?

@@ -69,7 +69,7 @@ class Views::Teams::Show < Views::Base
   def render_row(game)
     tr do
       td { week_label(game) }
-      td(class: "text-sm whitespace-nowrap") { game.kickoff_at&.strftime("%a %b %-d %-l:%M%P") || "-" }
+      td(class: "text-sm whitespace-nowrap") { game.starts_at&.strftime("%a %b %-d %-l:%M%P") || "-" }
       td { opponent_label(game) }
       td(class: "font-mono") { result_cell(game) }
       td { span(class: "badge badge-sm #{status_color(game.status)}") { game.status } }

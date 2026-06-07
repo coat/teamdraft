@@ -32,7 +32,7 @@ class Views::Admin::Games::Edit < Views::Base
             select_row(f, :status, "Status", Game::STATUSES)
             select_row(f, :round, "Round", rounds)
             number_row(f, :week, "Week", min: 1)
-            datetime_row(f, :kickoff_at, "Kickoff", value: @game.kickoff_at&.iso8601)
+            datetime_row(f, :starts_at, "Start time", value: @game.starts_at&.iso8601)
             number_row(f, :home_score, "Home score", min: 0)
             number_row(f, :away_score, "Away score", min: 0)
             div(class: "card-actions justify-end pt-2") do

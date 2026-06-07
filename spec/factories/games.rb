@@ -6,7 +6,7 @@ FactoryBot.define do
     round { "regular_season" }
     week { 1 }
     status { "scheduled" }
-    kickoff_at { 1.day.from_now }
+    starts_at { 1.day.from_now }
 
     trait :final do
       status { "final" }

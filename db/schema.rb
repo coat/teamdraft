@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -52,17 +52,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
     t.string "external_id"
     t.integer "home_score"
     t.bigint "home_season_team_id", null: false
-    t.datetime "kickoff_at", null: false
     t.string "round", default: "regular_season", null: false
     t.bigint "season_id", null: false
+    t.datetime "starts_at", null: false
     t.string "status", default: "scheduled", null: false
     t.datetime "updated_at", null: false
     t.integer "week"
     t.index ["away_season_team_id"], name: "index_games_on_away_season_team_id"
     t.index ["home_season_team_id"], name: "index_games_on_home_season_team_id"
-    t.index ["kickoff_at"], name: "index_games_on_kickoff_at"
     t.index ["season_id", "external_id"], name: "index_games_on_season_and_external_id", unique: true, where: "(external_id IS NOT NULL)"
     t.index ["season_id"], name: "index_games_on_season_id"
+    t.index ["starts_at"], name: "index_games_on_starts_at"
     t.check_constraint "home_season_team_id <> away_season_team_id", name: "games_distinct_teams"
     t.check_constraint "status::text <> 'final'::text OR home_score IS NOT NULL AND away_score IS NOT NULL", name: "games_final_has_scores"
     t.check_constraint "status::text = ANY (ARRAY['scheduled'::character varying::text, 'in_progress'::character varying::text, 'final'::character varying::text, 'postponed'::character varying::text])", name: "games_status_valid"

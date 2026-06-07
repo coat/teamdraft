@@ -20,7 +20,7 @@ RSpec.describe "Admin games", type: :request do
 
     expect {
       patch admin_game_path(game), params: {
-        game: {status: "final", home_score: 24, away_score: 17, round: "regular_season", week: 1, kickoff_at: game.kickoff_at}
+        game: {status: "final", home_score: 24, away_score: 17, round: "regular_season", week: 1, starts_at: game.starts_at}
       }
     }.to have_enqueued_job(Scoring::RecomputeJob).with(season.id)
 

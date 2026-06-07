@@ -9,7 +9,7 @@ class Admin::GamesController < Admin::BaseController
     scope = if season
       season.games
         .includes(home_season_team: :team, away_season_team: :team)
-        .order(Arel.sql("kickoff_at ASC NULLS LAST"))
+        .order(Arel.sql("starts_at ASC NULLS LAST"))
     else
       Game.none
     end
@@ -44,6 +44,6 @@ class Admin::GamesController < Admin::BaseController
   # Blank score fields ride through as empty strings; ActiveRecord's integer
   # type-cast nils them on assignment, so no manual `.presence` is needed.
   def game_params
-    params.require(:game).permit(:status, :home_score, :away_score, :round, :week, :kickoff_at, :completed_at)
+    params.require(:game).permit(:status, :home_score, :away_score, :round, :week, :starts_at, :completed_at)
   end
 end

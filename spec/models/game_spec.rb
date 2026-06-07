@@ -9,7 +9,7 @@ RSpec.describe Game do
     game = Game.new(
       season: season, round: "regular_season",
       home_season_team: home, away_season_team: home,
-      kickoff_at: 1.day.from_now, status: "scheduled"
+      starts_at: 1.day.from_now, status: "scheduled"
     )
 
     expect { game.save(validate: false) }
@@ -22,7 +22,7 @@ RSpec.describe Game do
     game = Game.new(
       season: season, round: "regular_season",
       home_season_team: home, away_season_team: away,
-      kickoff_at: 1.day.ago, status: "final"
+      starts_at: 1.day.ago, status: "final"
     )
 
     expect { game.save(validate: false) }
