@@ -8,12 +8,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "09ggg2zk0qrh0mc3fa23xjbn2gzqxd0jfqj6qm6460ydcqg6fxdg";
+      sha256 = "050f0b6bv94k4vszy366m5l5krfgn93y9sj43yd9sm184q7gfyss";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "4.0.2";
+    version = "4.0.3";
   };
   ruby-lsp = {
     dependencies = ["language_server-protocol" "prism" "rbs"];
