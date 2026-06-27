@@ -85,7 +85,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.24.6)
       msgpack (~> 1.2)
-    brakeman (8.0.4)
+    brakeman (8.0.5)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -143,6 +143,9 @@ GEM
       activesupport (>= 6.1)
     haikunator (1.1.1)
     hashdiff (1.2.1)
+    http-2 (1.2.0)
+    httpx (1.8.0)
+      http-2 (>= 1.2.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.2.3)
@@ -443,6 +446,7 @@ DEPENDENCIES
   foreman
   friendly_id (~> 5.5)
   haikunator
+  httpx
   importmap-rails
   kamal
   literal

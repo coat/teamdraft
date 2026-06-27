@@ -48,6 +48,9 @@ gem "tailwindcss-rails"
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
+# HTTP client with HTTP/2 support (required — MLB Stats API rejects HTTP/1.1 from this server)
+gem "httpx"
+
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false
 

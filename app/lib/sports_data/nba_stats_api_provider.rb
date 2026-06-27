@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "json"
-
 module SportsData
   # NBA.com's static schedule CDN
   # (https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json).
@@ -52,9 +49,8 @@ module SportsData
       "finals" => "NBA Finals"
     }.freeze
 
-    def initialize(season:, http: Net::HTTP)
+    def initialize(season:)
       super(season:)
-      @http = http
     end
 
     def fetch_games(rounds: nil, dates: nil)
@@ -90,13 +86,11 @@ module SportsData
 
     def request_schedule
       uri = URI("#{BASE_URL}/scheduleLeagueV2.json")
-      request = Net::HTTP::Get.new(uri)
-      request["User-Agent"] = USER_AGENT
-      request["Accept"] = "application/json"
-      request["Referer"] = REFERER
-      response = @http.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.request(request) }
-      raise FetchFailed, "schedule returned #{response.code}" unless response.is_a?(Net::HTTPSuccess)
-      JSON.parse(response.body)
+      response = HTTPX.with(headers: {"User-Agent" => USER_AGENT, "Accept" => "application/json", "Referer" => REFERER}).get(uri.to_s)
+      raise FetchFailed, "schedule returned #{response.status}" unless response.status.between?(200, 299)
+      JSON.parse(response.body.to_s)
+    rescue HTTPX::Error => e
+      raise FetchFailed, "request failed: #{e.message}"
     rescue JSON::ParserError => e
       raise FetchFailed, "invalid JSON from schedule: #{e.message}"
     end
