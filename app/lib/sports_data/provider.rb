@@ -8,7 +8,8 @@ module SportsData
     PROVIDERS = {
       "thesportsdb" => "SportsData::TheSportsDbProvider",
       "mlb_stats_api" => "SportsData::MlbStatsApiProvider",
-      "nba_stats_api" => "SportsData::NbaStatsApiProvider"
+      "nba_stats_api" => "SportsData::NbaStatsApiProvider",
+      "moneyline" => "SportsData::MoneylineProvider"
     }.freeze
 
     def self.for(season)
