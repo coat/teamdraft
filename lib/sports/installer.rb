@@ -14,7 +14,7 @@ module Sports
   class Installer
     SUPPORTED = %w[nfl nba mlb].freeze
 
-    Result = Struct.new(:sport, :created, :existed, :seasons, keyword_init: true)
+    Result = Struct.new(:sport, :created, :existed, :seasons)
 
     def self.call(...) = new(...).call
 

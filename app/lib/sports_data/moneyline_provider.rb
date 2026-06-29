@@ -61,7 +61,7 @@ module SportsData
     }.freeze
 
     def initialize(season:)
-      super(season:)
+      super
     end
 
     def fetch_games(rounds: nil, dates: nil)
