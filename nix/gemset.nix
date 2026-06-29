@@ -342,16 +342,16 @@
     version = "1.0.1";
   };
   crass = {
-    groups = ["default"];
+    groups = ["default" "development" "test"];
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0pfl5c0pyqaparxaqxi6s4gfl21bdldwiawrc0aknyvflli60lfw";
+      sha256 = "15djj19ynz3sbw54fsf8n7y3sha8a333f2mgvjfwhr46jhcqg1ll";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "1.0.6";
+    version = "1.0.7";
   };
   cuprite = {
     dependencies = ["capybara" "ferrum"];
@@ -844,12 +844,12 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0v68nyl07xira30iyhn3118a4g59ar5748laq0cx2pwnsdy7ivrz";
+      sha256 = "18g6ps30z6m365bly7sfialavnsf6m6qamdxsr84w96k51j4mnlb";
       target = "ruby";
       type = "gem";
     };
     targets = [];
-    version = "1.8.1";
+    version = "1.8.3";
   };
   net-imap = {
     dependencies = ["date" "net-protocol"];
