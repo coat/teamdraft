@@ -39,7 +39,7 @@ module SportsData
     ALL_GAME_TYPES = GAME_TYPE_TO_ROUND.keys.freeze
 
     def initialize(season:)
-      super(season:)
+      super
     end
 
     def fetch_games(rounds: nil, dates: nil)

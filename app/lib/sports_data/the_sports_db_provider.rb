@@ -16,7 +16,7 @@ module SportsData
     BASE_URL = "https://www.thesportsdb.com/api/v1/json"
     DEFAULT_KEY = "123"
 
-    SportConfig = Struct.new(:league_id, :regular_rounds, :playoff_rounds, :season_format, keyword_init: true) do
+    SportConfig = Struct.new(:league_id, :regular_rounds, :playoff_rounds, :season_format) do
       def all_rounds
         regular_rounds + playoff_rounds.keys
       end

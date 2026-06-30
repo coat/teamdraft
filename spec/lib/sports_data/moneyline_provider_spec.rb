@@ -13,8 +13,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   def event(id:, home: "New York Yankees", away: "Boston Red Sox",
-            start_time: "2026-06-27T23:10:00Z", status: "scheduled",
-            home_score: nil, away_score: nil)
+    start_time: "2026-06-27T23:10:00Z", status: "scheduled",
+    home_score: nil, away_score: nil)
     scores = (home_score.nil? && away_score.nil?) ? nil : {"home" => home_score, "away" => away_score}
     {"eventId" => id, "homeTeamName" => home, "awayTeamName" => away,
      "startTime" => start_time, "status" => status, "scores" => scores}
@@ -31,11 +31,11 @@ RSpec.describe SportsData::MoneylineProvider do
     stub_request(:get, events_url(from: "2026-06-26", to: "2026-06-28"))
       .to_return(json_body(envelope([
         event(id: "ml-001", home: "New York Yankees", away: "Boston Red Sox",
-              status: "final", home_score: 5, away_score: 3,
-              start_time: "2026-06-26T23:05:00Z"),
+          status: "final", home_score: 5, away_score: 3,
+          start_time: "2026-06-26T23:05:00Z"),
         event(id: "ml-002", home: "Los Angeles Dodgers", away: "San Francisco Giants",
-              status: "scheduled",
-              start_time: "2026-06-27T02:10:00Z")
+          status: "scheduled",
+          start_time: "2026-06-27T02:10:00Z")
       ])))
 
     games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-26", "2026-06-27"])
@@ -97,7 +97,7 @@ RSpec.describe SportsData::MoneylineProvider do
 
   it "fetches the full season range when no dates are given" do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline",
-                    starts_on: Date.new(2026, 3, 27), ends_on: Date.new(2026, 10, 4))
+      starts_on: Date.new(2026, 3, 27), ends_on: Date.new(2026, 10, 4))
     stub_request(:get, events_url(from: "2026-03-27", to: "2026-10-05"))
       .to_return(json_body(envelope([event(id: "ml-season")])))
 
@@ -128,7 +128,7 @@ RSpec.describe SportsData::MoneylineProvider do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline")
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(status: 401, body: '{"error":"Unauthorized"}',
-                 headers: {"Content-Type" => "application/json"})
+        headers: {"Content-Type" => "application/json"})
 
     expect { SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"]) }
       .to raise_error(SportsData::Provider::FetchFailed, /401/)
