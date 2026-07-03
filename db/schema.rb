@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_024619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -193,6 +193,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_000002) do
     t.bigint "sport_id", null: false
     t.date "starts_on"
     t.string "status", default: "upcoming", null: false
+    t.boolean "sync_paused", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "year", null: false
     t.index ["sport_id", "year"], name: "index_seasons_on_sport_id_and_year", unique: true

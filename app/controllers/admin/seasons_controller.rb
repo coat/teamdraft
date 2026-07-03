@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::SeasonsController < Admin::BaseController
-  before_action :load_season, only: [:show, :edit, :update, :activate]
+  before_action :load_season, only: [:show, :edit, :update, :activate, :toggle_sync_pause]
 
   def index
     pagy, seasons = pagy(Season.includes(:sport).order("sports.key, seasons.year DESC"))
@@ -44,6 +44,12 @@ class Admin::SeasonsController < Admin::BaseController
   def activate
     Seasons::Activate.call(season: @season)
     redirect_to admin_seasons_path, notice: "Activated #{@season.label}."
+  end
+
+  def toggle_sync_pause
+    @season.update!(sync_paused: !@season.sync_paused?)
+    label = @season.sync_paused? ? "paused" : "resumed"
+    redirect_to admin_seasons_path, notice: "#{@season.label} sync #{label}."
   end
 
   private

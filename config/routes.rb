@@ -50,7 +50,10 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#show"
     resources :seasons, only: [:index, :show, :new, :create, :edit, :update] do
-      member { post :activate }
+      member do
+        post :activate
+        post :toggle_sync_pause
+      end
     end
     resources :teams, only: [:index, :edit, :update] do
       member do

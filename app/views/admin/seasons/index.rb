@@ -45,7 +45,7 @@ class Views::Admin::Seasons::Index < Views::Base
       td(class: "font-medium") do
         a(href: admin_season_path(season), class: "link link-hover") { season.label }
       end
-      td { render_status(season.status) }
+      td { render_status(season) }
       td { date_range(season) }
       td(class: "text-sm") do
         if season.external_id.present?
@@ -64,13 +64,20 @@ class Views::Admin::Seasons::Index < Views::Base
             method: :post, form: {class: "inline"},
             class: "btn btn-xs"
         end
+        if season.status == "active"
+          pause_label = season.sync_paused? ? "Resume" : "Pause"
+          button_to pause_label, toggle_sync_pause_admin_season_path(season),
+            method: :post, form: {class: "inline"},
+            class: "btn btn-xs #{season.sync_paused? ? "btn-warning" : "btn-ghost"}"
+        end
       end
     end
   end
 
-  def render_status(status)
-    color = {"active" => "badge-success", "upcoming" => "badge-info", "completed" => "badge-ghost"}[status]
-    span(class: "badge badge-sm #{color}") { status }
+  def render_status(season)
+    color = {"active" => "badge-success", "upcoming" => "badge-info", "completed" => "badge-ghost"}[season.status]
+    span(class: "badge badge-sm #{color}") { season.status }
+    span(class: "badge badge-sm badge-warning ml-1") { "paused" } if season.sync_paused?
   end
 
   def date_range(season)

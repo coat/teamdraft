@@ -16,7 +16,7 @@ production:
   refresh_active_seasons:
     class: Sync::RefreshActiveSeasonsJob
     queue: default
-    schedule: every 10 minutes
+    schedule: every 30 minutes
   sweep_live_draft_clocks:
     class: Drafts::ClockSweeperJob
     queue: default

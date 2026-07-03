@@ -76,6 +76,19 @@ class Views::Admin::Seasons::Show < Views::Base
             span { "This season has no external_id, so the game sync will no-op. Set one via Edit." }
           end
         end
+        if @season.status == "active"
+          div(class: "flex items-center justify-between mt-3") do
+            if @season.sync_paused?
+              span(class: "badge badge-warning") { "Automated sync paused" }
+            else
+              span(class: "text-sm text-base-content/50") { "Automated sync active" }
+            end
+            pause_label = @season.sync_paused? ? "Resume sync" : "Pause sync"
+            button_to pause_label, toggle_sync_pause_admin_season_path(@season),
+              method: :post, form: {class: "inline"},
+              class: "btn btn-sm #{@season.sync_paused? ? "btn-warning" : "btn-ghost"}"
+          end
+        end
         render Views::Components::Admin::SyncActions.new(season: @season, back_path: admin_season_path(@season))
       end
     end
