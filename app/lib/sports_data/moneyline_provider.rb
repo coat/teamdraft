@@ -152,12 +152,5 @@ module SportsData
       wanted = Array(dates).map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }.to_set
       games.select { |g| g.starts_at && wanted.include?(g.starts_at.to_date) }
     end
-
-    def parse_start(value)
-      return nil if value.blank?
-      Time.iso8601(value)
-    rescue ArgumentError
-      nil
-    end
   end
 end

@@ -171,12 +171,5 @@ module SportsData
     rescue ArgumentError, TypeError
       nil
     end
-
-    def parse_start(value)
-      return nil if value.blank?
-      Time.iso8601(value)
-    rescue ArgumentError
-      nil
-    end
   end
 end

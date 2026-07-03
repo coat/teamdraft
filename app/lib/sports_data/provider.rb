@@ -43,5 +43,16 @@ module SportsData
     def round_labels
       raise NotImplementedError
     end
+
+    private
+
+    # Shared by the JSON API providers (MLB Stats API, Moneyline, NBA),
+    # which all expose start times as ISO8601 strings.
+    def parse_start(value)
+      return nil if value.blank?
+      Time.iso8601(value)
+    rescue ArgumentError
+      nil
+    end
   end
 end
