@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       member do
         post :activate
         post :toggle_sync_pause
+        post :switch_provider
       end
     end
     resources :teams, only: [:index, :edit, :update] do

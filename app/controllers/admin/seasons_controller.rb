@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::SeasonsController < Admin::BaseController
-  before_action :load_season, only: [:show, :edit, :update, :activate, :toggle_sync_pause]
+  before_action :load_season, only: [:show, :edit, :update, :activate, :toggle_sync_pause, :switch_provider]
 
   def index
     pagy, seasons = pagy(Season.includes(:sport).order("sports.key, seasons.year DESC"))
@@ -50,6 +50,31 @@ class Admin::SeasonsController < Admin::BaseController
     @season.update!(sync_paused: !@season.sync_paused?)
     label = @season.sync_paused? ? "paused" : "resumed"
     redirect_to admin_seasons_path, notice: "#{@season.label} sync #{label}."
+  end
+
+  def switch_provider
+    new_provider = params[:new_provider].to_s.strip
+    unless SportsData::Provider::PROVIDERS.key?(new_provider)
+      return redirect_to admin_season_path(@season), alert: "Unknown provider: #{new_provider.inspect}"
+    end
+    if @season.league_seasons.where(status: "drafting").any?
+      return redirect_to admin_season_path(@season),
+        alert: "Cannot switch provider while a draft is in progress for this season."
+    end
+
+    has_picks = @season.league_seasons.joins(:draft_picks).any?
+
+    @season.update!(
+      external_provider: new_provider,
+      external_id: params[:new_external_id].presence || @season.external_id
+    )
+
+    Sync::GamesJob.perform_later(@season.id, dates: [Date.yesterday, Date.current].map(&:iso8601))
+    Scoring::RecomputeJob.perform_later(@season.id) if has_picks
+
+    msg = "Provider switched to #{new_provider}. Re-sync queued"
+    msg += " (scoring recompute also queued)" if has_picks
+    redirect_to admin_season_path(@season), notice: "#{msg}."
   end
 
   private

@@ -2,6 +2,7 @@
 
 class Views::Admin::Seasons::Show < Views::Base
   include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::FormWith
 
   def initialize(season:, stats:)
     @season = season
@@ -18,6 +19,7 @@ class Views::Admin::Seasons::Show < Views::Base
       render_metadata
       render_counts
       render_sync_panel
+      render_switch_provider_panel
     end
   end
 
@@ -90,6 +92,47 @@ class Views::Admin::Seasons::Show < Views::Base
           end
         end
         render Views::Components::Admin::SyncActions.new(season: @season, back_path: admin_season_path(@season))
+      end
+    end
+  end
+
+  def render_switch_provider_panel
+    drafting = @season.league_seasons.where(status: "drafting").any?
+    has_picks = @season.league_seasons.joins(:draft_picks).any?
+
+    div(class: "card bg-base-100 shadow") do
+      div(class: "card-body") do
+        h2(class: "card-title") { "Switch Data Provider" }
+        p(class: "text-sm text-base-content/70") do
+          plain "Changes the external API used to pull game schedules and scores, then queues a re-sync for yesterday and today. Existing game records are kept; the new provider adds its own records going forward."
+          plain " If the season has draft picks, scoring events are recomputed after re-sync." if has_picks
+        end
+        if drafting
+          div(class: "alert alert-error mt-3 text-sm") do
+            span { "A draft is currently in progress — provider cannot be switched until it completes." }
+          end
+        else
+          if has_picks
+            div(class: "alert alert-warning mt-3 text-sm") do
+              span { "This season has league picks. Scoring events will be recomputed after the re-sync completes." }
+            end
+          end
+          form_with(url: switch_provider_admin_season_path(@season), method: :post, class: "space-y-3 mt-3") do |f|
+            div(class: "space-y-1") do
+              f.label :new_provider, "Provider", class: "label label-text font-medium"
+              f.select :new_provider,
+                SportsData::Provider::PROVIDERS.keys,
+                {selected: @season.external_provider},
+                class: "select select-sm select-bordered w-full"
+            end
+            div(class: "space-y-1") do
+              f.label :new_external_id, "External ID (leave blank to keep current)", class: "label label-text font-medium"
+              f.text_field :new_external_id, value: @season.external_id,
+                class: "input input-sm input-bordered w-full"
+            end
+            f.submit "Switch & Re-sync", class: "btn btn-sm btn-warning"
+          end
+        end
       end
     end
   end
