@@ -2,10 +2,11 @@
 
 module SportsData
   # MLB's public Stats API (https://statsapi.mlb.com/api/v1/). No API key,
-  # no auth, no documented pagination cap on /schedule. We use it as the
-  # MLB-only provider because TheSportsDB's free tier can't return a full
-  # 162-game slate. mlb-rs/mlbt's `mlbt-api` crate confirmed the same
-  # endpoints work without authentication.
+  # no auth, no documented pagination cap on /schedule. Kept as a working
+  # fallback to MoneylineProvider (the current MLB default): it covers the
+  # full 162-game slate TheSportsDB's free tier can't, but syncing too
+  # frequently from one IP got that IP blocked, so switch back only from a
+  # fresh address and keep the sync cadence modest.
   #
   # Round encoding here matches MLB's `gameType` codes; round_labels turns
   # them into human strings for the admin dropdown:
@@ -133,13 +134,6 @@ module SportsData
       away = game.dig("teams", "away", "score")
       return "final" if (state == "Final" || coded == "F") && !home.nil? && !away.nil?
       "scheduled"
-    end
-
-    def parse_start(value)
-      return nil if value.blank?
-      Time.iso8601(value)
-    rescue ArgumentError
-      nil
     end
   end
 end
