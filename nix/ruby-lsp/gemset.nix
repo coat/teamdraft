@@ -2,19 +2,6 @@
 # plus the additions below. Identical entries are inherited from
 # ../gemset.nix; only new or version-shifted gems appear here.
 (import ../gemset.nix) // {
-  rbs = {
-    dependencies = ["logger" "prism" "tsort"];
-    groups = ["default"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "050f0b6bv94k4vszy366m5l5krfgn93y9sj43yd9sm184q7gfyss";
-      target = "ruby";
-      type = "gem";
-    };
-    targets = [];
-    version = "4.0.3";
-  };
   ruby-lsp = {
     dependencies = ["language_server-protocol" "prism" "rbs"];
     groups = ["default"];
