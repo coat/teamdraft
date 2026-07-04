@@ -73,6 +73,11 @@ module SportsData
       from, to = date_range(dates)
       events = fetch_all_events(from:, to:)
       games = events.filter_map { |e| parse_event(e) }
+      # Spring training games are indistinguishable in the payload (no
+      # gameType/round field), so use the season boundary: anything dated
+      # before starts_on is exhibition, even if the sync range reaches back
+      # further. (2026-07-03: 130 spring games inflated the standings.)
+      games = games.reject { |g| g.starts_at && g.starts_at.to_date < @season.starts_on }
       games = filter_by_dates(games, dates) if dates
       games = games.select { |g| Array(rounds).map(&:to_s).include?(g.round) } if rounds
       games

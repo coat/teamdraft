@@ -31,7 +31,8 @@ RSpec.describe SportsData::MoneylineProvider do
   let(:sport) { create(:sport, :mlb) }
 
   it "parses a date-based sync into ParsedGame structs" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-26", to: "2026-06-28"))
       .to_return(json_body(envelope([
         event(id: "ml-001", home: "New York Yankees", away: "Boston Red Sox",
@@ -56,7 +57,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "marks games as final only when status is final AND both scores are present" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(json_body(envelope([
         event(id: "ml-101", status: "final", home_score: 4, away_score: 2),
@@ -75,7 +77,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "paginates across multiple pages" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28", page: 1))
       .to_return(json_body(envelope([event(id: "ml-p1")], page: 1, pages: 2, total: 2)))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28", page: 2))
@@ -87,7 +90,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "silently skips events with unrecognized team names" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(json_body(envelope([
         event(id: "ml-good"),
@@ -110,8 +114,25 @@ RSpec.describe SportsData::MoneylineProvider do
     expect(games.map(&:external_id)).to eq(["ml-season"])
   end
 
+  it "drops events that start before the season begins (spring training)" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_request(:get, events_url(from: "2026-03-20", to: "2026-03-27"))
+      .to_return(json_body(envelope([
+        event(id: "ml-spring", status: "final", home_score: 7, away_score: 7,
+          start_time: "2026-03-20T20:05:00Z"),
+        event(id: "ml-opener", start_time: "2026-03-26T23:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:)
+      .fetch_games(dates: ["2026-03-20", "2026-03-26"])
+
+    expect(games.map(&:external_id)).to eq(["ml-opener"])
+  end
+
   it "raises FetchFailed on HTTP error responses" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(status: 503, body: "Service Unavailable")
 
@@ -120,7 +141,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "raises FetchFailed on connection-level errors (HTTPX returns ErrorResponse, not an exception)" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28")).to_timeout
 
     expect { SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"]) }
@@ -128,7 +150,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "raises FetchFailed with a clear message on 429 rate limiting" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(status: 429, headers: {"Retry-After" => "60"})
 
@@ -137,7 +160,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "raises FetchFailed on 401 unauthorized" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
       .to_return(status: 401, body: '{"error":"Unauthorized"}',
         headers: {"Content-Type" => "application/json"})
@@ -147,7 +171,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "exposes round_numbers and round_labels for the admin UI" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     provider = SportsData::MoneylineProvider.new(season:)
 
     expect(provider.round_numbers).to eq(["regular_season"])
@@ -155,7 +180,8 @@ RSpec.describe SportsData::MoneylineProvider do
   end
 
   it "sends x-api-key header on every request" do
-    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("MONEYLINE_API_KEY", nil).and_return("ml_live_testkey")
     stub = stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
