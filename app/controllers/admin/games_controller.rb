@@ -4,17 +4,16 @@ class Admin::GamesController < Admin::BaseController
   before_action :load_game, only: [:edit, :update]
 
   def index
-    season_id = params[:season_id].presence || Season.where(status: "active").pick(:id) || Season.first&.id
-    season = season_id && Season.find(season_id)
-    scope = if season
-      season.games
-        .includes(home_season_team: :team, away_season_team: :team)
-        .order(Arel.sql("starts_at ASC NULLS LAST"))
-    else
-      Game.none
-    end
-    pagy, games = pagy(scope)
-    render Views::Admin::Games::Index.new(season: season, games: games, all_seasons: Season.order(year: :desc), pagy: pagy)
+    query = Admin::Games::ListQuery.new(params)
+    pagy, games = pagy(query.relation)
+    render Views::Admin::Games::Index.new(
+      query: query,
+      games: games,
+      all_seasons: Season.order(year: :desc),
+      team_options: team_options(query.season),
+      round_options: round_options(query.season),
+      pagy: pagy
+    )
   end
 
   def edit
@@ -36,6 +35,16 @@ class Admin::GamesController < Admin::BaseController
   end
 
   private
+
+  def team_options(season)
+    return [] unless season
+    season.season_teams.joins(:team).order("teams.name").pluck("teams.name", "season_teams.team_id")
+  end
+
+  def round_options(season)
+    return [] unless season
+    season.games.distinct.order(:round).pluck(:round)
+  end
 
   def load_game
     @game = Game.find(params[:id])
