@@ -10,7 +10,9 @@ module SportsData
   # under "meta" ("page"/"pages"/"total"). Future games appear as
   # "isStub": true events (odds-feed placeholders, eventId "mlb-odds-…") that
   # are later replaced by real events with different eventIds ("mlb-ev-…");
-  # Sync::ApplyGames absorbs the ID change via matchup fallback matching.
+  # Stubs shadowed by a real event in the same response are dropped here so
+  # ApplyGames' matchup fallback can adopt the stub's existing row; stub→real
+  # transitions across separate syncs are absorbed by the same fallback.
   #
   # Team matching: events expose team names only (no IDs). TEAM_NAMES maps
   # MoneylineApp team names to the MLB Stats API integer IDs already stored as
@@ -73,7 +75,7 @@ module SportsData
 
     def fetch_games(rounds: nil, dates: nil)
       from, to = date_range(dates)
-      events = fetch_all_events(from:, to:)
+      events = drop_shadowed_stubs(fetch_all_events(from:, to:))
       games = events.filter_map { |e| parse_event(e) }
       # Spring training games are indistinguishable in the payload (no
       # gameType/round field), so use the season boundary: anything dated
@@ -164,6 +166,27 @@ module SportsData
     # on a sync range's last day would be fetched but then dropped here.
     def local_date(time)
       time.in_time_zone(TIME_ZONE).to_date
+    end
+
+    # Moneyline can return a stub ("isStub" odds placeholder) AND its real
+    # event in one response. If the stub survives into the batch it
+    # exact-matches its own existing row and claims it, forcing the real
+    # event to insert a duplicate; with the stub gone, ApplyGames' matchup
+    # fallback adopts the stub's row instead. Stubs with no real
+    # counterpart are legitimate future-game placeholders and are kept.
+    def drop_shadowed_stubs(events)
+      real_keys = events.reject { |e| stub?(e) }.map { |e| matchup_key(e) }.to_set
+      events.reject { |e| stub?(e) && real_keys.include?(matchup_key(e)) }
+    end
+
+    def stub?(event)
+      return event["isStub"] if event.key?("isStub")
+      event["eventId"].to_s.start_with?("mlb-odds-")
+    end
+
+    def matchup_key(event)
+      starts = parse_start(event["startTime"])
+      [event["homeTeamName"], event["awayTeamName"], starts && local_date(starts)]
     end
   end
 end

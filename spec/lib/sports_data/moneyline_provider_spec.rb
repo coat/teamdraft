@@ -14,10 +14,12 @@ RSpec.describe SportsData::MoneylineProvider do
 
   def event(id:, home: "New York Yankees", away: "Boston Red Sox",
     start_time: "2026-06-27T23:10:00Z", status: "scheduled",
-    home_score: nil, away_score: nil)
+    home_score: nil, away_score: nil, is_stub: nil)
     scores = (home_score.nil? && away_score.nil?) ? nil : {"home" => home_score, "away" => away_score}
-    {"eventId" => id, "homeTeamName" => home, "awayTeamName" => away,
-     "startTime" => start_time, "status" => status, "scores" => scores}
+    e = {"eventId" => id, "homeTeamName" => home, "awayTeamName" => away,
+         "startTime" => start_time, "status" => status, "scores" => scores}
+    e["isStub"] = is_stub unless is_stub.nil?
+    e
   end
 
   # Mirrors the real response shape (captured live 2026-07-02): events under
@@ -163,6 +165,42 @@ RSpec.describe SportsData::MoneylineProvider do
       .fetch_games(dates: ["2026-03-24", "2026-03-25"])
 
     expect(games.map(&:external_id)).to eq(["ml-opener"])
+  end
+
+  it "drops stub events shadowed by a real event for the same matchup on the same Eastern date" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_request(:get, events_url(from: "2026-06-21", to: "2026-06-22"))
+      .to_return(json_body(envelope([
+        # Stub at 19:00 ET 6/21; real event at 22:10 ET 6/21 (02:10Z 6/22 —
+        # different UTC dates, same Eastern date). The stub must be dropped.
+        event(id: "mlb-odds-aaa", is_stub: true, start_time: "2026-06-21T23:00:00Z"),
+        event(id: "mlb-ev-111", status: "final", home_score: 5, away_score: 3,
+          start_time: "2026-06-22T02:10:00Z"),
+        # Different matchup, stub only — must be kept.
+        event(id: "mlb-odds-bbb", is_stub: true,
+          home: "Los Angeles Dodgers", away: "San Francisco Giants",
+          start_time: "2026-06-21T20:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-21"])
+
+    expect(games.map(&:external_id)).to contain_exactly("mlb-ev-111", "mlb-odds-bbb")
+  end
+
+  it "falls back to the mlb-odds- id prefix when isStub is absent" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
+      .to_return(json_body(envelope([
+        event(id: "mlb-odds-ccc", start_time: "2026-06-27T23:11:00Z"),
+        event(id: "mlb-ev-222", status: "final", home_score: 4, away_score: 2,
+          start_time: "2026-06-27T23:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"])
+
+    expect(games.map(&:external_id)).to eq(["mlb-ev-222"])
   end
 
   it "raises FetchFailed on HTTP error responses" do
