@@ -71,6 +71,10 @@ RSpec.configure do |config|
   #
   config.infer_spec_type_from_file_location!
 
+  # Season routes have two dynamic segments; this override lets request
+  # specs keep calling season_path(season) with a record.
+  config.include SeasonPaths, type: :request
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:

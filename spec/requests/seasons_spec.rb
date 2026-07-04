@@ -52,4 +52,102 @@ RSpec.describe "Seasons", type: :request do
     positions = sorted_names.map { |n| response.body.index(n) }
     expect(positions).to eq(positions.sort)
   end
+
+  describe "hierarchical URLs" do
+    it "serves the season at /seasons/:sport_key/:year" do
+      season = create_nfl_season(team_count: 2)
+
+      get "/seasons/nfl/#{season.year}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(season.label)
+    end
+
+    it "generates the hierarchical path from season_path" do
+      season = create_nfl_season(team_count: 2)
+
+      expect(season_path(season)).to eq("/seasons/nfl/#{season.year}")
+    end
+
+    it "404s for an unknown sport key" do
+      season = create_nfl_season(team_count: 2)
+
+      get "/seasons/nope/#{season.year}"
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "404s for a year with no season" do
+      create_nfl_season(team_count: 2, year: 2025)
+
+      get "/seasons/nfl/1999"
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "301-redirects a mixed-case sport key to the canonical lowercase path" do
+      season = create_nfl_season(team_count: 2)
+
+      get "/seasons/NFL/#{season.year}"
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/seasons/nfl/#{season.year}")
+    end
+  end
+
+  describe "legacy numeric URLs" do
+    it "301-redirects /seasons/:id to the canonical URL, preserving query params" do
+      season = create_nfl_season(team_count: 2)
+
+      get "/seasons/#{season.id}?sort=name"
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/seasons/nfl/#{season.year}?sort=name")
+    end
+
+    it "404s for a missing legacy id" do
+      get "/seasons/999999"
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "standings views" do
+    it "defaults to the standings table with a link to the division view" do
+      season = create_nfl_season(team_count: 4)
+
+      get season_path(season)
+
+      expect(response.body).to include("sort=division")
+      expect(response.body).to include("view=division")
+    end
+
+    it "shows teams grouped by division when view=division" do
+      season = create_nfl_season(team_count: 2)
+      season.season_teams.first.team.update!(conference: "AFC", division: "West")
+
+      get season_path(season, view: "division")
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("AFC West")
+      expect(response.body).not_to include("sort=division")
+    end
+
+    it "keeps the division view active in sortable header links" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season, view: "division")
+
+      expect(response.body).to match(/sort=name[^"]*view=division|view=division[^"]*sort=name/)
+    end
+
+    it "falls back to the standings table for unknown view values" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season, view: "bogus")
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("sort=division")
+    end
+  end
 end

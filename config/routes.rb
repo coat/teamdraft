@@ -12,9 +12,17 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  resources :seasons, only: [:index, :show] do
-    resources :teams, only: [:show], param: :slug
-  end
+  resources :seasons, only: [:index]
+
+  # Canonical hierarchical URLs, e.g. /seasons/mlb/2006/teams/dodgers
+  get "seasons/:sport_key/:year" => "seasons#show", :as => :season,
+    :constraints => {year: /\d{4}/}
+  get "seasons/:sport_key/:year/teams/:slug" => "teams#show", :as => :season_team,
+    :constraints => {year: /\d{4}/}
+
+  # Legacy numeric URLs 301-redirect to the canonical form.
+  get "seasons/:id" => "seasons#legacy_show", :as => :legacy_season, :constraints => {id: /\d+/}
+  get "seasons/:id/teams/:slug" => "teams#legacy_show", :as => :legacy_season_team, :constraints => {id: /\d+/}
   get "rankings" => "rankings#sports_index", :as => :rankings
   get "rankings/:sport_slug" => "rankings#index", :as => :sport_rankings
   post "rankings/:sport_slug" => "rankings#create", :as => :sport_rankings_create

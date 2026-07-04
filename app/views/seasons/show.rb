@@ -63,15 +63,23 @@ class Views::Seasons::Show < Views::Base
       return
     end
 
-    div(class: "tabs tabs-border") do
-      input(type: "radio", name: "teams_view", class: "tab",
-        aria_label: "Standings", checked: true)
-      div(class: "tab-content pt-3") { render_standings_table }
-
-      input(type: "radio", name: "teams_view", class: "tab",
-        aria_label: "By division")
-      div(class: "tab-content pt-3") { render_teams_by_division }
+    # Link tabs (not CSS radio tabs) so the active view lives in the URL
+    # and can be shared; switching is a full-page navigation like sorting.
+    div(class: "tabs tabs-border", role: "tablist") do
+      render_view_tab("Standings", view: "standings")
+      render_view_tab("By division", view: "division")
     end
+    div(class: "pt-3") do
+      (@standings_query.view == "division") ? render_teams_by_division : render_standings_table
+    end
+  end
+
+  def render_view_tab(label, view:)
+    active = @standings_query.view == view
+    override = (view == "standings") ? nil : view
+    a(href: season_path(@season, **@standings_query.to_url_params(view: override)),
+      role: "tab", aria_selected: active.to_s,
+      class: active ? "tab tab-active" : "tab") { label }
   end
 
   def render_teams_by_division

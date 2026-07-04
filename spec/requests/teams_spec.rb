@@ -45,4 +45,46 @@ RSpec.describe "Teams", type: :request do
     expect(response.body).to include("scheduled")
     expect(response.body).to include("-")
   end
+
+  describe "hierarchical URLs" do
+    it "serves the team page at /seasons/:sport_key/:year/teams/:slug" do
+      season = create_nfl_season(team_count: 2)
+      team = season.season_teams.first.team
+
+      get "/seasons/nfl/#{season.year}/teams/#{team.slug}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(team.name)
+    end
+
+    it "301-redirects a mixed-case sport key to the canonical lowercase path" do
+      season = create_nfl_season(team_count: 2)
+      team = season.season_teams.first.team
+
+      get "/seasons/NFL/#{season.year}/teams/#{team.slug}"
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/seasons/nfl/#{season.year}/teams/#{team.slug}")
+    end
+
+    it "404s for a team slug not in the season" do
+      season = create_nfl_season(team_count: 2)
+
+      get "/seasons/nfl/#{season.year}/teams/not-a-team"
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "legacy numeric URLs" do
+    it "301-redirects /seasons/:id/teams/:slug to the canonical URL" do
+      season = create_nfl_season(team_count: 2)
+      team = season.season_teams.first.team
+
+      get "/seasons/#{season.id}/teams/#{team.slug}"
+
+      expect(response).to have_http_status(:moved_permanently)
+      expect(response).to redirect_to("/seasons/nfl/#{season.year}/teams/#{team.slug}")
+    end
+  end
 end
