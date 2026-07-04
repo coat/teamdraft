@@ -63,11 +63,13 @@ class Views::Layouts::Application < Views::Base
     if user
       div(class: "flex items-center gap-1") do
         a(href: root_path, class: "btn btn-ghost btn-sm") { "Leagues" }
+        a(href: seasons_path, class: "btn btn-ghost btn-sm") { "Seasons" }
         a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
         render_user_menu(user)
       end
     else
       div(class: "flex items-center gap-1") do
+        a(href: seasons_path, class: "btn btn-ghost btn-sm") { "Seasons" }
         a(href: about_path, class: "btn btn-ghost btn-sm") { "About" }
         a(href: new_session_path, class: "btn btn-ghost btn-sm") { "Sign in" }
       end
