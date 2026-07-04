@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe SportsData::MoneylineProvider do
   def events_url(from:, to:, page: 1)
     query = URI.encode_www_form(league: "mlb", from:, to:, limit: 100, page:)
-    "https://api.moneylineapp.com/v1/events?#{query}"
+    "https://mlapi.bet/v1/events?#{query}"
   end
 
   def json_body(payload)
@@ -20,8 +20,12 @@ RSpec.describe SportsData::MoneylineProvider do
      "startTime" => start_time, "status" => status, "scores" => scores}
   end
 
+  # Mirrors the real response shape (captured live 2026-07-02): events under
+  # "data", pagination under "meta".
   def envelope(events, page: 1, pages: 1, total: nil)
-    {"events" => events, "page" => page, "pages" => pages, "total" => total || events.size}
+    {"success" => true, "data" => events,
+     "meta" => {"count" => events.size, "total" => total || events.size,
+                "page" => page, "pages" => pages}}
   end
 
   let(:sport) { create(:sport, :mlb) }
@@ -113,6 +117,14 @@ RSpec.describe SportsData::MoneylineProvider do
 
     expect { SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"]) }
       .to raise_error(SportsData::Provider::FetchFailed, /503/)
+  end
+
+  it "raises FetchFailed on connection-level errors (HTTPX returns ErrorResponse, not an exception)" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline")
+    stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28")).to_timeout
+
+    expect { SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"]) }
+      .to raise_error(SportsData::Provider::FetchFailed, /request failed/)
   end
 
   it "raises FetchFailed with a clear message on 429 rate limiting" do

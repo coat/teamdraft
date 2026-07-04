@@ -7,8 +7,8 @@
 # Season#score_sync_reason and only then enqueues a Sync::GamesJob targeting
 # yesterday + today (UTC). Yesterday is included to catch late-finishing
 # games that crossed midnight on the previous tick. Idempotent end-to-end:
-# Sync::ApplyGames upserts by (season_id, external_id), so overlapping ticks
-# are safe.
+# Sync::ApplyGames matches rows by external_id (with a matchup fallback for
+# provider/stub ID changes), so overlapping ticks are safe.
 #
 # Seasons without an external_id or with sync_paused: true are skipped.
 # Pausing a season stops the automated refresh without changing its status.

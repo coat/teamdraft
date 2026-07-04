@@ -125,6 +125,15 @@ RSpec.describe SportsData::MlbStatsApiProvider do
       .to raise_error(SportsData::Provider::FetchFailed)
   end
 
+  it "raises FetchFailed on connection-level errors (HTTPX returns ErrorResponse, not an exception)" do
+    sport = create(:sport, :mlb)
+    season = create(:season, sport: sport, year: 2025, external_provider: "mlb_stats_api")
+    stub_request(:get, schedule_url(season: "2025", gameTypes: "R,F,D,L,W")).to_timeout
+
+    expect { SportsData::MlbStatsApiProvider.new(season: season).fetch_games }
+      .to raise_error(SportsData::Provider::FetchFailed, /request failed/)
+  end
+
   it "sends a non-bot-flagged User-Agent and JSON Accept header" do
     sport = create(:sport, :mlb)
     season = create(:season, sport: sport, year: 2025, external_provider: "mlb_stats_api")

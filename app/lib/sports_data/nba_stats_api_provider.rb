@@ -86,13 +86,7 @@ module SportsData
 
     def request_schedule
       uri = URI("#{BASE_URL}/scheduleLeagueV2.json")
-      response = HTTPX.with(headers: {"User-Agent" => USER_AGENT, "Accept" => "application/json", "Referer" => REFERER}).get(uri.to_s)
-      raise FetchFailed, "schedule returned #{response.status}" unless response.status.between?(200, 299)
-      JSON.parse(response.body.to_s)
-    rescue HTTPX::Error => e
-      raise FetchFailed, "request failed: #{e.message}"
-    rescue JSON::ParserError => e
-      raise FetchFailed, "invalid JSON from schedule: #{e.message}"
+      get_json(uri.to_s, headers: {"User-Agent" => USER_AGENT, "Accept" => "application/json", "Referer" => REFERER}, label: "schedule")
     end
 
     def parse_payload(payload)

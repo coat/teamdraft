@@ -46,6 +46,23 @@ module SportsData
 
     private
 
+    # Shared by the JSON API providers. HTTPX does not raise on
+    # connection-level failures (DNS, TLS, timeouts) - it returns an
+    # HTTPX::ErrorResponse, which has no #status - so that case must be
+    # checked before anything else. `label` names the endpoint in error
+    # messages (e.g. "schedule returned 503").
+    def get_json(url, headers:, label: "request")
+      response = HTTPX.with(headers:).get(url)
+      raise FetchFailed, "request failed: #{response.error.message}" if response.is_a?(HTTPX::ErrorResponse)
+      raise FetchFailed, "rate limited — retry after 60s" if response.status == 429
+      raise FetchFailed, "#{label} returned #{response.status}" unless response.status.between?(200, 299)
+      JSON.parse(response.body.to_s)
+    rescue HTTPX::Error => e
+      raise FetchFailed, "request failed: #{e.message}"
+    rescue JSON::ParserError => e
+      raise FetchFailed, "invalid JSON from #{label}: #{e.message}"
+    end
+
     # Shared by the JSON API providers (MLB Stats API, Moneyline, NBA),
     # which all expose start times as ISO8601 strings.
     def parse_start(value)

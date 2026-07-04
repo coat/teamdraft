@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 module SportsData
-  # MoneylineApp REST API (https://www.moneylineapp.com).
-  # Auth: x-api-key header; free tier: 1,000 requests/month, 10 req/min.
+  # MoneylineApp REST API (docs: https://www.moneylineapp.com/docs, API host
+  # is mlapi.bet). Auth: x-api-key header; free tier: 1,000 requests/month,
+  # 10 req/min.
   # Events endpoint: GET /v1/events?league=mlb&from=YYYY-MM-DD&to=YYYY-MM-DD&limit=100&page=N
-  # The `to` date is an exclusive boundary (to include June 27, send to=2026-06-28).
+  # The `to` date is an exclusive boundary (to include June 27, send
+  # to=2026-06-28). Responses are enveloped: events under "data", pagination
+  # under "meta" ("page"/"pages"/"total"). Future games appear as
+  # "isStub": true events (odds-feed placeholders, eventId "mlb-odds-…") that
+  # are later replaced by real events with different eventIds ("mlb-ev-…");
+  # Sync::ApplyGames absorbs the ID change via matchup fallback matching.
   #
   # Team matching: events expose team names only (no IDs). TEAM_NAMES maps
   # MoneylineApp team names to the MLB Stats API integer IDs already stored as
@@ -14,7 +20,7 @@ module SportsData
   # fetched games are tagged "regular_season". Postseason round detection must
   # be added before the 2026 MLB playoffs begin in October.
   class MoneylineProvider < Provider
-    BASE_URL = "https://api.moneylineapp.com/v1"
+    BASE_URL = "https://mlapi.bet/v1"
 
     ROUND_KEY = "regular_season"
 
@@ -24,9 +30,8 @@ module SportsData
 
     # MoneylineApp team name → MLB Stats API team ID (stable DB external_id).
     # If a name doesn't match, the event is silently skipped (same "unmapped
-    # team(s)" log path used by ApplyGames).
-    # The Athletics entry may need updating — verify the exact name after the
-    # first successful sync (could be "Athletics", "Las Vegas Athletics", etc.).
+    # team(s)" log path used by ApplyGames). All 30 names verified against a
+    # live response on 2026-07-02 (the A's are exactly "Athletics").
     TEAM_NAMES = {
       "Arizona Diamondbacks" => "109",
       "Atlanta Braves" => "144",
@@ -101,8 +106,8 @@ module SportsData
       events = []
       while page <= pages
         resp = request_events(from:, to:, page:)
-        events.concat(Array(resp["events"]))
-        pages = resp["pages"].to_i
+        events.concat(Array(resp["data"]))
+        pages = resp.dig("meta", "pages").to_i
         pages = 1 if pages < 1
         page += 1
       end
@@ -113,14 +118,7 @@ module SportsData
       uri = URI("#{BASE_URL}/events")
       uri.query = URI.encode_www_form(league: "mlb", from:, to:, limit: 100, page:)
       api_key = ENV.fetch("MONEYLINE_API_KEY", nil)
-      response = HTTPX.with(headers: {"x-api-key" => api_key, "Accept" => "application/json"}).get(uri.to_s)
-      raise FetchFailed, "rate limited — retry after 60s" if response.status == 429
-      raise FetchFailed, "events returned #{response.status}" unless response.status.between?(200, 299)
-      JSON.parse(response.body.to_s)
-    rescue HTTPX::Error => e
-      raise FetchFailed, "request failed: #{e.message}"
-    rescue JSON::ParserError => e
-      raise FetchFailed, "invalid JSON from events: #{e.message}"
+      get_json(uri.to_s, headers: {"x-api-key" => api_key, "Accept" => "application/json"}, label: "events")
     end
 
     def parse_event(event)

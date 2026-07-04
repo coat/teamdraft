@@ -118,6 +118,13 @@ RSpec.describe SportsData::NbaStatsApiProvider do
       .to raise_error(SportsData::Provider::FetchFailed)
   end
 
+  it "raises FetchFailed on connection-level errors (HTTPX returns ErrorResponse, not an exception)" do
+    stub_request(:get, schedule_url).to_timeout
+
+    expect { described_class.new(season: season).fetch_games }
+      .to raise_error(SportsData::Provider::FetchFailed, /request failed/)
+  end
+
   it "sends a Referer header so the CDN does not 403" do
     stub = stub_request(:get, schedule_url)
       .with(headers: {"User-Agent" => "Mozilla/5.0 (compatible; teamdraft/1.0)", "Referer" => "https://www.nba.com/"})

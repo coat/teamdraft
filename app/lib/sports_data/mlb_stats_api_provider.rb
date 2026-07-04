@@ -90,13 +90,7 @@ module SportsData
       params = {sportId: SPORT_ID}.merge(params)
       uri = URI("#{BASE_URL}/schedule")
       uri.query = URI.encode_www_form(params)
-      response = HTTPX.with(headers: {"User-Agent" => USER_AGENT, "Accept" => "application/json"}).get(uri.to_s)
-      raise FetchFailed, "schedule returned #{response.status}" unless response.status.between?(200, 299)
-      JSON.parse(response.body.to_s)
-    rescue HTTPX::Error => e
-      raise FetchFailed, "request failed: #{e.message}"
-    rescue JSON::ParserError => e
-      raise FetchFailed, "invalid JSON from schedule: #{e.message}"
+      get_json(uri.to_s, headers: {"User-Agent" => USER_AGENT, "Accept" => "application/json"}, label: "schedule")
     end
 
     def parse_payload(payload)
