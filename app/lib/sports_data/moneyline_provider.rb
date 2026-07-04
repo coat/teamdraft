@@ -22,6 +22,8 @@ module SportsData
   class MoneylineProvider < Provider
     BASE_URL = "https://mlapi.bet/v1"
 
+    TIME_ZONE = "America/New_York"
+
     ROUND_KEY = "regular_season"
 
     ROUND_LABELS = {
@@ -77,7 +79,7 @@ module SportsData
       # gameType/round field), so use the season boundary: anything dated
       # before starts_on is exhibition, even if the sync range reaches back
       # further. (2026-07-03: 130 spring games inflated the standings.)
-      games = games.reject { |g| g.starts_at && g.starts_at.to_date < @season.starts_on }
+      games = games.reject { |g| g.starts_at && local_date(g.starts_at) < @season.starts_on }
       games = filter_by_dates(games, dates) if dates
       games = games.select { |g| Array(rounds).map(&:to_s).include?(g.round) } if rounds
       games
@@ -153,7 +155,15 @@ module SportsData
 
     def filter_by_dates(games, dates)
       wanted = Array(dates).map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }.to_set
-      games.select { |g| g.starts_at && wanted.include?(g.starts_at.to_date) }
+      games.select { |g| g.starts_at && wanted.include?(local_date(g.starts_at)) }
+    end
+
+    # MLB schedules by Eastern-time date (a 10pm ET start is still "today's
+    # game") and mlapi.bet's from/to params match that, so date comparisons
+    # must not use the UTC date: it rolls over at 8pm ET and every night game
+    # on a sync range's last day would be fetched but then dropped here.
+    def local_date(time)
+      time.in_time_zone(TIME_ZONE).to_date
     end
   end
 end

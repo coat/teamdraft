@@ -130,6 +130,41 @@ RSpec.describe SportsData::MoneylineProvider do
     expect(games.map(&:external_id)).to eq(["ml-opener"])
   end
 
+  it "keeps night games whose UTC date rolls past the requested date (dates are Eastern)" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_request(:get, events_url(from: "2026-06-20", to: "2026-06-21"))
+      .to_return(json_body(envelope([
+        # 22:10 ET on 6/20 — 02:10 UTC on 6/21. MLB schedules by Eastern
+        # date and mlapi.bet's from/to filter matches it, so a 6/20 sync
+        # must keep this game.
+        event(id: "ml-night", status: "final", home_score: 8, away_score: 16,
+          start_time: "2026-06-21T02:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-20"])
+
+    expect(games.map(&:external_id)).to eq(["ml-night"])
+  end
+
+  it "drops spring games whose UTC date rolls onto opening day (season boundary is Eastern)" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_request(:get, events_url(from: "2026-03-24", to: "2026-03-26"))
+      .to_return(json_body(envelope([
+        # 20:10 ET on 3/24 — 00:10 UTC on 3/25 (starts_on). Exhibition game
+        # the night before opening day must still be rejected.
+        event(id: "ml-freeway", status: "final", home_score: 0, away_score: 3,
+          start_time: "2026-03-25T00:10:00Z"),
+        event(id: "ml-opener", start_time: "2026-03-25T23:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:)
+      .fetch_games(dates: ["2026-03-24", "2026-03-25"])
+
+    expect(games.map(&:external_id)).to eq(["ml-opener"])
+  end
+
   it "raises FetchFailed on HTTP error responses" do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline",
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
