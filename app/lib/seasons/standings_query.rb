@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 module Seasons
-  # Sort-aware wrapper around `Seasons::TeamStandings` for the /seasons/:id
-  # show page. Mirrors `Leagues::DirectoryQuery` in shape (whitelisted sort
-  # columns + `to_url_params`) so the same `SortableHeader` component can
-  # drive both tables.
+  # Sort-aware wrapper around `Seasons::TeamStandings` for the
+  # /seasons/:sport_key/:year show page. Mirrors `Leagues::DirectoryQuery`
+  # in shape (whitelisted sort columns + `to_url_params`) so the same
+  # `SortableHeader` component can drive both tables. Also tracks which
+  # teams view (flat standings vs by division) the URL selects.
   class StandingsQuery
     SORTS = %w[name division record points].freeze
-    URL_PARAM_KEYS = %i[sort dir].freeze
+    VIEWS = %w[standings division].freeze
+    URL_PARAM_KEYS = %i[sort dir view].freeze
 
     def self.from_request(season:, params:)
       new(season: season, params: params.permit(*URL_PARAM_KEYS))
@@ -40,8 +42,15 @@ module Seasons
       %w[name division].include?(sort_column) ? "asc" : "desc"
     end
 
+    def view
+      v = params[:view].to_s
+      VIEWS.include?(v) ? v : "standings"
+    end
+
     def to_url_params(overrides = {})
-      {sort: sort_column, dir: sort_dir}.merge(overrides).compact_blank
+      # The default view stays out of URLs so /seasons/nfl/2025 remains canonical.
+      view_param = (view == "standings") ? nil : view
+      {sort: sort_column, dir: sort_dir, view: view_param}.merge(overrides).compact_blank
     end
 
     private
