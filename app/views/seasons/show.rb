@@ -3,6 +3,7 @@
 class Views::Seasons::Show < Views::Base
   include Views::Components::TeamDirectoryHelpers
   include Views::Components::ScoringBreakdownHelpers
+  include Phlex::Rails::Helpers::TurboFrameTag
 
   # tbody disclosure rows span the full column set when expanded.
   # Standings: chevron | swatch | Team | Division | W-L | Points
@@ -63,14 +64,18 @@ class Views::Seasons::Show < Views::Base
       return
     end
 
-    # Link tabs (not CSS radio tabs) so the active view lives in the URL
-    # and can be shared; switching is a full-page navigation like sorting.
-    div(class: "tabs tabs-border", role: "tablist") do
-      render_view_tab("Standings", view: "standings")
-      render_view_tab("By division", view: "division")
-    end
-    div(class: "pt-3") do
-      (@standings_query.view == "division") ? render_teams_by_division : render_standings_table
+    # Link tabs (not CSS radio tabs) so the active view lives in the URL and
+    # can be shared. The surrounding turbo-frame scopes tab switches and
+    # column sorts to this region, so the page doesn't scroll back to the
+    # top; sort/tab links advance the URL, links leaving the page target _top.
+    turbo_frame_tag "season_teams" do
+      div(class: "tabs tabs-border", role: "tablist") do
+        render_view_tab("Standings", view: "standings")
+        render_view_tab("By division", view: "division")
+      end
+      div(class: "pt-3") do
+        (@standings_query.view == "division") ? render_teams_by_division : render_standings_table
+      end
     end
   end
 
@@ -79,7 +84,8 @@ class Views::Seasons::Show < Views::Base
     override = (view == "standings") ? nil : view
     a(href: season_path(@season, **@standings_query.to_url_params(view: override)),
       role: "tab", aria_selected: active.to_s,
-      class: active ? "tab tab-active" : "tab") { label }
+      class: active ? "tab tab-active" : "tab",
+      data: {turbo_action: "advance"}) { label }
   end
 
   def render_teams_by_division
@@ -141,12 +147,14 @@ class Views::Seasons::Show < Views::Base
   def render_team_row(row, columns:, show_division:)
     team = row.team
     panel_id = "season-breakdown-#{row.season_team.id}"
-    tbody(class: "even:bg-base-200", data: {controller: "disclosure"}) do
+    tbody(class: "even:bg-base-200",
+      data: {controller: "disclosure", disclosure_key_value: panel_id}) do
       tr do
         th(class: "align-middle") { render_disclosure_toggle(panel_id) }
         td { render_team_swatch(team) }
         td(class: "font-medium") do
-          a(href: season_team_path(@season, slug: team.slug), class: "link link-hover") do
+          a(href: season_team_path(@season, slug: team.slug), class: "link link-hover",
+            data: {turbo_frame: "_top"}) do
             plain team.name
           end
         end
