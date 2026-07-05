@@ -82,4 +82,52 @@ RSpec.describe "Admin seasons", type: :request do
 
     expect(response).to redirect_to(new_session_path)
   end
+
+  it "updates round windows and prunes blank pairs" do
+    sign_in_admin
+    season = create(:season, sport: create(:sport, :mlb), year: 2026,
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+
+    patch admin_season_path(season), params: {
+      season: {
+        label: season.label,
+        round_windows: {
+          "wildcard" => {"starts_on" => "2026-09-29", "ends_on" => "2026-10-02"},
+          "world_series" => {"starts_on" => "", "ends_on" => ""}
+        }
+      }
+    }
+
+    expect(response).to redirect_to(admin_seasons_path)
+    expect(season.reload.round_windows).to eq(
+      "wildcard" => {"starts_on" => "2026-09-29", "ends_on" => "2026-10-02"}
+    )
+  end
+
+  it "re-renders the edit form when round windows are invalid" do
+    sign_in_admin
+    season = create(:season, sport: create(:sport, :mlb), year: 2026,
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+
+    patch admin_season_path(season), params: {
+      season: {
+        label: season.label,
+        round_windows: {"wildcard" => {"starts_on" => "2026-10-02", "ends_on" => "2026-09-29"}}
+      }
+    }
+
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(season.reload.round_windows).to eq({})
+  end
+
+  it "renders round window date fields on the edit form" do
+    sign_in_admin
+    season = create(:season, sport: create(:sport, :mlb), year: 2026,
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+
+    get edit_admin_season_path(season)
+
+    expect(response.body).to include("season[round_windows][wildcard][starts_on]")
+    expect(response.body).to include("season[round_windows][world_series][ends_on]")
+  end
 end

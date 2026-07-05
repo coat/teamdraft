@@ -25,6 +25,7 @@ class Views::Admin::Seasons::Form < Views::Base
       date_row(f, :ends_on, "Ends on")
       text_row(f, :external_provider, "External provider (e.g. \"thesportsdb\")")
       text_row(f, :external_id, "External ID (provider's season key)")
+      round_windows_rows if @season.persisted?
       div(class: "card-actions justify-end pt-2") do
         a(href: admin_seasons_path, class: "btn btn-ghost") { "Cancel" }
         f.submit "Save", class: "btn btn-primary"
@@ -59,6 +60,32 @@ class Views::Admin::Seasons::Form < Views::Base
     div(class: "space-y-1") do
       f.label name, label, class: "label label-text font-medium"
       f.select name, options, {include_blank: opts.delete(:include_blank)}, class: "select w-full", **opts
+    end
+  end
+
+  # One starts_on/ends_on date pair per playoff round the sport defines.
+  # Rendered only on edit: a new season has no chosen sport until saved.
+  def round_windows_rows
+    rounds = @season.sport.scoring_rules.ordered
+      .where(kind: "playoff_appearance").pluck(:round_key, :short_label)
+    return if rounds.empty?
+
+    fieldset(class: "space-y-2 pt-2") do
+      legend(class: "label label-text font-medium") { "Playoff round windows (Eastern dates; blank = regular season)" }
+      rounds.each do |round_key, short_label|
+        window = @season.round_windows[round_key] || {}
+        div(class: "grid grid-cols-2 gap-2") do
+          round_date_input("season[round_windows][#{round_key}][starts_on]", window["starts_on"], "#{short_label} starts")
+          round_date_input("season[round_windows][#{round_key}][ends_on]", window["ends_on"], "#{short_label} ends")
+        end
+      end
+    end
+  end
+
+  def round_date_input(field_name, value, label_text)
+    div(class: "space-y-1") do
+      label(class: "label label-text font-medium") { label_text }
+      input(type: "date", name: field_name, value: value, class: "input w-full")
     end
   end
 end
