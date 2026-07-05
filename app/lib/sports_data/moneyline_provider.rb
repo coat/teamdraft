@@ -18,19 +18,15 @@ module SportsData
   # MoneylineApp team names to the MLB Stats API integer IDs already stored as
   # team external_ids in the DB, so no team record migration is needed.
   #
-  # Round detection: MoneylineApp events carry no gameType/round field, so all
-  # fetched games are tagged "regular_season". Postseason round detection must
-  # be added before the 2026 MLB playoffs begin in October.
+  # Round detection: events carry no gameType/round field, so playoff rounds
+  # come from the season's admin-configured round_windows (Eastern-date lookup
+  # via Season#round_for); anything outside a window is regular_season.
   class MoneylineProvider < Provider
     BASE_URL = "https://mlapi.bet/v1"
 
     TIME_ZONE = "America/New_York"
 
     ROUND_KEY = "regular_season"
-
-    ROUND_LABELS = {
-      "regular_season" => "Regular Season"
-    }.freeze
 
     # MoneylineApp team name → MLB Stats API team ID (stable DB external_id).
     # If a name doesn't match, the event is silently skipped (same "unmapped
@@ -88,11 +84,15 @@ module SportsData
     end
 
     def round_numbers
-      [ROUND_KEY]
+      [ROUND_KEY] + @season.round_windows.keys
     end
 
     def round_labels
-      ROUND_LABELS.dup
+      short_labels = @season.sport.scoring_rules
+        .where(kind: "playoff_appearance").pluck(:round_key, :short_label).to_h
+      labels = {ROUND_KEY => "Regular Season"}
+      @season.round_windows.keys.each { |k| labels[k] = short_labels[k] || k.titleize }
+      labels
     end
 
     private
@@ -135,14 +135,16 @@ module SportsData
       away_ext = TEAM_NAMES[event["awayTeamName"]]
       return nil unless home_ext && away_ext
 
+      starts_at = parse_start(event["startTime"])
+
       ParsedGame.new(
         external_id: event["eventId"].to_s,
         home_team_external_id: home_ext,
         away_team_external_id: away_ext,
         home_score: event.dig("scores", "home"),
         away_score: event.dig("scores", "away"),
-        starts_at: parse_start(event["startTime"]),
-        round: ROUND_KEY,
+        starts_at: starts_at,
+        round: round_key_for(starts_at),
         week: nil,
         status: status_for(event)
       )
@@ -166,6 +168,11 @@ module SportsData
     # on a sync range's last day would be fetched but then dropped here.
     def local_date(time)
       time.in_time_zone(TIME_ZONE).to_date
+    end
+
+    def round_key_for(starts_at)
+      return ROUND_KEY if starts_at.nil?
+      @season.round_for(local_date(starts_at)) || ROUND_KEY
     end
 
     # Moneyline can return a stub ("isStub" odds placeholder) AND its real

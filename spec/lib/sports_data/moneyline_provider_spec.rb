@@ -243,6 +243,51 @@ RSpec.describe SportsData::MoneylineProvider do
       .to raise_error(SportsData::Provider::FetchFailed, /401/)
   end
 
+  it "assigns playoff rounds from the season's round windows using Eastern dates" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5),
+      round_windows: {"world_series" => {"starts_on" => "2026-10-23", "ends_on" => "2026-11-04"}})
+    stub_request(:get, events_url(from: "2026-10-24", to: "2026-10-25"))
+      .to_return(json_body(envelope([
+        # 00:10Z on 10/25 = 20:10 ET on 10/24 — inside the window by ET date.
+        event(id: "ml-ws1", status: "final", home_score: 3, away_score: 2,
+          start_time: "2026-10-25T00:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-10-24"])
+
+    expect(games.first.round).to eq("world_series")
+  end
+
+  it "keeps games outside every window tagged regular_season" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5),
+      round_windows: {"world_series" => {"starts_on" => "2026-10-23", "ends_on" => "2026-11-04"}})
+    stub_request(:get, events_url(from: "2026-07-04", to: "2026-07-05"))
+      .to_return(json_body(envelope([event(id: "ml-rs1", start_time: "2026-07-04T23:10:00Z")])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-07-04"])
+
+    expect(games.first.round).to eq("regular_season")
+  end
+
+  it "exposes configured playoff rounds in round_numbers and round_labels" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5),
+      round_windows: {
+        "wildcard" => {"starts_on" => "2026-09-29", "ends_on" => "2026-10-02"},
+        "world_series" => {"starts_on" => "2026-10-23", "ends_on" => "2026-11-04"}
+      })
+    provider = SportsData::MoneylineProvider.new(season:)
+
+    expect(provider.round_numbers).to eq(["regular_season", "wildcard", "world_series"])
+    expect(provider.round_labels).to eq(
+      "regular_season" => "Regular Season",
+      "wildcard" => "Wild Card",
+      "world_series" => "World Series"
+    )
+  end
+
   it "exposes round_numbers and round_labels for the admin UI" do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline",
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
