@@ -88,11 +88,23 @@ class Admin::SeasonsController < Admin::BaseController
   end
 
   def season_params
-    params.require(:season).permit(
+    permitted = params.require(:season).permit(
       :sport_id, :year, :label, :status,
       :starts_on, :ends_on,
-      :external_provider, :external_id
+      :external_provider, :external_id,
+      round_windows: {}
     )
+    prune_blank_round_windows(permitted)
+  end
+
+  # The form always submits every round's date pair; drop rounds the admin
+  # left fully blank so they read as "window unset" rather than failing
+  # the both-dates-required validation.
+  def prune_blank_round_windows(permitted)
+    windows = permitted[:round_windows]
+    return permitted if windows.nil?
+    pruned = windows.to_h.reject { |_key, w| w["starts_on"].blank? && w["ends_on"].blank? }
+    permitted.merge(round_windows: pruned)
   end
 
   def season_stats

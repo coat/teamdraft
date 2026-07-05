@@ -10,25 +10,23 @@ module SportsData
   # under "meta" ("page"/"pages"/"total"). Future games appear as
   # "isStub": true events (odds-feed placeholders, eventId "mlb-odds-…") that
   # are later replaced by real events with different eventIds ("mlb-ev-…");
-  # Sync::ApplyGames absorbs the ID change via matchup fallback matching.
+  # Stubs shadowed by a real event in the same response are dropped here so
+  # ApplyGames' matchup fallback can adopt the stub's existing row; stub→real
+  # transitions across separate syncs are absorbed by the same fallback.
   #
   # Team matching: events expose team names only (no IDs). TEAM_NAMES maps
   # MoneylineApp team names to the MLB Stats API integer IDs already stored as
   # team external_ids in the DB, so no team record migration is needed.
   #
-  # Round detection: MoneylineApp events carry no gameType/round field, so all
-  # fetched games are tagged "regular_season". Postseason round detection must
-  # be added before the 2026 MLB playoffs begin in October.
+  # Round detection: events carry no gameType/round field, so playoff rounds
+  # come from the season's admin-configured round_windows (Eastern-date lookup
+  # via Season#round_for); anything outside a window is regular_season.
   class MoneylineProvider < Provider
     BASE_URL = "https://mlapi.bet/v1"
 
     TIME_ZONE = "America/New_York"
 
     ROUND_KEY = "regular_season"
-
-    ROUND_LABELS = {
-      "regular_season" => "Regular Season"
-    }.freeze
 
     # MoneylineApp team name → MLB Stats API team ID (stable DB external_id).
     # If a name doesn't match, the event is silently skipped (same "unmapped
@@ -73,7 +71,7 @@ module SportsData
 
     def fetch_games(rounds: nil, dates: nil)
       from, to = date_range(dates)
-      events = fetch_all_events(from:, to:)
+      events = drop_shadowed_stubs(fetch_all_events(from:, to:))
       games = events.filter_map { |e| parse_event(e) }
       # Spring training games are indistinguishable in the payload (no
       # gameType/round field), so use the season boundary: anything dated
@@ -86,11 +84,13 @@ module SportsData
     end
 
     def round_numbers
-      [ROUND_KEY]
+      [ROUND_KEY] + ordered_windows.map(&:first)
     end
 
     def round_labels
-      ROUND_LABELS.dup
+      labels = {ROUND_KEY => "Regular Season"}
+      ordered_windows.each { |key, short_label| labels[key] = short_label || key.titleize }
+      labels
     end
 
     private
@@ -133,14 +133,16 @@ module SportsData
       away_ext = TEAM_NAMES[event["awayTeamName"]]
       return nil unless home_ext && away_ext
 
+      starts_at = parse_start(event["startTime"])
+
       ParsedGame.new(
         external_id: event["eventId"].to_s,
         home_team_external_id: home_ext,
         away_team_external_id: away_ext,
         home_score: event.dig("scores", "home"),
         away_score: event.dig("scores", "away"),
-        starts_at: parse_start(event["startTime"]),
-        round: ROUND_KEY,
+        starts_at: starts_at,
+        round: round_key_for(starts_at),
         week: nil,
         status: status_for(event)
       )
@@ -164,6 +166,44 @@ module SportsData
     # on a sync range's last day would be fetched but then dropped here.
     def local_date(time)
       time.in_time_zone(TIME_ZONE).to_date
+    end
+
+    def round_key_for(starts_at)
+      return ROUND_KEY if starts_at.nil?
+      @season.round_for(local_date(starts_at)) || ROUND_KEY
+    end
+
+    # Window keys in the sport's scoring-rule display order — jsonb does not
+    # preserve insertion order, so the admin dropdown would otherwise list
+    # rounds by key length.
+    def ordered_windows
+      configured = @season.round_windows.keys
+      rules = @season.sport.scoring_rules.ordered
+        .where(kind: "playoff_appearance").pluck(:round_key, :short_label).to_h
+      ordered = rules.keys.select { |k| configured.include?(k) } + (configured - rules.keys)
+      ordered.map { |k| [k, rules[k]] }
+    end
+
+    # Moneyline can return a stub ("isStub" odds placeholder) AND its real
+    # event in one response. If the stub survives into the batch it
+    # exact-matches its own existing row and claims it, forcing the real
+    # event to insert a duplicate; with the stub gone, ApplyGames' matchup
+    # fallback adopts the stub's row instead. Stubs with no real
+    # counterpart are legitimate future-game placeholders and are kept.
+    # A doubleheader stub dropped against game 1's real event costs at most a row-identity swap that converges once game 2's real event syncs.
+    def drop_shadowed_stubs(events)
+      real_keys = events.reject { |e| stub?(e) }.map { |e| matchup_key(e) }.to_set
+      events.reject { |e| stub?(e) && real_keys.include?(matchup_key(e)) }
+    end
+
+    def stub?(event)
+      return event["isStub"] unless event["isStub"].nil?
+      event["eventId"].to_s.start_with?("mlb-odds-")
+    end
+
+    def matchup_key(event)
+      starts = parse_start(event["startTime"])
+      [event["homeTeamName"], event["awayTeamName"], starts && local_date(starts)]
     end
   end
 end
