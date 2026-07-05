@@ -84,14 +84,12 @@ module SportsData
     end
 
     def round_numbers
-      [ROUND_KEY] + @season.round_windows.keys
+      [ROUND_KEY] + ordered_windows.map(&:first)
     end
 
     def round_labels
-      short_labels = @season.sport.scoring_rules
-        .where(kind: "playoff_appearance").pluck(:round_key, :short_label).to_h
       labels = {ROUND_KEY => "Regular Season"}
-      @season.round_windows.keys.each { |k| labels[k] = short_labels[k] || k.titleize }
+      ordered_windows.each { |key, short_label| labels[key] = short_label || key.titleize }
       labels
     end
 
@@ -175,19 +173,31 @@ module SportsData
       @season.round_for(local_date(starts_at)) || ROUND_KEY
     end
 
+    # Window keys in the sport's scoring-rule display order — jsonb does not
+    # preserve insertion order, so the admin dropdown would otherwise list
+    # rounds by key length.
+    def ordered_windows
+      configured = @season.round_windows.keys
+      rules = @season.sport.scoring_rules.ordered
+        .where(kind: "playoff_appearance").pluck(:round_key, :short_label).to_h
+      ordered = rules.keys.select { |k| configured.include?(k) } + (configured - rules.keys)
+      ordered.map { |k| [k, rules[k]] }
+    end
+
     # Moneyline can return a stub ("isStub" odds placeholder) AND its real
     # event in one response. If the stub survives into the batch it
     # exact-matches its own existing row and claims it, forcing the real
     # event to insert a duplicate; with the stub gone, ApplyGames' matchup
     # fallback adopts the stub's row instead. Stubs with no real
     # counterpart are legitimate future-game placeholders and are kept.
+    # A doubleheader stub dropped against game 1's real event costs at most a row-identity swap that converges once game 2's real event syncs.
     def drop_shadowed_stubs(events)
       real_keys = events.reject { |e| stub?(e) }.map { |e| matchup_key(e) }.to_set
       events.reject { |e| stub?(e) && real_keys.include?(matchup_key(e)) }
     end
 
     def stub?(event)
-      return event["isStub"] if event.key?("isStub")
+      return event["isStub"] unless event["isStub"].nil?
       event["eventId"].to_s.start_with?("mlb-odds-")
     end
 

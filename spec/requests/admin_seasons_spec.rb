@@ -129,5 +129,7 @@ RSpec.describe "Admin seasons", type: :request do
 
     expect(response.body).to include("season[round_windows][wildcard][starts_on]")
     expect(response.body).to include("season[round_windows][world_series][ends_on]")
+    expect(response.body).to include('id="season_round_windows_wildcard_starts_on"')
+    expect(response.body).to include('for="season_round_windows_wildcard_starts_on"')
   end
 end

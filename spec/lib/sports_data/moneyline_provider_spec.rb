@@ -188,6 +188,22 @@ RSpec.describe SportsData::MoneylineProvider do
     expect(games.map(&:external_id)).to contain_exactly("mlb-ev-111", "mlb-odds-bbb")
   end
 
+  it "treats an explicit null isStub as unknown and falls back to the id prefix" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+    stub_event = event(id: "mlb-odds-nullstub", start_time: "2026-06-27T23:11:00Z").merge("isStub" => nil)
+    stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
+      .to_return(json_body(envelope([
+        stub_event,
+        event(id: "mlb-ev-333", status: "final", home_score: 4, away_score: 2,
+          start_time: "2026-06-27T23:10:00Z")
+      ])))
+
+    games = SportsData::MoneylineProvider.new(season:).fetch_games(dates: ["2026-06-27"])
+
+    expect(games.map(&:external_id)).to eq(["mlb-ev-333"])
+  end
+
   it "falls back to the mlb-odds- id prefix when isStub is absent" do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline",
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
@@ -295,6 +311,20 @@ RSpec.describe SportsData::MoneylineProvider do
 
     expect(provider.round_numbers).to eq(["regular_season"])
     expect(provider.round_labels).to eq("regular_season" => "Regular Season")
+  end
+
+  it "orders round_numbers by the sport's scoring-rule order, not window insertion order" do
+    season = create(:season, sport:, year: 2026, external_provider: "moneyline",
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5),
+      round_windows: {
+        "world_series" => {"starts_on" => "2026-10-23", "ends_on" => "2026-11-04"},
+        "lcs" => {"starts_on" => "2026-10-12", "ends_on" => "2026-10-21"},
+        "wildcard" => {"starts_on" => "2026-09-29", "ends_on" => "2026-10-02"}
+      })
+    provider = SportsData::MoneylineProvider.new(season:)
+
+    expect(provider.round_numbers).to eq(["regular_season", "wildcard", "lcs", "world_series"])
+    expect(provider.round_labels.keys).to eq(["regular_season", "wildcard", "lcs", "world_series"])
   end
 
   it "sends x-api-key header on every request" do

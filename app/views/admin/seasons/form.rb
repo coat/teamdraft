@@ -83,9 +83,10 @@ class Views::Admin::Seasons::Form < Views::Base
   end
 
   def round_date_input(field_name, value, label_text)
+    field_id = field_name.tr("[]", "_").squeeze("_").chomp("_")
     div(class: "space-y-1") do
-      label(class: "label label-text font-medium") { label_text }
-      input(type: "date", name: field_name, value: value, class: "input w-full")
+      label(for: field_id, class: "label label-text font-medium") { label_text }
+      input(type: "date", id: field_id, name: field_name, value: value, class: "input w-full")
     end
   end
 end
