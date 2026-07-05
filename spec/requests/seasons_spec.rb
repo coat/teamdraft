@@ -141,6 +141,41 @@ RSpec.describe "Seasons", type: :request do
       expect(response.body).to match(/sort=name[^"]*view=division|view=division[^"]*sort=name/)
     end
 
+    it "wraps the teams tab in a turbo frame so sorting swaps in place" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season)
+
+      expect(response.body).to include('<turbo-frame id="season_teams"')
+    end
+
+    it "sends team links to the full page from inside the frame" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season)
+
+      expect(response.body).to include('data-turbo-frame="_top"')
+    end
+
+    it "marks the view tab links to advance the URL within the frame" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season)
+
+      expect(response.body).to match(/role="tab"[^>]*data-turbo-action="advance"/)
+    end
+
+    it "tags disclosure rows with a persistence key" do
+      season = create_nfl_season(team_count: 2)
+
+      get season_path(season)
+
+      season_team = season.season_teams.first
+      expect(response.body).to include(
+        %(data-disclosure-key-value="season-breakdown-#{season_team.id}")
+      )
+    end
+
     it "falls back to the standings table for unknown view values" do
       season = create_nfl_season(team_count: 2)
 
