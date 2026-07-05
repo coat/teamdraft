@@ -119,5 +119,11 @@ RSpec.describe Season do
       expect(overlapping).not_to be_valid
       expect(overlapping.errors[:round_windows].join).to include("overlap")
     end
+
+    it "rejects a non-hash round_windows value" do
+      season = mlb_season(["wildcard"])
+      expect(season).not_to be_valid
+      expect(season.errors[:round_windows].join).to include("map of round keys")
+    end
   end
 end

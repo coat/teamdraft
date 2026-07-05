@@ -73,6 +73,10 @@ class Season < ApplicationRecord
 
   def round_windows_valid
     return if round_windows.blank?
+    unless round_windows.is_a?(Hash)
+      errors.add(:round_windows, "must be a map of round keys to date windows")
+      return
+    end
     allowed = sport ? sport.scoring_rules.where(kind: "playoff_appearance").pluck(:round_key) : []
     parsed = []
     round_windows.each do |key, window|
