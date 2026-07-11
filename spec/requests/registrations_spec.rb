@@ -39,7 +39,7 @@ RSpec.describe "Registrations", type: :request do
         user: {email_address: "not-an-email", password: "x", password_confirmation: "y"}
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

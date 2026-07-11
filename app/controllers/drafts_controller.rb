@@ -50,7 +50,7 @@ class DraftsController < ApplicationController
     redirect_to league_path(@league), notice: "Draft settings updated."
   rescue ActiveRecord::RecordInvalid
     render Views::Drafts::Edit.new(league: @league, league_season: @league_season),
-      status: :unprocessable_entity
+      status: :unprocessable_content
   end
 
   private

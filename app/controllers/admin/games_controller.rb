@@ -30,7 +30,7 @@ class Admin::GamesController < Admin::BaseController
       end
       redirect_to admin_games_path(season_id: @game.season_id), notice: notice
     else
-      render Views::Admin::Games::Edit.new(game: @game), status: :unprocessable_entity
+      render Views::Admin::Games::Edit.new(game: @game), status: :unprocessable_content
     end
   end
 

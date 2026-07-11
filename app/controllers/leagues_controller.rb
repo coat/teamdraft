@@ -41,7 +41,7 @@ class LeaguesController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     @league = e.record.is_a?(League) ? e.record : League.new
     @errors = e.record.errors.full_messages
-    render Views::Leagues::New.new(league: @league, seasons: selectable_seasons, errors: @errors), status: :unprocessable_entity
+    render Views::Leagues::New.new(league: @league, seasons: selectable_seasons, errors: @errors), status: :unprocessable_content
   end
 
   def show
@@ -86,7 +86,7 @@ class LeaguesController < ApplicationController
     redirect_to league_path(@league), notice: "League updated."
   rescue ActiveRecord::RecordInvalid
     render Views::Leagues::Edit.new(league: @league, league_season: @league_season),
-      status: :unprocessable_entity
+      status: :unprocessable_content
   end
 
   def history

@@ -116,7 +116,7 @@ RSpec.describe "Admin seasons", type: :request do
       }
     }
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(season.reload.round_windows).to eq({})
   end
 

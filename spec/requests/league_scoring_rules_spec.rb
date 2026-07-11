@@ -65,7 +65,7 @@ RSpec.describe "League scoring rules", type: :request do
       overrides: {override.id.to_s => {points: "-2"}}
     }
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(override.reload.points).to eq(original_points)
   end
 end

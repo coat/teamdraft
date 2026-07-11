@@ -24,7 +24,7 @@ class Admin::SeasonsController < Admin::BaseController
       redirect_to admin_seasons_path, notice: "Created #{season.label}."
     else
       render Views::Admin::Seasons::New.new(season: season, sports: sports_options),
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
   end
 
@@ -37,7 +37,7 @@ class Admin::SeasonsController < Admin::BaseController
       redirect_to admin_seasons_path, notice: "Updated #{@season.label}."
     else
       render Views::Admin::Seasons::Edit.new(season: @season, sports: sports_options),
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
   end
 

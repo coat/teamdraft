@@ -25,7 +25,7 @@ class Admin::LeaguesController < Admin::BaseController
     end
     redirect_to admin_leagues_path, notice: "Updated #{@league.name}."
   rescue ActiveRecord::RecordInvalid
-    render Views::Admin::Leagues::Edit.new(league: @league, league_season: league_season), status: :unprocessable_entity
+    render Views::Admin::Leagues::Edit.new(league: @league, league_season: league_season), status: :unprocessable_content
   end
 
   def destroy

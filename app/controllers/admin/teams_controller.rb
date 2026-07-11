@@ -31,7 +31,7 @@ class Admin::TeamsController < Admin::BaseController
     if @team.update(team_params)
       redirect_to admin_teams_path(list_params), notice: "Updated #{@team.name}."
     else
-      render Views::Admin::Teams::Edit.new(team: @team), status: :unprocessable_entity
+      render Views::Admin::Teams::Edit.new(team: @team), status: :unprocessable_content
     end
   end
 

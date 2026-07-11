@@ -22,7 +22,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.update(user_params)
       redirect_to admin_user_path(@user), notice: "Updated #{@user.email_address}."
     else
-      render Views::Admin::Users::Edit.new(user: @user), status: :unprocessable_entity
+      render Views::Admin::Users::Edit.new(user: @user), status: :unprocessable_content
     end
   end
 

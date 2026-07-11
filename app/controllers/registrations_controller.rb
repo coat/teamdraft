@@ -19,6 +19,6 @@ class RegistrationsController < ApplicationController
     redirect_to after_authentication_url, notice: "Account created. Welcome!"
   rescue ActiveRecord::RecordInvalid => e
     render Views::Registrations::New.new(user: e.record),
-      status: :unprocessable_entity
+      status: :unprocessable_content
   end
 end

@@ -33,7 +33,7 @@ class LeagueScoringRulesController < ApplicationController
       league: @league,
       league_season: @league_season,
       overrides: ordered_overrides
-    ), status: :unprocessable_entity
+    ), status: :unprocessable_content
   end
 
   def reset

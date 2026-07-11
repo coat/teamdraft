@@ -129,7 +129,7 @@ RSpec.describe "Leagues", type: :request do
 
       post "/leagues", params: {league: {your_name: "", opponent_name: ""}}
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
