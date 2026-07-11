@@ -45,7 +45,11 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          # Kamal verifies the image carries a `service` label matching
+          # config/deploy.yml before deploying it.
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+            service=teamdraft
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
