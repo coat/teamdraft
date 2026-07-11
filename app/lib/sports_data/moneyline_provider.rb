@@ -148,10 +148,18 @@ module SportsData
       )
     end
 
+    # The API documents exactly three statuses: scheduled, in_progress,
+    # final (postponed games get no status of their own - they linger as
+    # scheduled 0-0 events under the original start time). in_progress
+    # passes through so Season#score_sync_reason's :live gate keeps polling
+    # games that run past the post-start sync window. Gating final on both
+    # scores keeps a scoreless "final" from tripping Game's
+    # final-games-have-scores validation.
     def status_for(event)
       home = event.dig("scores", "home")
       away = event.dig("scores", "away")
       return "final" if event["status"] == "final" && !home.nil? && !away.nil?
+      return "in_progress" if event["status"] == "in_progress"
       "scheduled"
     end
 

@@ -10,6 +10,11 @@ class Season < ApplicationRecord
   SYNC_WINDOW_BEFORE = 30.minutes
   SYNC_WINDOW_AFTER = 6.hours
   SYNC_OVERNIGHT_FALLBACK = 3.hours
+  # How far back an in_progress game still counts as live. Wide enough for
+  # a suspended game that resumes the next day; beyond that the game has
+  # fallen out of Sync::GamesJob's yesterday+today range, so polling can't
+  # resolve it and would burn API quota every tick forever.
+  SYNC_LIVE_LOOKBACK = 48.hours
 
   scope :active, -> { where(status: "active") }
 
@@ -35,7 +40,7 @@ class Season < ApplicationRecord
   def score_sync_reason(now: Time.current)
     window = (now - SYNC_WINDOW_AFTER)..(now + SYNC_WINDOW_BEFORE)
     return :window if games.where(starts_at: window).exists?
-    return :live if games.where(status: "in_progress").exists?
+    return :live if games.where(status: "in_progress", starts_at: (now - SYNC_LIVE_LOOKBACK)..).exists?
     return :fallback if last_synced_at.nil? || last_synced_at < now - SYNC_OVERNIGHT_FALLBACK
     nil
   end

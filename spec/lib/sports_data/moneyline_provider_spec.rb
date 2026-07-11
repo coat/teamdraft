@@ -58,7 +58,7 @@ RSpec.describe SportsData::MoneylineProvider do
     expect(yankees_game.week).to be_nil
   end
 
-  it "marks games as final only when status is final AND both scores are present" do
+  it "maps the API's three statuses, gating final on both scores being present" do
     season = create(:season, sport:, year: 2026, external_provider: "moneyline",
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-27", to: "2026-06-28"))
@@ -73,7 +73,8 @@ RSpec.describe SportsData::MoneylineProvider do
 
     by_id = games.index_by(&:external_id)
     expect(by_id["ml-101"].status).to eq("final")
-    expect(by_id["ml-102"].status).to eq("scheduled")
+    expect(by_id["ml-102"].status).to eq("in_progress")
+    expect(by_id["ml-102"].home_score).to eq(3)
     expect(by_id["ml-103"].status).to eq("scheduled")
     expect(by_id["ml-104"].status).to eq("scheduled")
   end

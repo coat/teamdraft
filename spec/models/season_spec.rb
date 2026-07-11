@@ -31,6 +31,15 @@ RSpec.describe Season do
       expect(season.score_sync_reason).to eq(:live)
     end
 
+    it "ignores an in_progress game older than the live lookback (unresolvable by the daily sync)" do
+      season = create_nfl_season(last_synced_at: 1.minute.ago)
+      home, away = season.season_teams.first(2)
+      create(:game, season: season, home_season_team: home, away_season_team: away,
+        status: "in_progress", starts_at: 3.days.ago)
+
+      expect(season.score_sync_reason).to be_nil
+    end
+
     it "returns :fallback when no relevant games exist and last_synced_at is stale" do
       season = create_nfl_season(last_synced_at: 4.hours.ago)
       home, away = season.season_teams.first(2)
