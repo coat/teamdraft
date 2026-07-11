@@ -136,14 +136,14 @@ GEM
       thor (~> 1.4)
     friendly_id (5.7.0)
       activerecord (>= 4.0.0)
-    fugit (1.12.1)
+    fugit (1.13.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
-    globalid (1.3.0)
+    globalid (1.4.0)
       activesupport (>= 6.1)
     haikunator (1.1.1)
     hashdiff (1.2.1)
-    http-2 (1.2.0)
+    http-2 (1.2.1)
     httpx (1.8.0)
       http-2 (>= 1.2.0)
     i18n (1.15.2)
@@ -170,7 +170,7 @@ GEM
       sshkit (>= 1.23.0, < 2.0)
       thor (~> 1.3)
       zeitwerk (>= 2.6.18, < 3.0)
-    language_server-protocol (3.17.0.5)
+    language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     literal (1.9.0)
       zeitwerk
@@ -178,13 +178,13 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.9.0)
+    mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
       net-smtp
-    marcel (1.1.0)
+    marcel (1.2.1)
     matrix (0.4.3)
     mini_mime (1.1.5)
     minitest (6.0.6)
@@ -221,7 +221,7 @@ GEM
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
     ostruct (0.6.3)
-    pagy (43.5.6)
+    pagy (43.6.0)
       json
       uri
       yaml
@@ -337,14 +337,14 @@ GEM
       rubocop-ast (>= 1.49.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.49.1)
+    rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
     rubocop-performance (1.26.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
-    ruby-lsp (0.26.9)
+    ruby-lsp (0.26.10)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
@@ -392,8 +392,8 @@ GEM
     tailwindcss-rails (4.6.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
-    tailwindcss-ruby (4.3.1-aarch64-linux-gnu)
-    tailwindcss-ruby (4.3.1-x86_64-linux-gnu)
+    tailwindcss-ruby (4.3.2-aarch64-linux-gnu)
+    tailwindcss-ruby (4.3.2-x86_64-linux-gnu)
     thor (1.5.0)
     thruster (0.1.22-aarch64-linux)
     thruster (0.1.22-x86_64-linux)
@@ -418,7 +418,7 @@ GEM
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.9.2)
-    websocket-driver (0.8.0)
+    websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -471,4 +471,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-  4.0.6
+  4.0.10
