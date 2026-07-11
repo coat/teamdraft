@@ -72,6 +72,75 @@ RSpec.describe Scoring::Recompute do
     expect { Scoring::Recompute.call(season: season) }.not_to change(ScoringEvent, :count)
   end
 
+  it "moves the win event when a corrected score flips the winner" do
+    season = create_nfl_season(team_count: 2)
+    home, away = season.season_teams.first(2)
+    game = create(:game, :final,
+      season: season, home_season_team: home, away_season_team: away,
+      home_score: 21, away_score: 14)
+    Scoring::Recompute.call(season: season)
+
+    game.update!(home_score: 14, away_score: 21)
+    Scoring::Recompute.call(season: season)
+
+    events = ScoringEvent.where(game: game).to_a
+    expect(events.size).to eq(1)
+    expect(events.first.season_team).to eq(away)
+  end
+
+  it "removes events for a game that reverts from final" do
+    season = create_nfl_season(team_count: 2)
+    home, away = season.season_teams.first(2)
+    game = create(:game, :final,
+      season: season, home_season_team: home, away_season_team: away,
+      home_score: 21, away_score: 14)
+    Scoring::Recompute.call(season: season)
+
+    game.update!(status: "postponed")
+    Scoring::Recompute.call(season: season)
+
+    expect(ScoringEvent.where(game: game)).to be_empty
+  end
+
+  it "leaves another season's events alone when pruning" do
+    season = create_nfl_season(team_count: 2)
+    home, away = season.season_teams.first(2)
+    create(:game, :final, season: season, home_season_team: home, away_season_team: away,
+      home_score: 21, away_score: 14)
+    other_season = create(:season, sport: season.sport)
+    other_home = create(:season_team, season: other_season, team: home.team)
+    other_away = create(:season_team, season: other_season, team: away.team)
+    create(:game, :final, season: other_season,
+      home_season_team: other_home, away_season_team: other_away,
+      home_score: 10, away_score: 3)
+    Scoring::Recompute.call(season: other_season)
+
+    expect { Scoring::Recompute.call(season: season) }
+      .not_to change { ScoringEvent.where(season_team: other_home).count }
+  end
+
+  it "backfills a bye appearance in one pass despite a stale event from a reverted game" do
+    season = create_nfl_season(team_count: 4)
+    bye, opponent = season.season_teams.first(2)
+    wildcard = create(:game, :final,
+      season: season, round: "wildcard", starts_at: 3.days.from_now,
+      home_season_team: opponent, away_season_team: bye,
+      home_score: 13, away_score: 20)
+    Scoring::Recompute.call(season: season)
+
+    # The wildcard result is thrown out; the team's playoff_appearance
+    # should now come from the divisional backfill instead of the stale row.
+    wildcard.update!(status: "postponed")
+    divisional = create(:game, :final,
+      season: season, round: "divisional", starts_at: 10.days.from_now,
+      home_season_team: bye, away_season_team: opponent,
+      home_score: 31, away_score: 17)
+    Scoring::Recompute.call(season: season)
+
+    appearances = ScoringEvent.where(season_team: bye, event_type: "playoff_appearance")
+    expect(appearances.pluck(:game_id)).to eq([divisional.id])
+  end
+
   it "ignores regular-season ties (no winner)" do
     season = create_nfl_season(team_count: 2)
     home, away = season.season_teams.first(2)

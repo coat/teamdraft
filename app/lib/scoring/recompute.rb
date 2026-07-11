@@ -4,6 +4,9 @@ module Scoring
   # Walks every final game in a season and upserts ScoringEvent rows. The
   # (season_team_id, game_id, event_type) unique index makes this idempotent:
   # repeated calls converge on the same set of events without duplicates.
+  # Events the pass didn't re-justify are pruned at the end - a game that
+  # reverted from final, or a corrected score that flipped the winner, no
+  # longer leaves the old winner's points behind.
   #
   # Scoring shape is driven entirely by the season's sport's scoring_rules:
   #   - regular season: each game winner gets one regular_win event.
@@ -24,13 +27,20 @@ module Scoring
 
     def call
       ApplicationRecord.transaction do
-        @season.games.final.includes(:home_season_team, :away_season_team).find_each do |game|
+        @kept_event_ids = []
+        @credited = Set.new
+        # Chronological order (not PK order): the bye backfill assumes a
+        # team's trigger-round game was scored before the next round's, and
+        # `already_credited?` only knows about this pass's events.
+        @season.games.final.includes(:home_season_team, :away_season_team)
+          .order(:starts_at, :id).each do |game|
           if game.round == Game::REGULAR_SEASON
             score_regular_season(game)
           else
             score_playoff_game(game)
           end
         end
+        prune_stale_events
         apply_default_pick_ranks
       end
     end
@@ -107,7 +117,7 @@ module Scoring
       rule = @rules.bye_backfill_rule
       return unless rule
       return unless game.round == @rules.bye_backfill_trigger_round
-      return if has_event?(season_team, rule.event_type)
+      return if already_credited?(season_team, rule.event_type)
       upsert_event(
         season_team:, game:,
         event_type: rule.event_type,
@@ -124,11 +134,21 @@ module Scoring
         .last&.round_key
     end
 
-    def has_event?(season_team, event_type)
-      ScoringEvent
-        .where(season_team_id: season_team.id, event_type: event_type)
-        .joins(:game).where(games: {season_id: @season.id})
-        .exists?
+    # Only counts events written by this pass. A leftover row from a
+    # previous run (say, a reverted trigger-round game) must not suppress
+    # the backfill - it's about to be pruned.
+    def already_credited?(season_team, event_type)
+      @credited.include?([season_team.id, event_type])
+    end
+
+    # Delete every event this pass didn't re-justify: the game reverted
+    # from final, a corrected score flipped the winner, or the round
+    # changed. Runs before apply_default_pick_ranks so ranks come from the
+    # pruned set.
+    def prune_stale_events
+      ScoringEvent.where(game_id: @season.games.select(:id))
+        .where.not(id: @kept_event_ids)
+        .delete_all
     end
 
     def occurred_at(game)
@@ -136,7 +156,7 @@ module Scoring
     end
 
     def upsert_event(season_team:, game:, event_type:, occurred_at:)
-      ScoringEvent.upsert(
+      result = ScoringEvent.upsert(
         {
           season_team_id: season_team.id,
           game_id: game.id,
@@ -145,8 +165,11 @@ module Scoring
           created_at: Time.current,
           updated_at: Time.current
         },
-        unique_by: :index_scoring_events_unique_per_team_game_type
+        unique_by: :index_scoring_events_unique_per_team_game_type,
+        returning: [:id]
       )
+      @kept_event_ids << result.rows.first.first
+      @credited << [season_team.id, event_type]
     end
   end
 end
