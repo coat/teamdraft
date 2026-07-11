@@ -10,7 +10,7 @@
 
 service: teamdraft
 
-# Kamal prepends `registry.server` automatically — do not include
+# Kamal prepends `registry.server` automatically - do not include
 # `registry.teamdraft.party/` here.
 image: teamdraft
 

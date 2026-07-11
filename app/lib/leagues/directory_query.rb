@@ -45,7 +45,7 @@ module Leagues
     end
 
     def status
-      # Absent param → fall back to the per-phase default. Explicit empty
+      # Absent param -> fall back to the per-phase default. Explicit empty
       # string (e.g. user picked "All teams" in the dropdown) is honored.
       return default_status unless params.key?(:status)
       value = params[:status].to_s

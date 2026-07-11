@@ -109,7 +109,7 @@ class Views::Admin::Seasons::Show < Views::Base
         end
         if drafting
           div(class: "alert alert-error mt-3 text-sm") do
-            span { "A draft is currently in progress — provider cannot be switched until it completes." }
+            span { "A draft is currently in progress - provider cannot be switched until it completes." }
           end
         else
           if has_picks

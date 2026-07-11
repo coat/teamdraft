@@ -18,7 +18,7 @@ gem "stimulus-rails"
 # Phlex view components + typed properties [https://www.phlex.fun]
 gem "phlex-rails"
 gem "literal"
-# Heroicons SVGs as Phlex components — Ruby-only, no npm.
+# Heroicons SVGs as Phlex components - Ruby-only, no npm.
 gem "phlex-icons-hero"
 
 # Human-readable league slugs (e.g. "badger-apple-blue")
@@ -42,7 +42,7 @@ gem "solid_cable"
 # Web UI for Active Job / Solid Queue [https://github.com/rails/mission_control-jobs]
 gem "mission_control-jobs"
 
-# Tailwind CSS — Node-free, ships a standalone CLI [https://github.com/rails/tailwindcss-rails]
+# Tailwind CSS - Node-free, ships a standalone CLI [https://github.com/rails/tailwindcss-rails]
 gem "tailwindcss-rails"
 
 # Reduces boot times through caching; required in config/boot.rb

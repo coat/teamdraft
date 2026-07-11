@@ -86,7 +86,7 @@ module Drafts
         raise ActiveRecord::RecordInvalid.new(ls)
       end
       if @expected_pick_number && ls.current_pick_number != @expected_pick_number
-        ls.errors.add(:base, "another pick was just made — check the board and try again")
+        ls.errors.add(:base, "another pick was just made - check the board and try again")
         raise StalePick.new(ls)
       end
     end

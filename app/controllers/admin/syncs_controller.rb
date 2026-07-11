@@ -40,7 +40,7 @@ class Admin::SyncsController < Admin::BaseController
     end
     dates = (from..to).map(&:iso8601)
     Sync::GamesJob.perform_later(season.id, dates: dates)
-    redirect_to back, notice: "Games sync queued for #{season.label} (#{from.iso8601} → #{to.iso8601}, #{dates.size} day(s))."
+    redirect_to back, notice: "Games sync queued for #{season.label} (#{from.iso8601} -> #{to.iso8601}, #{dates.size} day(s))."
   rescue Date::Error
     redirect_to back, alert: "Invalid date(s) supplied."
   end

@@ -138,7 +138,7 @@ RSpec.describe SportsData::MoneylineProvider do
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-20", to: "2026-06-21"))
       .to_return(json_body(envelope([
-        # 22:10 ET on 6/20 — 02:10 UTC on 6/21. MLB schedules by Eastern
+        # 22:10 ET on 6/20 - 02:10 UTC on 6/21. MLB schedules by Eastern
         # date and mlapi.bet's from/to filter matches it, so a 6/20 sync
         # must keep this game.
         event(id: "ml-night", status: "final", home_score: 8, away_score: 16,
@@ -155,7 +155,7 @@ RSpec.describe SportsData::MoneylineProvider do
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-03-24", to: "2026-03-26"))
       .to_return(json_body(envelope([
-        # 20:10 ET on 3/24 — 00:10 UTC on 3/25 (starts_on). Exhibition game
+        # 20:10 ET on 3/24 - 00:10 UTC on 3/25 (starts_on). Exhibition game
         # the night before opening day must still be rejected.
         event(id: "ml-freeway", status: "final", home_score: 0, away_score: 3,
           start_time: "2026-03-25T00:10:00Z"),
@@ -173,12 +173,12 @@ RSpec.describe SportsData::MoneylineProvider do
       starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
     stub_request(:get, events_url(from: "2026-06-21", to: "2026-06-22"))
       .to_return(json_body(envelope([
-        # Stub at 19:00 ET 6/21; real event at 22:10 ET 6/21 (02:10Z 6/22 —
+        # Stub at 19:00 ET 6/21; real event at 22:10 ET 6/21 (02:10Z 6/22 -
         # different UTC dates, same Eastern date). The stub must be dropped.
         event(id: "mlb-odds-aaa", is_stub: true, start_time: "2026-06-21T23:00:00Z"),
         event(id: "mlb-ev-111", status: "final", home_score: 5, away_score: 3,
           start_time: "2026-06-22T02:10:00Z"),
-        # Different matchup, stub only — must be kept.
+        # Different matchup, stub only - must be kept.
         event(id: "mlb-odds-bbb", is_stub: true,
           home: "Los Angeles Dodgers", away: "San Francisco Giants",
           start_time: "2026-06-21T20:10:00Z")
@@ -266,7 +266,7 @@ RSpec.describe SportsData::MoneylineProvider do
       round_windows: {"world_series" => {"starts_on" => "2026-10-23", "ends_on" => "2026-11-04"}})
     stub_request(:get, events_url(from: "2026-10-24", to: "2026-10-25"))
       .to_return(json_body(envelope([
-        # 00:10Z on 10/25 = 20:10 ET on 10/24 — inside the window by ET date.
+        # 00:10Z on 10/25 = 20:10 ET on 10/24 - inside the window by ET date.
         event(id: "ml-ws1", status: "final", home_score: 3, away_score: 2,
           start_time: "2026-10-25T00:10:00Z")
       ])))

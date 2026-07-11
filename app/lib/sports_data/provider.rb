@@ -54,7 +54,7 @@ module SportsData
     def get_json(url, headers:, label: "request")
       response = HTTPX.with(headers:).get(url)
       raise FetchFailed, "request failed: #{response.error.message}" if response.is_a?(HTTPX::ErrorResponse)
-      raise FetchFailed, "rate limited — retry after 60s" if response.status == 429
+      raise FetchFailed, "rate limited - retry after 60s" if response.status == 429
       raise FetchFailed, "#{label} returned #{response.status}" unless response.status.between?(200, 299)
       JSON.parse(response.body.to_s)
     rescue HTTPX::Error => e

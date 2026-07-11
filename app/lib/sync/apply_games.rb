@@ -8,8 +8,8 @@ module Sync
   #
   # Matching is two-tier: exact external_id first, then matchup fallback
   # (same home/away teams, starts_at within FALLBACK_WINDOW). The fallback
-  # absorbs external_id changes - a provider switch (MLB Stats API gamePk →
-  # Moneyline eventId) or Moneyline's stub→real event transition - by
+  # absorbs external_id changes - a provider switch (MLB Stats API gamePk ->
+  # Moneyline eventId) or Moneyline's stub->real event transition - by
   # updating the existing row in place and adopting the new external_id
   # instead of inserting a duplicate.
   class ApplyGames

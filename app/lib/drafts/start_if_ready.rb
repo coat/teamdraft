@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Drafts
-  # Transitions a draft from draft_pending → drafting when it's ready to go.
+  # Transitions a draft from draft_pending -> drafting when it's ready to go.
   #
   # Live drafts wait for both seats to be claimed and (optionally) for a
   # scheduled start time. Manual drafts - where the owner records both

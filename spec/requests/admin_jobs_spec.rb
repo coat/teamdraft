@@ -27,7 +27,7 @@ RSpec.describe "Admin jobs (Mission Control)", type: :request do
 
     get "/admin/jobs"
 
-    # Mission Control redirects /admin/jobs → /admin/jobs/queues by default;
+    # Mission Control redirects /admin/jobs -> /admin/jobs/queues by default;
     # accept either a 200 on the index or a redirect into the engine.
     expect(response).to have_http_status(:ok).or have_http_status(:redirect)
   end

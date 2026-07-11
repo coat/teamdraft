@@ -4,7 +4,7 @@
 #
 # external_id values are MLB Stats API team ids (statsapi.mlb.com/api/v1/teams?sportId=1),
 # stable integers used as internal keys. Schedule data is served by
-# SportsData::MoneylineProvider (not MlbStatsApiProvider — the MLB Stats API CDN
+# SportsData::MoneylineProvider (not MlbStatsApiProvider - the MLB Stats API CDN
 # blocks the production server IP). MoneylineProvider maps MoneylineApp team names
 # to these ids via a static TEAM_NAMES hash in the provider.
 # default_pick_rank: 1 = first AI auto-pick, 30 = last resort; loosely based on

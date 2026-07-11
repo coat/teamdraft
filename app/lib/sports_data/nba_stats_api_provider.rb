@@ -3,12 +3,12 @@
 module SportsData
   # NBA.com's static schedule CDN
   # (https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json).
-  # No API key, no auth, no rate-limit cap — one CDN-served blob for the
+  # No API key, no auth, no rate-limit cap - one CDN-served blob for the
   # whole current season (~8 MB), regular season + Play-In + every playoff
   # round. Verified live on 2026-06-06. The CDN rejects requests without
   # a Referer header (403), so we always send one.
   #
-  # This provider only handles the *current* NBA season — the endpoint
+  # This provider only handles the *current* NBA season - the endpoint
   # only serves whatever season is in progress. Past NBA seasons should
   # stay on whatever provider stored them (typically TheSportsDB).
   #
@@ -35,7 +35,7 @@ module SportsData
       "NBA Finals" => "finals"
     }.freeze
 
-    # Labels we explicitly drop — exhibition and non-counting events.
+    # Labels we explicitly drop - exhibition and non-counting events.
     SKIP_LABEL_PREFIXES = ["Preseason", "All-Star", "Rising Stars"].freeze
 
     ROUND_KEYS = ([REGULAR_SEASON] + PLAYOFF_LABEL_TO_ROUND.values.uniq).freeze

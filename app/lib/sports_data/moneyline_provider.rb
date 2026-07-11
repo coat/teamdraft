@@ -11,7 +11,7 @@ module SportsData
   # "isStub": true events (odds-feed placeholders, eventId "mlb-odds-…") that
   # are later replaced by real events with different eventIds ("mlb-ev-…");
   # Stubs shadowed by a real event in the same response are dropped here so
-  # ApplyGames' matchup fallback can adopt the stub's existing row; stub→real
+  # ApplyGames' matchup fallback can adopt the stub's existing row; stub->real
   # transitions across separate syncs are absorbed by the same fallback.
   #
   # Team matching: events expose team names only (no IDs). TEAM_NAMES maps
@@ -28,7 +28,7 @@ module SportsData
 
     ROUND_KEY = "regular_season"
 
-    # MoneylineApp team name → MLB Stats API team ID (stable DB external_id).
+    # MoneylineApp team name -> MLB Stats API team ID (stable DB external_id).
     # If a name doesn't match, the event is silently skipped (same "unmapped
     # team(s)" log path used by ApplyGames). All 30 names verified against a
     # live response on 2026-07-02 (the A's are exactly "Athletics").
@@ -76,7 +76,7 @@ module SportsData
       # Spring training games are indistinguishable in the payload (no
       # gameType/round field), so use the season boundary: anything dated
       # before starts_on is exhibition, even if the sync range reaches back
-      # further. (2026-07-03: 130 spring games inflated the standings.)
+      # further.
       games = games.reject { |g| g.starts_at && local_date(g.starts_at) < @season.starts_on }
       games = filter_by_dates(games, dates) if dates
       games = games.select { |g| Array(rounds).map(&:to_s).include?(g.round) } if rounds
@@ -181,7 +181,7 @@ module SportsData
       @season.round_for(local_date(starts_at)) || ROUND_KEY
     end
 
-    # Window keys in the sport's scoring-rule display order — jsonb does not
+    # Window keys in the sport's scoring-rule display order - jsonb does not
     # preserve insertion order, so the admin dropdown would otherwise list
     # rounds by key length.
     def ordered_windows

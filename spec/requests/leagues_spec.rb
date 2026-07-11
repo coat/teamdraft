@@ -43,7 +43,7 @@ RSpec.describe "Leagues", type: :request do
       it "sorts upcoming seasons across sports by starts_on ascending" do
         nfl = create(:sport, :nfl)
         nba = create(:sport, :nba)
-        # NFL starts later than NBA → NBA should appear first
+        # NFL starts later than NBA -> NBA should appear first
         make_season(sport: nfl, status: "upcoming", starts_on: Date.new(2026, 9, 15), label: "2026 NFL", year: 2026)
         make_season(sport: nba, status: "upcoming", starts_on: Date.new(2026, 8, 1), label: "2026 NBA", year: 2026)
 
@@ -55,7 +55,7 @@ RSpec.describe "Leagues", type: :request do
       it "sorts active seasons across sports by starts_on descending" do
         nfl = create(:sport, :nfl)
         nba = create(:sport, :nba)
-        # NBA started more recently → NBA should appear first
+        # NBA started more recently -> NBA should appear first
         make_season(sport: nfl, status: "active", starts_on: Date.new(2025, 9, 1), label: "2025 NFL", year: 2025)
         make_season(sport: nba, status: "active", starts_on: Date.new(2026, 1, 1), label: "2026 NBA", year: 2026)
 
