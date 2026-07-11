@@ -34,9 +34,9 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
-# Ignore operator-specific Kamal deploy config and secrets.
-# Examples are committed as config/deploy.example.yml and .kamal/secrets.example.
-/config/deploy.yml
+# Ignore Kamal secrets; the example is committed as .kamal/secrets.example.
+# config/deploy.yml is committed (no secrets) so CI can deploy with it;
+# fork operators start from config/deploy.example.yml.
 /.kamal/secrets
 
 

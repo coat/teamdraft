@@ -48,3 +48,62 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: publish
+    # Repository gate keeps forks from ever attempting a deploy (their runs
+    # would also lack the environment secrets, but skipping beats failing).
+    if: github.repository == 'coat/teamdraft' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://teamdraft.party
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Trust the deploy host
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # Literal $VARs, resolved by Kamal from the environment at deploy
+      # time (same mechanism as POSTGRES_PASSWORD in .kamal/secrets.example),
+      # so secret values never touch the runner's disk.
+      - name: Write Kamal secrets
+        run: |
+          mkdir -p .kamal
+          cat > .kamal/secrets <<'EOF'
+          KAMAL_REGISTRY_USERNAME=$KAMAL_REGISTRY_USERNAME
+          KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD
+          RAILS_MASTER_KEY=$RAILS_MASTER_KEY
+          TEAMDRAFT_DATABASE_PASSWORD=$TEAMDRAFT_DATABASE_PASSWORD
+          POSTGRES_PASSWORD=$TEAMDRAFT_DATABASE_PASSWORD
+          THESPORTSDB_KEY=$THESPORTSDB_KEY
+          MONEYLINE_API_KEY=$MONEYLINE_API_KEY
+          EOF
+
+      - name: Deploy with Kamal
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          TEAMDRAFT_DATABASE_PASSWORD: ${{ secrets.TEAMDRAFT_DATABASE_PASSWORD }}
+          THESPORTSDB_KEY: ${{ secrets.THESPORTSDB_KEY }}
+          MONEYLINE_API_KEY: ${{ secrets.MONEYLINE_API_KEY }}
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add - <<< "$SSH_PRIVATE_KEY"
+          bundle exec kamal deploy --skip-push --version "$GITHUB_REF_NAME"
