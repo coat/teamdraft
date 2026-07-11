@@ -34,6 +34,26 @@ RSpec.describe Drafts::SubmitPick do
     expect(ls.draft_completed_at).to be_present
   end
 
+  it "accepts a pick whose expected pick number matches the clock" do
+    ls = create_drafting_league_season(team_count: 4)
+    season_team = ls.season.season_teams.first
+
+    result = Drafts::SubmitPick.call(league_season: ls, season_team: season_team, expected_pick_number: 1)
+
+    expect(result.pick.pick_number).to eq(1)
+  end
+
+  it "rejects a pick whose expected pick number is stale" do
+    ls = create_drafting_league_season(team_count: 4)
+    teams = ls.season.season_teams.to_a
+    Drafts::SubmitPick.call(league_season: ls, season_team: teams.first)
+
+    expect {
+      Drafts::SubmitPick.call(league_season: ls.reload, season_team: teams.second, expected_pick_number: 1)
+    }.to raise_error(Drafts::SubmitPick::StalePick, /another pick was just made/)
+    expect(ls.reload.current_pick_number).to eq(2)
+  end
+
   it "rejects picks while the league season is still in draft_pending" do
     season = create_nfl_season(team_count: 4)
     ls = create(:league_season, :with_two_participants, season: season)

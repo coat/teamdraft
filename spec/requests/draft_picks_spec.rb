@@ -10,10 +10,26 @@ RSpec.describe "Draft picks", type: :request do
     season_team = season.season_teams.first
 
     expect {
-      post league_draft_picks_path(league), params: {season_team_id: season_team.id}
+      post league_draft_picks_path(league), params: {season_team_id: season_team.id, pick_number: 1}
     }.to change(DraftPick, :count).by(1)
     # Mid-draft picks redirect back to the draft room.
     expect(response).to redirect_to(league_draft_path(league))
+  end
+
+  it "rejects a pick submitted for a pick number that already advanced" do
+    season = create_nfl_season(team_count: 4)
+    league = create_league_via_http(draft_mode: "manual")
+    start_drafting!(league.current_league_season)
+    post league_draft_picks_path(league),
+      params: {season_team_id: season.season_teams.first.id, pick_number: 1}
+
+    expect {
+      post league_draft_picks_path(league),
+        params: {season_team_id: season.season_teams.second.id, pick_number: 1}
+    }.not_to change(DraftPick, :count)
+
+    follow_redirect!
+    expect(response.body).to include("another pick was just made")
   end
 
   it "non-owner gets bounced in manual mode" do

@@ -18,6 +18,17 @@ RSpec.describe Drafts::PickClockJob do
       .not_to change(DraftPick, :count)
   end
 
+  it "is a no-op when a human pick wins the race inside the row lock" do
+    # Simulates the pick landing between this job's pick-number guard and
+    # SubmitPick's row lock - too narrow a window to arrange for real.
+    ls = create_drafting_ls
+    allow(Drafts::AutoPick).to receive(:call)
+      .and_raise(Drafts::SubmitPick::StalePick.new(ls))
+
+    expect { Drafts::PickClockJob.perform_now(ls.id, ls.current_pick_number) }
+      .not_to raise_error
+  end
+
   it "is a no-op for manual league seasons" do
     ls = create_drafting_ls
     ls.update!(draft_mode: "manual")

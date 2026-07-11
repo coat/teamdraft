@@ -423,7 +423,7 @@ class Views::Drafts::Show < Views::Base
     # is treated as a full page swap.
     button_to "Pick", league_draft_picks_path(@league, **query.to_url_params),
       method: :post,
-      params: {season_team_id: season_team.id},
+      params: {season_team_id: season_team.id, pick_number: @league_season.current_pick_number},
       form: {class: "inline", data: {turbo_frame: "_top"}},
       class: "btn btn-primary btn-sm"
   end

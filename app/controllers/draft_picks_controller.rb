@@ -9,7 +9,11 @@ class DraftPicksController < ApplicationController
 
   def create
     season_team = @league_season.season.season_teams.find(params[:season_team_id])
-    Drafts::SubmitPick.call(league_season: @league_season, season_team:)
+    # The form carries the pick number it was rendered for; SubmitPick
+    # re-checks it under the row lock so a double-submit can't land as the
+    # next participant's pick. A missing param coerces to 0 and fails closed.
+    Drafts::SubmitPick.call(league_season: @league_season, season_team:,
+      expected_pick_number: params[:pick_number].to_i)
     # The final pick flips status to in_season - at that point the
     # standings page is the right destination, not the draft room.
     redirect_to post_pick_path

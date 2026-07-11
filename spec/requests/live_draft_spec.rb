@@ -94,7 +94,7 @@ RSpec.describe "Live draft", type: :request do
     claim_seat_via_http(league, bob_seat)
 
     post league_draft_picks_path(league, sort: "name", dir: "desc"),
-      params: {season_team_id: season.season_teams.first.id}
+      params: {season_team_id: season.season_teams.first.id, pick_number: 1}
 
     expect(response).to have_http_status(:redirect)
     expect(response.location).to include("sort=name")
@@ -130,7 +130,7 @@ RSpec.describe "Live draft", type: :request do
     claim_seat_via_http(league, bob_seat)
     Drafts::SubmitPick.call(league_season: league.reload.current_league_season, season_team: season.season_teams.first)
 
-    expect { post league_draft_picks_path(league), params: {season_team_id: season.season_teams.second.id} }
+    expect { post league_draft_picks_path(league), params: {season_team_id: season.season_teams.second.id, pick_number: 2} }
       .to change(DraftPick, :count).by(1)
   end
 end

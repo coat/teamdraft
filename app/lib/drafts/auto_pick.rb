@@ -8,14 +8,16 @@ module Drafts
   class AutoPick
     def self.call(...) = new(...).call
 
-    def initialize(league_season:)
+    def initialize(league_season:, expected_pick_number: nil)
       @league_season = league_season
+      @expected_pick_number = expected_pick_number
     end
 
     def call
       season_team = next_available_team
       return nil unless season_team
-      SubmitPick.call(league_season: @league_season, season_team:, autopicked: true)
+      SubmitPick.call(league_season: @league_season, season_team:, autopicked: true,
+        expected_pick_number: @expected_pick_number)
     end
 
     private

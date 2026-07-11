@@ -6,12 +6,23 @@ module Drafts
   class SubmitPick
     Result = Data.define(:pick, :league_season)
 
+    # Raised when the draft advanced between the caller reading
+    # current_pick_number and this transaction acquiring the row lock (a
+    # double-submit, or an auto-pick racing a human). Without the guard the
+    # late arrival would be recorded as the *next* participant's pick.
+    # Subclasses RecordInvalid so existing rescue paths handle it.
+    class StalePick < ActiveRecord::RecordInvalid; end
+
     def self.call(...) = new(...).call
 
-    def initialize(league_season:, season_team:, autopicked: false)
+    # expected_pick_number is the pick the caller believes it is submitting
+    # (from the rendered form or the clock job's key). nil skips the check -
+    # only safe for sequential callers like test setup.
+    def initialize(league_season:, season_team:, autopicked: false, expected_pick_number: nil)
       @league_season = league_season
       @season_team = season_team
       @autopicked = autopicked
+      @expected_pick_number = expected_pick_number
     end
 
     def call
@@ -73,6 +84,10 @@ module Drafts
       if ls.current_pick_number > ls.total_picks
         ls.errors.add(:base, "draft is complete")
         raise ActiveRecord::RecordInvalid.new(ls)
+      end
+      if @expected_pick_number && ls.current_pick_number != @expected_pick_number
+        ls.errors.add(:base, "another pick was just made — check the board and try again")
+        raise StalePick.new(ls)
       end
     end
   end

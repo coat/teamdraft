@@ -17,7 +17,10 @@ module Drafts
       return unless %w[draft_pending drafting].include?(ls.status)
       return unless ls.current_pick_number == expected_pick_number
 
-      AutoPick.call(league_season: ls)
+      AutoPick.call(league_season: ls, expected_pick_number: expected_pick_number)
+    rescue Drafts::SubmitPick::StalePick
+      # The human's pick committed between the guard above and SubmitPick's
+      # row lock - their pick stands and this job has nothing left to do.
     end
   end
 end

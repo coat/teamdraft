@@ -29,6 +29,14 @@ RSpec.describe Drafts::AutoPick do
     expect(ls.draft_picks.last.autopicked).to be(false)
   end
 
+  it "raises StalePick when the draft advanced past the expected pick number" do
+    ls = create_drafting_ls
+    Drafts::SubmitPick.call(league_season: ls, season_team: ls.season.season_teams.first)
+
+    expect { Drafts::AutoPick.call(league_season: ls.reload, expected_pick_number: 1) }
+      .to raise_error(Drafts::SubmitPick::StalePick)
+  end
+
   it "skips already-drafted teams" do
     ls = create_drafting_ls
     ranked = ls.season.season_teams.joins(:team).order("teams.default_pick_rank").to_a
