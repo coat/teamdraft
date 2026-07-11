@@ -199,7 +199,7 @@ class Views::Leagues::Show < Views::Base
     div(class: "card bg-base-100 shadow") do
       div(class: "card-body") do
         h2(class: "card-title") { draft_cta_title }
-        p(class: "text-base-content/70") { draft_cta_subtitle } if draft_cta_subtitle
+        render_draft_cta_subtitle
         div(class: "card-actions") do
           a(href: league_draft_path(@league), class: "btn btn-primary inline-flex items-center gap-1") do
             plain draft_cta_button_label
@@ -217,12 +217,18 @@ class Views::Leagues::Show < Views::Base
     "Draft hasn't started yet"
   end
 
-  def draft_cta_subtitle
-    return nil unless @league_season.status == "draft_pending"
+  def render_draft_cta_subtitle
+    return unless @league_season.status == "draft_pending"
     if @league_season.participants.where(joined_at: nil).any?
-      "Waiting for the other player to claim their seat."
+      p(class: "text-base-content/70") { "Waiting for the other player to claim their seat." }
     elsif (starts_at = @league_season.draft_scheduled_at).present? && starts_at > Time.current
-      "Starts #{starts_at.strftime("%a %b %-d at %-l:%M %p %Z")}."
+      p(class: "text-base-content/70") do
+        plain "Starts "
+        time(datetime: starts_at.iso8601, data: {controller: "local-time"}) do
+          plain starts_at.strftime("%a %b %-d at %-l:%M %p %Z")
+        end
+        plain "."
+      end
     end
   end
 

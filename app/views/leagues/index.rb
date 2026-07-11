@@ -53,7 +53,7 @@ class Views::Leagues::Index < Views::Base
                 class_name: "size-5 text-base-content/60 group-hover:text-base-content group-hover:translate-x-0.5 transition"
               )
             end
-            span(class: status_badge_class(ls.status)) { humanized_status(ls) }
+            span(class: status_badge_class(ls.status)) { render_status_label(ls) }
           end
           render_summary(ls, participant)
         end
@@ -72,22 +72,25 @@ class Views::Leagues::Index < Views::Base
     end
   end
 
-  def humanized_status(ls)
+  def render_status_label(ls)
     case ls.status
-    when "draft_pending" then league_pending_label(ls)
-    when "drafting" then "Drafting (pick ##{ls.current_pick_number} of #{ls.total_picks})"
-    when "in_season" then "In season"
-    when "completed" then "Completed"
+    when "draft_pending" then render_pending_label(ls)
+    when "drafting" then plain "Drafting (pick ##{ls.current_pick_number} of #{ls.total_picks})"
+    when "in_season" then plain "In season"
+    when "completed" then plain "Completed"
     end
   end
 
-  def league_pending_label(ls)
+  def render_pending_label(ls)
     if ls.draft_scheduled_at.present? && ls.draft_scheduled_at > Time.current
-      "Drafts #{ls.draft_scheduled_at.strftime("%a %b %-d at %-l:%M %p %Z")}"
+      plain "Drafts "
+      time(datetime: ls.draft_scheduled_at.iso8601, data: {controller: "local-time"}) do
+        plain ls.draft_scheduled_at.strftime("%a %b %-d at %-l:%M %p %Z")
+      end
     elsif ls.participants.where(joined_at: nil).any?
-      "Awaiting opponent"
+      plain "Awaiting opponent"
     else
-      "Draft pending"
+      plain "Draft pending"
     end
   end
 
