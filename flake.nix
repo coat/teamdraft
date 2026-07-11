@@ -8,7 +8,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs";
-    ruby-nix.url = "github:inscapist/ruby-nix";
     nixpkgs-ruby.url = "github:bobvanderlinden/nixpkgs-ruby";
     nixpkgs-ruby.inputs.nixpkgs.follows = "nixpkgs";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
@@ -18,7 +17,6 @@
   outputs = {
     self,
     nixpkgs,
-    ruby-nix,
     nixpkgs-ruby,
     process-compose-flake,
     services-flake,
@@ -34,63 +32,15 @@
             overlays = [nixpkgs-ruby.overlays.default];
           };
 
-          gemset =
-            if builtins.pathExists ./nix/gemset.nix
-            then import ./nix/gemset.nix
-            else {};
-
           rubyVersion = builtins.head (builtins.match "(.*)\n" (builtins.readFile ./.ruby-version));
           ruby = pkgs.${rubyVersion};
 
-          rnPkgs = import ruby-nix.inputs.nixpkgs {
-            inherit system;
-            overlays = [nixpkgs-ruby.overlays.default];
-          };
-
-          rubyNix = ruby-nix.lib rnPkgs;
-
-          gemConfig = rnPkgs.defaultGemConfig;
-
-          rubyEnv = rubyNix {
-            inherit gemset ruby;
-            name = appName;
-            inherit gemConfig;
-          };
-
-          # ruby-lsp env is optional: only built if nix/ruby-lsp/gemset.nix
-          # exists.
-          hasLspGemset = builtins.pathExists ./nix/ruby-lsp/gemset.nix;
-
-          rubyLspEnv =
-            if hasLspGemset
-            then
-              rubyNix {
-                inherit ruby gemConfig;
-                name = "${appName}-ruby-lsp";
-                gemset = import ./nix/ruby-lsp/gemset.nix;
-              }
-            else null;
-
-          # Wrapper that points ruby-lsp at the composed Gemfile in the
-          # project tree (nix/ruby-lsp/Gemfile), so Bundler.setup sees
-          # ruby-lsp + project gems together. Falls through to the
-          # rubyNix-built ruby-lsp binary.
-          rubyLspWrapper =
-            if hasLspGemset
-            then
-              pkgs.writeShellScriptBin "ruby-lsp" ''
-                project_root=''${RUBY_LSP_PROJECT_ROOT:-$PWD}
-                composed="$project_root/nix/ruby-lsp/Gemfile"
-                if [ -f "$composed" ]; then
-                  export BUNDLE_GEMFILE="$composed"
-                fi
-                exec ${rubyLspEnv.env}/bin/ruby-lsp "$@"
-              ''
-            else null;
-
-          # `relock` regenerates Gemfile.lock + nix/gemset.nix + the composed
-          # ruby-lsp gemset. Exposed on PATH so it works from any subdir.
-          relockBin = pkgs.writers.writeRubyBin "relock" {} (builtins.readFile ./nix/relock);
+          rubyEnvSetup = ''
+            export BUNDLE_PATH="$PWD/.direnv/state/.bundle"
+            export GEM_HOME="$BUNDLE_PATH/${ruby.rubyEngine}/${ruby.version.libDir}"
+            export GEM_PATH="$GEM_HOME/gems:''${GEM_PATH:-}"
+            export PATH="$GEM_HOME/bin:$PATH"
+          '';
 
           servicesModule = {
             services.postgres."pg" = {
@@ -111,7 +61,11 @@
           # standalone).
           railsModule = {
             settings.processes.rails = {
-              command = "${rubyEnv.env}/bin/bundle exec rails server -b 0.0.0.0";
+              command = ''
+                ${rubyEnvSetup}
+                ${ruby}/bin/bundle check >/dev/null || ${ruby}/bin/bundle install
+                exec ${ruby}/bin/bundle exec rails server -b 0.0.0.0
+              '';
               # libpq treats PGHOST as a hostname unless it starts with `/`,
               # so pass TCP here (postgres listens on 127.0.0.1 too). The
               # devShell shellHook sets PGHOST to the absolute socket dir
@@ -123,15 +77,18 @@
               depends_on."pg".condition = "process_healthy";
             };
             settings.processes.tailwind = {
-              command = "${rubyEnv.env}/bin/bundle exec rails tailwindcss:watch";
+              command = ''
+                ${rubyEnvSetup}
+                exec ${ruby}/bin/bundle exec rails tailwindcss:watch
+              '';
               environment.TAILWINDCSS_INSTALL_DIR = "${pkgs.tailwindcss_4}/bin";
             };
-            # SolidQueue worker. Live-draft pick clocks and the recurring
-            # sweeper need this running to fire on time; without it,
-            # scheduled jobs sit in solid_queue_scheduled_executions
-            # until something dispatches them.
+
             settings.processes.jobs = {
-              command = "${rubyEnv.env}/bin/bundle exec rails solid_queue:start";
+              command = ''
+                ${rubyEnvSetup}
+                exec ${ruby}/bin/bundle exec rails solid_queue:start
+              '';
               environment.PGHOST = "127.0.0.1";
               depends_on."pg".condition = "process_healthy";
             };
@@ -150,8 +107,8 @@
           servicesMod = evalServices [];
           devMod = evalServices [railsModule];
         in {
-          # `nix run .#`         → full stack (services + rails)
-          # `nix run .#services` → backing services only (postgres);
+          # `nix run .#`         -> full stack (services + rails)
+          # `nix run .#services` -> backing services only (postgres);
           #                        run `bin/dev` separately for the app.
           packages.${system} = {
             default = devMod.config.outputs.package;
@@ -164,28 +121,27 @@
             ];
             buildInputs =
               [
-                rubyEnv.env
+                ruby
               ]
-              ++ nixpkgs.lib.optionals hasLspGemset [
-                rubyLspWrapper
-                rubyLspEnv.env
-              ]
-              ++ [relockBin]
               ++ (with pkgs; [
-                bundix
+                # Native-extension build deps for `bundle install`: psych
+                # needs libyaml, pg needs libpq when built from source.
+                pkg-config
+                libyaml
+                libpq
                 tailwindcss_4
               ]);
             shellHook = ''
+              ${rubyEnvSetup}
+              bundle check >/dev/null 2>&1 || bundle install
               mkdir -p ./tmp/pg
-              # libpq env so bare `psql` (no args) connects to the dev db
-              # over the project-local socket. Override via RAILS_ENV-style
-              # exports if you need _test, etc.
               export PGHOST="$PWD/tmp/pg"
               export PGDATABASE="${appName}_development"
-              # Point tailwindcss-rails at the system Tailwind CLI from
-              # nixpkgs. The bundled tailwindcss-ruby binary (a Bun-compiled
-              # single-file executable) doesn't survive Nix's auto-patchelf;
-              # nixpkgs builds Tailwind v4 cleanly for our glibc target.
+
+              # Point tailwindcss-rails at the Tailwind CLI from nixpkgs.
+              # The tailwindcss-ruby gem ships a Bun-compiled single-file
+              # executable that expects an FHS system and won't run on
+              # NixOS; nixpkgs builds Tailwind v4 for our glibc target.
               export TAILWINDCSS_INSTALL_DIR="${pkgs.tailwindcss_4}/bin"
             '';
           };

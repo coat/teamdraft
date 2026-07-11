@@ -1,7 +1,0 @@
-# Composed Gemfile for ruby-lsp's bundlerEnv. Project deps come from the main
-# Gemfile via eval_gemfile; only LSP-specific gems are added here.
-
-eval_gemfile(File.expand_path("../../Gemfile", __dir__))
-
-gem "ruby-lsp", require: false
-gem "ruby-lsp-rails", require: false

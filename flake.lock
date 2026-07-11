@@ -69,20 +69,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1678875422,
-        "narHash": "sha256-T3o6NcQPwXjxJMn2shz86Chch4ljXgZn746c2caGxd8=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "126f49a01de5b7e35a43fd43f891ecf6d3a51459",
-        "type": "github"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
     "process-compose-flake": {
       "locked": {
         "lastModified": 1782060835,
@@ -103,26 +89,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-ruby": "nixpkgs-ruby",
         "process-compose-flake": "process-compose-flake",
-        "ruby-nix": "ruby-nix",
         "services-flake": "services-flake"
-      }
-    },
-    "ruby-nix": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1755059052,
-        "narHash": "sha256-yUJmmNIw11ZEIAFogqcqNomk4YV3F/zjwI1f7bYzIyY=",
-        "owner": "inscapist",
-        "repo": "ruby-nix",
-        "rev": "86b498e80058a84461d1f533e121574d85d272d7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "inscapist",
-        "repo": "ruby-nix",
-        "type": "github"
       }
     },
     "services-flake": {
