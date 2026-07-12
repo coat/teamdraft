@@ -30,8 +30,8 @@ proxy:
     http_port: 8080 # listen on 8080 (default is 80)
 
 # In CI, github.actor + GITHUB_TOKEN are written into .kamal/secrets by
-# the workflow. On a laptop, use your GitHub login + a PAT with
-# read:packages (write:packages if you also build/push from the laptop).
+# the workflow. For local kamal commands (logs, console, etc.), use your
+# GitHub login + a PAT with read:packages.
 registry:
   server: ghcr.io
   username:
@@ -39,9 +39,9 @@ registry:
   password:
     - KAMAL_REGISTRY_PASSWORD
 
-# Builds locally when deploying from a laptop. CI passes `--skip-push`
-# so this block is bypassed there (the image is already in GHCR from
-# the publish job).
+# Kamal requires a builder config, but deploys run from CI with
+# `--skip-push` (the image is already in GHCR from the publish job),
+# so this is only exercised on an ad-hoc manual deploy.
 builder:
   arch: amd64
   local: true
