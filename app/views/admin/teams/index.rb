@@ -24,13 +24,13 @@ class Views::Admin::Teams::Index < Views::Base
       render Views::Components::Admin::TableCard.new do
         thead do
           tr do
-            th { "Sport" }
+            th(scope: "col") { "Sport" }
             render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_teams_path)
-            th { "Abbr" }
-            th { "Conf/Div" }
-            th { "External ID" }
+            th(scope: "col") { "Abbr" }
+            th(scope: "col") { "Conf/Div" }
+            th(scope: "col") { "External ID" }
             render Views::Components::SortableHeader.new(query: @query, column: "rank", label: "Pick rank", path: admin_teams_path)
-            th(colspan: 3) { "Actions" }
+            th(colspan: 3, scope: "colgroup") { "Actions" }
           end
         end
         tbody do
@@ -50,14 +50,14 @@ class Views::Admin::Teams::Index < Views::Base
   def render_filter_card
     render Views::Components::Admin::FilterCard.new(url: admin_teams_path, query: @query) do |form|
       div(class: "space-y-1") do
-        form.label :sport_id, "Sport", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :sport_id, "Sport", class: "label label-text text-xs uppercase tracking-wide"
         form.select :sport_id,
           [["All sports", ""]] + @sports,
           {selected: @query.sport_id},
           class: "select select-bordered"
       end
       div(class: "space-y-1") do
-        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide"
         form.text_field :q, value: @query.search_term, placeholder: "Team name…",
           class: "input input-bordered w-48"
       end

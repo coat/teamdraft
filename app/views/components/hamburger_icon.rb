@@ -13,7 +13,8 @@ class Views::Components::HamburgerIcon < Views::Base
       class: @class_name,
       fill: "none",
       viewBox: "0 0 24 24",
-      stroke: "currentColor"
+      stroke: "currentColor",
+      aria_hidden: "true"
     ) do |s|
       s.path(
         stroke_linecap: "round",

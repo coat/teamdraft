@@ -31,13 +31,35 @@
   .prose table { @apply my-4; }
 }
 
+/* daisyUI defaults table headers to 60% base-content, which lands around
+   3.9:1 on a white base-100 - below WCAG AA's 4.5:1 for small text. */
+.table :where(thead, tfoot) {
+  color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+}
+
+/* Same 60% dimming on .label; don't stack opacity-* utilities on top of
+   these elements or the ratio drops right back below AA. */
+.label {
+  color: color-mix(in oklab, currentcolor 70%, transparent);
+}
+
+/* The dark theme's primary is tuned for button fills (white text on
+   primary passes); as link text on dark base backgrounds it sits around
+   3.5:1. Lighten links only - buttons keep the brand color. Mirrors
+   daisyUI's own `:root:not([data-theme])` prefers-dark scoping. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .link-primary {
+    color: color-mix(in oklab, var(--color-primary) 70%, white);
+  }
+}
+
 /* draft_clock_controller toggles these states as the clock counts down. */
 @layer components {
   [data-controller~="draft-clock"].draft-clock--warning {
     @apply ring-2 ring-warning/70 bg-warning/10;
   }
   [data-controller~="draft-clock"].draft-clock--warning .countdown {
-    @apply text-warning animate-pulse;
+    @apply text-warning motion-safe:animate-pulse;
   }
   [data-controller~="draft-clock"].draft-clock--expired {
     @apply ring-2 ring-error/70 bg-error/10;

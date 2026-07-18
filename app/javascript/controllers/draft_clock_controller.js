@@ -10,11 +10,12 @@ function formatRemaining(seconds) {
 }
 
 // daisyUI's `.countdown` reveals digits via a CSS counter on `--value`.
-// Update the custom property alongside aria-label and textContent so the
-// animation runs and assistive tech still reads the current value.
+// Update the custom property alongside textContent so the animation runs
+// and the current value is readable on demand. Deliberately NOT a live
+// region - announcing every tick would flood assistive tech; turn changes
+// are announced once via the #draft-announcer status region instead.
 function setCountdownValue(el, n) {
   el.style.setProperty("--value", n)
-  el.setAttribute("aria-label", String(n))
   el.textContent = String(n)
 }
 

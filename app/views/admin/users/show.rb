@@ -52,7 +52,7 @@ class Views::Admin::Users::Show < Views::Base
           render_disable_toggle
         end
         if @user == current_user
-          p(class: "text-xs text-base-content/60 mt-2") do
+          p(class: "text-xs text-base-content/70 mt-2") do
             plain "You can't revoke your own admin access or disable your own account."
           end
         end
@@ -95,14 +95,14 @@ class Views::Admin::Users::Show < Views::Base
   def render_related_panel
     render Views::Components::Admin::RelatedPanel.new(title: "Leagues (#{@participants.size})") do
       if @participants.empty?
-        p(class: "text-sm text-base-content/60") { "Not a participant in any league." }
+        p(class: "text-sm text-base-content/70") { "Not a participant in any league." }
       else
         ul(class: "menu bg-base-100 w-full p-0 [&_li>*]:rounded-lg") do
           @participants.each do |p|
             li do
               a(href: admin_league_path(p.league_season.league)) do
                 span(class: "font-medium") { p.league_season.league.name }
-                span(class: "text-xs opacity-60 ml-2") { "as #{p.display_name}#{" · owner" if p.is_owner}" }
+                span(class: "text-xs opacity-70 ml-2") { "as #{p.display_name}#{" · owner" if p.is_owner}" }
               end
             end
           end

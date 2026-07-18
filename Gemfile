@@ -79,6 +79,10 @@ group :test do
   gem "capybara"
   gem "cuprite"
   gem "webmock"
+
+  # Automated WCAG checks in system specs (be_axe_clean matcher)
+  gem "axe-core-rspec"
+  gem "axe-core-capybara"
 end
 
 group :development do

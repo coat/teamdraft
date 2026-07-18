@@ -60,7 +60,7 @@ class Views::Leagues::Edit < Views::Base
           plain "Draft settings"
           render Views::Components::Icon.new(:chevron_right)
         end
-        span(class: "text-xs opacity-60") { draft_settings_summary }
+        span(class: "text-xs opacity-70") { draft_settings_summary }
       end
     end
   end
@@ -74,7 +74,7 @@ class Views::Leagues::Edit < Views::Base
           plain "Scoring"
           render Views::Components::Icon.new(:chevron_right)
         end
-        span(class: "text-xs opacity-60") { scoring_summary }
+        span(class: "text-xs opacity-70") { scoring_summary }
       end
     end
   end

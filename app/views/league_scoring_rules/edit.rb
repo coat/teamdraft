@@ -60,16 +60,19 @@ class Views::LeagueScoringRules::Edit < Views::Base
     div(class: "flex items-center gap-3") do
       div(class: "grow") do
         div(class: "font-medium") { override.label }
-        div(class: "text-xs opacity-60") { default_hint(override) }
+        div(class: "text-xs opacity-70") { default_hint(override) }
       end
       div(class: "shrink-0") do
         label(class: "label-text-alt sr-only", for: input_id(override)) { override.label }
+        invalid = override.errors.any?
         input(type: "number",
           name: "overrides[#{override.id}][points]",
           id: input_id(override),
           value: override.points,
           min: 0,
           step: 1,
+          aria_invalid: (true if invalid),
+          aria_describedby: ("form-errors" if invalid),
           class: "input input-bordered w-24 text-right")
         span(class: "ml-2 text-sm opacity-70") { "pts" }
       end
@@ -78,7 +81,7 @@ class Views::LeagueScoringRules::Edit < Views::Base
 
   def render_reset
     div(class: "mt-6 pt-4 border-t border-base-300") do
-      p(class: "text-xs opacity-60 mb-2") do
+      p(class: "text-xs opacity-70 mb-2") do
         plain "Restore all point values to the sport's defaults."
       end
       button_to "Reset to sport defaults",
@@ -101,7 +104,7 @@ class Views::LeagueScoringRules::Edit < Views::Base
   def render_errors
     invalid = @overrides.select { |o| o.errors.any? }
     return if invalid.empty?
-    div(class: "alert alert-error mt-3", role: "alert") do
+    div(id: "form-errors", class: "alert alert-error mt-3", role: "alert") do
       ul(class: "list-disc list-inside") do
         invalid.each do |o|
           o.errors.full_messages.each { |msg| li { "#{o.label}: #{msg}" } }

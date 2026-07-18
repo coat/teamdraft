@@ -26,12 +26,14 @@ class Views::Components::Admin::Sidebar < Views::Base
       nav(class: "p-3 space-y-4") do
         GROUPS.each do |label, items|
           div do
-            div(class: "text-xs uppercase tracking-wide opacity-60 px-3 pb-1") { label }
+            div(class: "text-xs uppercase tracking-wide opacity-70 px-3 pb-1") { label }
             ul(class: "menu p-0 [&_li>a]:rounded-lg w-full") do
               items.each do |key, item_label, path_helper|
                 active = (key == @current_section)
                 li do
-                  a(href: send(path_helper), class: ("menu-active font-medium" if active).to_s) { item_label }
+                  a(href: send(path_helper),
+                    class: ("menu-active font-medium" if active).to_s,
+                    aria_current: ("page" if active)) { item_label }
                 end
               end
             end

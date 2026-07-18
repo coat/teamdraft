@@ -27,19 +27,19 @@ class Views::Admin::Users::Index < Views::Base
   def render_filter_card
     render Views::Components::Admin::FilterCard.new(url: admin_users_path, query: @query) do |form|
       div(class: "space-y-1") do
-        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide"
         form.text_field :q, value: @query.search_term, placeholder: "Email…",
           class: "input input-bordered w-64"
       end
       div(class: "space-y-1") do
-        form.label :role, "Role", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :role, "Role", class: "label label-text text-xs uppercase tracking-wide"
         form.select :role,
           [["Any role", ""], ["Admin", "admin"], ["Non-admin", "non_admin"]],
           {selected: @query.role},
           class: "select select-bordered"
       end
       div(class: "space-y-1") do
-        form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide"
         form.select :status,
           [["Any status", ""], ["Active", "active"], ["Disabled", "disabled"]],
           {selected: @query.status},
@@ -53,10 +53,10 @@ class Views::Admin::Users::Index < Views::Base
       thead do
         tr do
           render Views::Components::SortableHeader.new(query: @query, column: "email_address", label: "Email", path: admin_users_path)
-          th { "Role" }
-          th { "Status" }
+          th(scope: "col") { "Role" }
+          th(scope: "col") { "Status" }
           render Views::Components::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_users_path)
-          th
+          th(scope: "col") { span(class: "sr-only") { "Actions" } }
         end
       end
       tbody do
@@ -74,7 +74,7 @@ class Views::Admin::Users::Index < Views::Base
   end
 
   def render_row(user)
-    tr(class: (user.disabled? ? "opacity-60" : nil)) do
+    tr(class: (user.disabled? ? "opacity-70" : nil)) do
       td(class: "font-medium") do
         a(href: admin_user_path(user), class: "link link-hover") { user.email_address }
       end

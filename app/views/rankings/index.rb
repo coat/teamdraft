@@ -50,7 +50,7 @@ class Views::Rankings::Index < Views::Base
     section_panel do
       h2(class: "card-title text-lg") { "Your ranking" }
       if @ranked.empty?
-        p(class: "text-sm text-base-content/60") do
+        p(class: "text-sm text-base-content/70") do
           "You haven't ranked any teams yet. Add some from the list below."
         end
       else
@@ -78,11 +78,11 @@ class Views::Rankings::Index < Views::Base
       table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
           tr do
-            th(class: "w-10 bg-base-100") { "#" }
-            th(class: "w-10 bg-base-100")
-            th(class: "bg-base-100") { "Team" }
-            th(class: "bg-base-100 hidden sm:table-cell") { "Conf / Div" }
-            th(class: "text-right bg-base-100")
+            th(class: "w-10 bg-base-100", scope: "col") { "#" }
+            th(class: "w-10 bg-base-100", scope: "col") { span(class: "sr-only") { "Logo" } }
+            th(class: "bg-base-100", scope: "col") { "Team" }
+            th(class: "bg-base-100 hidden sm:table-cell", scope: "col") { "Conf / Div" }
+            th(class: "text-right bg-base-100", scope: "col") { span(class: "sr-only") { "Actions" } }
           end
         end
         tbody do
@@ -97,11 +97,13 @@ class Views::Rankings::Index < Views::Base
   def render_ranked_row(ranking, first:, last:)
     team = ranking.team
     tr do
-      th(class: "font-mono text-sm") { ranking.rank.to_s }
-      th { render_team_swatch(team) }
+      # sticky + bg mirror daisyUI's .table-pin-cols th pinning; td keeps
+      # non-header cells from being misread as row headers.
+      th(class: "font-mono text-sm", scope: "row") { ranking.rank.to_s }
+      td(class: "sticky left-0 bg-base-100") { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
       td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
-      th(class: "text-right") do
+      td(class: "sticky right-0 bg-base-100 text-right") do
         div(class: "inline-flex gap-1") do
           if first
             span(class: "btn btn-ghost btn-xs btn-disabled", aria_hidden: "true") { render Views::Components::Icon.new(:chevron_up) }
@@ -137,13 +139,13 @@ class Views::Rankings::Index < Views::Base
   def render_unranked_section
     section_panel do
       h2(class: "card-title text-lg") { "Unranked" }
-      p(class: "text-xs text-base-content/60") do
+      p(class: "text-xs text-base-content/70") do
         "These follow the global default order in your auto-picks."
       end
       if @unranked.any?
         render_unranked_table
       else
-        p(class: "text-sm text-base-content/60") { "Every team is ranked." }
+        p(class: "text-sm text-base-content/70") { "Every team is ranked." }
       end
     end
   end
@@ -153,11 +155,11 @@ class Views::Rankings::Index < Views::Base
       table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
           tr do
-            th(class: "w-10 bg-base-100")
-            th(class: "bg-base-100") { "Team" }
-            th(class: "bg-base-100 hidden sm:table-cell") { "Conf / Div" }
-            th(class: "bg-base-100") { "Global rank" }
-            th(class: "text-right bg-base-100")
+            th(class: "w-10 bg-base-100", scope: "col") { span(class: "sr-only") { "Logo" } }
+            th(class: "bg-base-100", scope: "col") { "Team" }
+            th(class: "bg-base-100 hidden sm:table-cell", scope: "col") { "Conf / Div" }
+            th(class: "bg-base-100", scope: "col") { "Global rank" }
+            th(class: "text-right bg-base-100", scope: "col") { span(class: "sr-only") { "Actions" } }
           end
         end
         tbody do
@@ -169,11 +171,11 @@ class Views::Rankings::Index < Views::Base
 
   def render_unranked_row(team)
     tr do
-      th { render_team_swatch(team) }
+      td(class: "sticky left-0 bg-base-100") { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
       td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
       td(class: "font-mono text-sm") { team.default_pick_rank ? "##{team.default_pick_rank}" : "-" }
-      th(class: "text-right") do
+      td(class: "sticky right-0 bg-base-100 text-right") do
         button_to sport_rankings_create_path(@sport.key, team_id: team.id),
           method: :post, form: {class: "inline"},
           class: "btn btn-ghost btn-xs", title: "Add",

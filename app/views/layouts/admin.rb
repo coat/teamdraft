@@ -35,6 +35,7 @@ class Views::Layouts::Admin < Views::Base
         javascript_importmap_tags
       end
       body(class: "min-h-screen bg-base-200 text-base-content") do
+        render Views::Components::SkipLink.new
         div(class: "drawer lg:drawer-open", data: {controller: "admin-drawer"}) do
           input(id: "admin-drawer", type: "checkbox", class: "drawer-toggle",
             autocomplete: "off", data: {admin_drawer_target: "toggle"})
@@ -43,7 +44,7 @@ class Views::Layouts::Admin < Views::Base
             div(class: "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-4") do
               render_breadcrumbs
               render_flash
-              yield
+              main(id: "main-content", tabindex: -1, class: "space-y-4") { yield }
             end
           end
           div(class: "drawer-side z-30") do
@@ -58,7 +59,7 @@ class Views::Layouts::Admin < Views::Base
   private
 
   def render_topbar
-    div(class: "bg-base-100 border-b border-base-300") do
+    header(class: "bg-base-100 border-b border-base-300") do
       div(class: "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8") do
         div(class: "navbar min-h-0 py-2") do
           div(class: "navbar-start gap-2") do
@@ -86,16 +87,22 @@ class Views::Layouts::Admin < Views::Base
     render Views::Components::Admin::Breadcrumbs.new(trail: @breadcrumbs)
   end
 
+  # Both wrappers are always rendered, even empty: a live region inserted
+  # into the DOM together with its content is often not announced, but a
+  # message morphing into an existing region is.
   def render_flash
     notice = flash[:notice]
     alert = flash[:alert]
-    return if notice.blank? && alert.blank?
-    div(class: "space-y-2", role: "status") do
-      if notice.present?
-        div(class: "alert alert-success") { p { notice } }
+    div(class: ("space-y-2" if notice.present? || alert.present?)) do
+      div(role: "status") do
+        if notice.present?
+          div(class: "alert alert-success") { p { notice } }
+        end
       end
-      if alert.present?
-        div(class: "alert alert-warning") { p { alert } }
+      div(role: "alert") do
+        if alert.present?
+          div(class: "alert alert-warning") { p { alert } }
+        end
       end
     end
   end

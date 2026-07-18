@@ -51,6 +51,9 @@ class Views::Leagues::Form < Views::Base
   end
 
   def render_text_field(form, field, label, **opts)
+    if @league.errors.include?(field)
+      opts[:aria] = {invalid: true, describedby: "form-errors"}
+    end
     div(class: "space-y-1") do
       form.label field, label, class: "label label-text font-medium"
       form.text_field field, required: true, class: "input w-full", **opts
@@ -66,7 +69,7 @@ class Views::Leagues::Form < Views::Base
         data: {local_datetime_field_target: "input", action: "change->local-datetime-field#update"}
       input(type: "hidden", name: "league[time_zone]",
         data: {local_datetime_field_target: "timezone"})
-      span(class: "label-text-alt text-xs opacity-60",
+      span(class: "label-text-alt text-xs opacity-70",
         data: {local_datetime_field_target: "hint"}) { "Detecting your timezone…" }
     end
   end

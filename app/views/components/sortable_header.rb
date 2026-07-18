@@ -15,7 +15,7 @@ class Views::Components::SortableHeader < Views::Base
   end
 
   def view_template
-    th(class: @class_name) do
+    th(class: @class_name, scope: "col", aria_sort: aria_sort_value) do
       # data-turbo-action="advance" pushes the new URL to the address bar
       # when this link updates a surrounding turbo-frame. Without it, the
       # frame updates but `window.location.href` stays stale - so a
@@ -24,7 +24,7 @@ class Views::Components::SortableHeader < Views::Base
       a(href: link_href, class: "link link-hover inline-flex items-center gap-1",
         data: {turbo_action: "advance"}) do
         plain @label
-        span(class: "opacity-60") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
+        span(class: "opacity-70") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
       end
     end
   end
@@ -32,6 +32,11 @@ class Views::Components::SortableHeader < Views::Base
   private
 
   def active? = @query.sort_column == @column
+
+  def aria_sort_value
+    return unless active?
+    (@query.sort_dir == "asc") ? "ascending" : "descending"
+  end
 
   def next_dir
     return "asc" unless active?

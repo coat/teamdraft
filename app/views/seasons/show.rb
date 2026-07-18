@@ -60,7 +60,7 @@ class Views::Seasons::Show < Views::Base
 
   def render_teams_tab
     if standings.empty?
-      p(class: "text-base-content/60") { "No teams in this season yet." }
+      p(class: "text-base-content/70") { "No teams in this season yet." }
       return
     end
 
@@ -73,8 +73,10 @@ class Views::Seasons::Show < Views::Base
         render_view_tab("Standings", view: "standings")
         render_view_tab("By division", view: "division")
       end
-      div(class: "pt-3") do
-        (@standings_query.view == "division") ? render_teams_by_division : render_standings_table
+      active_view = (@standings_query.view == "division") ? "division" : "standings"
+      div(id: "season-teams-panel", role: "tabpanel",
+        aria_labelledby: view_tab_id(active_view), class: "pt-3") do
+        (active_view == "division") ? render_teams_by_division : render_standings_table
       end
     end
   end
@@ -83,10 +85,13 @@ class Views::Seasons::Show < Views::Base
     active = @standings_query.view == view
     override = (view == "standings") ? nil : view
     a(href: season_path(@season, **@standings_query.to_url_params(view: override)),
-      role: "tab", aria_selected: active.to_s,
+      id: view_tab_id(view),
+      role: "tab", aria_selected: active.to_s, aria_controls: "season-teams-panel",
       class: active ? "tab tab-active" : "tab",
       data: {turbo_action: "advance"}) { label }
   end
+
+  def view_tab_id(view) = "season-view-tab-#{view}"
 
   def render_teams_by_division
     grouped = standings.group_by { |r| [r.team.conference, r.team.division] }
@@ -109,8 +114,8 @@ class Views::Seasons::Show < Views::Base
       table(class: "table table-sm") do
         thead do
           tr do
-            th(class: "w-8")
-            th(class: "w-10")
+            th(class: "w-8", scope: "col") { span(class: "sr-only") { "Details" } }
+            th(class: "w-10", scope: "col") { span(class: "sr-only") { "Logo" } }
             render_sortable_th("name", "Team")
             render_sortable_th("record", "W-L", class_name: "text-right")
             render_sortable_th("points", "Points", class_name: "text-right")
@@ -126,8 +131,8 @@ class Views::Seasons::Show < Views::Base
       table(class: "table table-sm") do
         thead do
           tr do
-            th(class: "w-8")
-            th(class: "w-10")
+            th(class: "w-8", scope: "col") { span(class: "sr-only") { "Details" } }
+            th(class: "w-10", scope: "col") { span(class: "sr-only") { "Logo" } }
             render_sortable_th("name", "Team")
             render_sortable_th("division", "Division", class_name: "hidden sm:table-cell")
             render_sortable_th("record", "W-L", class_name: "text-right")
@@ -150,7 +155,7 @@ class Views::Seasons::Show < Views::Base
     tbody(class: "even:bg-base-200",
       data: {controller: "disclosure", disclosure_key_value: panel_id}) do
       tr do
-        th(class: "align-middle") { render_disclosure_toggle(panel_id) }
+        td(class: "align-middle") { render_disclosure_toggle(panel_id) }
         td { render_team_swatch(team) }
         td(class: "font-medium") do
           a(href: season_team_path(@season, slug: team.slug), class: "link link-hover",
@@ -162,7 +167,7 @@ class Views::Seasons::Show < Views::Base
           td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { plain(division_label(team) || "-") }
         end
         td(class: "text-right font-mono whitespace-nowrap") { plain combined_record(row) }
-        th(class: "text-right font-mono") { row.points.to_s }
+        td(class: "text-right font-mono font-semibold") { row.points.to_s }
       end
       tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
         td(colspan: columns.to_s, class: "bg-base-200/50") do
@@ -195,7 +200,7 @@ class Views::Seasons::Show < Views::Base
       aria_expanded: "false", aria_controls: panel_id,
       title: "Show record and scoring breakdown",
       data: {action: "click->disclosure#toggle"}) do
-      span(class: "inline-block transition-transform",
+      span(class: "inline-block motion-safe:transition-transform",
         data: {disclosure_target: "icon"}) do
         render Views::Components::Icon.new(:chevron_right)
       end
@@ -217,10 +222,10 @@ class Views::Seasons::Show < Views::Base
       table(class: "table table-sm table-zebra") do
         thead do
           tr do
-            th { "League" }
-            th { "Top participant" }
-            th(class: "text-right") { "Top score" }
-            th(class: "text-right") { "Seats" }
+            th(scope: "col") { "League" }
+            th(scope: "col") { "Top participant" }
+            th(class: "text-right", scope: "col") { "Top score" }
+            th(class: "text-right", scope: "col") { "Seats" }
           end
         end
         tbody do
@@ -233,7 +238,7 @@ class Views::Seasons::Show < Views::Base
               end
               td { plain(row.top_participant&.display_name || "-") }
               td(class: "text-right font-mono font-semibold") { row.top_score.to_s }
-              td(class: "text-right text-sm opacity-60") { "#{row.filled_seats}/#{row.total_seats}" }
+              td(class: "text-right text-sm opacity-70") { "#{row.filled_seats}/#{row.total_seats}" }
             end
           end
         end

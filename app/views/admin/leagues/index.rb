@@ -27,19 +27,19 @@ class Views::Admin::Leagues::Index < Views::Base
   def render_filter_card
     render Views::Components::Admin::FilterCard.new(url: admin_leagues_path, query: @query) do |form|
       div(class: "space-y-1") do
-        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :q, "Search", class: "label label-text text-xs uppercase tracking-wide"
         form.text_field :q, value: @query.search_term, placeholder: "League name…",
           class: "input input-bordered w-64"
       end
       div(class: "space-y-1") do
-        form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :status, "Status", class: "label label-text text-xs uppercase tracking-wide"
         form.select :status,
           [["Any status", ""]] + LeagueSeason::STATUSES.map { |s| [s.humanize, s] },
           {selected: @query.status},
           class: "select select-bordered"
       end
       div(class: "space-y-1") do
-        form.label :users, "Users", class: "label label-text text-xs uppercase tracking-wide opacity-60"
+        form.label :users, "Users", class: "label label-text text-xs uppercase tracking-wide"
         form.select :users,
           [["Any", ""], ["Has signed-up users", "yes"], ["Anonymous only", "no"]],
           {selected: @query.users},
@@ -53,12 +53,12 @@ class Views::Admin::Leagues::Index < Views::Base
       thead do
         tr do
           render Views::Components::SortableHeader.new(query: @query, column: "name", label: "Name", path: admin_leagues_path)
-          th { "Current season" }
-          th { "Status" }
-          th { "Owner" }
-          th { "Users" }
+          th(scope: "col") { "Current season" }
+          th(scope: "col") { "Status" }
+          th(scope: "col") { "Owner" }
+          th(scope: "col") { "Users" }
           render Views::Components::SortableHeader.new(query: @query, column: "created_at", label: "Created", path: admin_leagues_path)
-          th
+          th(scope: "col") { span(class: "sr-only") { "Actions" } }
         end
       end
       tbody do

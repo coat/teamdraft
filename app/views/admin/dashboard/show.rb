@@ -35,7 +35,7 @@ class Views::Admin::Dashboard::Show < Views::Base
 
   def stat(label, value)
     div do
-      dt(class: "text-xs uppercase tracking-wide opacity-60") { label }
+      dt(class: "text-xs uppercase tracking-wide opacity-70") { label }
       dd(class: "font-medium") { value.to_s }
     end
   end
@@ -45,7 +45,7 @@ class Views::Admin::Dashboard::Show < Views::Base
       div(class: "card-body") do
         h2(class: "card-title text-base") { "Sync" }
         if @stats[:active_seasons].empty?
-          p(class: "text-base-content/60") { "No active seasons." }
+          p(class: "text-base-content/70") { "No active seasons." }
         else
           div(class: "space-y-3") do
             @stats[:active_seasons].each do |season|
@@ -63,14 +63,14 @@ class Views::Admin::Dashboard::Show < Views::Base
         div(class: "card-body") do
           h2(class: "card-title text-base") { "Recent leagues (7 days)" }
           if @stats[:recent_leagues].empty?
-            p(class: "text-sm text-base-content/60") { "None." }
+            p(class: "text-sm text-base-content/70") { "None." }
           else
             ul(class: "menu bg-base-100 w-full p-0 [&_li>*]:rounded-lg") do
               @stats[:recent_leagues].each do |league|
                 li do
                   a(href: admin_league_path(league)) do
                     span(class: "font-medium") { league.name }
-                    span(class: "text-xs opacity-60 ml-2") { league.created_at.strftime("%Y-%m-%d") }
+                    span(class: "text-xs opacity-70 ml-2") { league.created_at.strftime("%Y-%m-%d") }
                   end
                 end
               end
@@ -82,14 +82,14 @@ class Views::Admin::Dashboard::Show < Views::Base
         div(class: "card-body") do
           h2(class: "card-title text-base") { "Recent users (7 days)" }
           if @stats[:recent_users].empty?
-            p(class: "text-sm text-base-content/60") { "None." }
+            p(class: "text-sm text-base-content/70") { "None." }
           else
             ul(class: "menu bg-base-100 w-full p-0 [&_li>*]:rounded-lg") do
               @stats[:recent_users].each do |user|
                 li do
                   a(href: admin_user_path(user)) do
                     span(class: "font-medium") { user.email_address }
-                    span(class: "text-xs opacity-60 ml-2") { user.created_at.strftime("%Y-%m-%d") }
+                    span(class: "text-xs opacity-70 ml-2") { user.created_at.strftime("%Y-%m-%d") }
                   end
                 end
               end

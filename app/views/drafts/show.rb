@@ -72,17 +72,39 @@ class Views::Drafts::Show < Views::Base
   def render_draft_section
     case @league_season.status
     when "draft_pending"
+      render_draft_announcer("Waiting for the draft to start.")
       render_pending_notice
       render_directory_with_optional_rankings(nil)
     when "drafting"
       on_the_clock = clock_participant
       viewer_on_clock = on_the_clock && @current_participant && @current_participant.id == on_the_clock.id
+      render_draft_announcer(announcer_text(on_the_clock, viewer_on_clock))
       render_draft_panel(on_the_clock, viewer_on_clock)
       render_directory_with_optional_rankings(on_the_clock)
     else
+      render_draft_announcer("Draft complete. All picks are in.")
       div(class: "card bg-base-100 shadow") do
         div(class: "card-body p-3 sm:p-6") { render_completed_state }
       end
+    end
+  end
+
+  # Visually-hidden live region announcing turn changes to screen readers.
+  # Always rendered with a stable id so Turbo morph updates the text in
+  # place - a live region inserted together with its content is often not
+  # announced at all, but a text change inside an existing one is.
+  def render_draft_announcer(text)
+    div(id: "draft-announcer", role: "status", class: "sr-only") { text }
+  end
+
+  def announcer_text(on_the_clock, viewer_on_clock)
+    pick = "pick #{@league_season.current_pick_number} of #{@league_season.total_picks}"
+    if viewer_on_clock
+      "You're on the clock - #{pick}."
+    elsif on_the_clock
+      "#{on_the_clock.display_name} is on the clock - #{pick}."
+    else
+      "Drafting - #{pick}."
     end
   end
 
@@ -208,9 +230,7 @@ class Views::Drafts::Show < Views::Base
         span(
           class: "inline-block min-w-[3ch] text-center tabular-nums",
           style: "--value:#{initial};",
-          data_draft_clock_target: "display",
-          aria_live: "polite",
-          aria_label: initial.to_s
+          data_draft_clock_target: "display"
         ) { initial.to_s }
       end
     end
@@ -255,9 +275,7 @@ class Views::Drafts::Show < Views::Base
         span(
           class: "inline-block min-w-[2ch] text-center tabular-nums",
           style: "--value:#{initial};",
-          data_draft_clock_target: target,
-          aria_live: "polite",
-          aria_label: initial.to_s
+          data_draft_clock_target: target
         ) { initial.to_s }
       end
       plain label
@@ -319,7 +337,7 @@ class Views::Drafts::Show < Views::Base
     form(action: league_draft_path(@league), method: "get", class: "flex flex-wrap items-end gap-3",
       data: {controller: "auto-submit", turbo_action: "advance"}) do
       div(class: "space-y-1") do
-        label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+        label(class: "label label-text text-xs uppercase tracking-wide",
           for: "team-directory-status") { "Status" }
         select(
           id: "team-directory-status",
@@ -336,7 +354,7 @@ class Views::Drafts::Show < Views::Base
       end
       if divisions.any?
         div(class: "space-y-1") do
-          label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+          label(class: "label label-text text-xs uppercase tracking-wide",
             for: "team-directory-division") { "Division" }
           select(
             id: "team-directory-division",
@@ -363,7 +381,7 @@ class Views::Drafts::Show < Views::Base
       table(class: "table table-sm table-zebra table-pin-cols") do
         thead do
           tr do
-            th(class: "w-10 bg-base-100")
+            th(class: "w-10 bg-base-100", scope: "col") { span(class: "sr-only") { "Logo" } }
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_draft_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "rank", label: "Rank", path: league_draft_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_draft_path(@league), class_name: "hidden sm:table-cell")
@@ -373,7 +391,7 @@ class Views::Drafts::Show < Views::Base
             if show_points
               render Views::Components::SortableHeader.new(query: query, column: "points", label: "Points", path: league_draft_path(@league))
             end
-            th(class: "text-right bg-base-100")
+            th(class: "text-right bg-base-100", scope: "col") { span(class: "sr-only") { "Actions" } }
           end
         end
         column_count = (show_points ? DRAFT_COLUMNS_WITH_POINTS : DRAFT_COLUMNS) - (show_pick ? 0 : 1)
@@ -392,13 +410,15 @@ class Views::Drafts::Show < Views::Base
     team = row.team
     pick = row.pick
     tr do
-      th { render_team_swatch(team) }
+      # sticky + bg mirror daisyUI's .table-pin-cols th pinning; a td keeps
+      # the cell from being misread as a row header by assistive tech.
+      td(class: "sticky left-0 bg-base-100") { render_team_swatch(team) }
       td(class: "font-medium") { team.name }
       td(class: "font-mono text-sm") { render_rank_cell(row) }
       td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
       td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) } if show_pick
       td(class: "font-mono text-right") { row.points.to_s } if show_points
-      th(class: "text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
+      td(class: "sticky right-0 bg-base-100 text-right") { render_directory_action_cell(query, row.season_team, pick, on_the_clock) }
     end
   end
 

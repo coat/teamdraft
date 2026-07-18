@@ -105,7 +105,7 @@ class Views::Drafts::Edit < Views::Base
         data: {local_datetime_field_target: "input", action: "change->local-datetime-field#update"})
       input(type: "hidden", name: "league_season[time_zone]",
         data: {local_datetime_field_target: "timezone"})
-      span(class: "label-text-alt text-xs opacity-60",
+      span(class: "label-text-alt text-xs opacity-70",
         data: {local_datetime_field_target: "hint"}) { "Detecting your timezone…" }
     end
   end
@@ -161,9 +161,9 @@ class Views::Drafts::Edit < Views::Base
       legend(class: "fieldset-legend text-sm font-medium") { "Draft order" }
       locked = @league_season.draft_picks.any?
       if locked
-        p(class: "text-xs opacity-60") { "Locked - the draft is underway." }
+        p(class: "text-xs opacity-70") { "Locked - the draft is underway." }
       else
-        p(class: "text-xs opacity-60") do
+        p(class: "text-xs opacity-70") do
           plain "Reorder seats before the draft begins. Position #1 picks first."
         end
       end
@@ -182,7 +182,7 @@ class Views::Drafts::Edit < Views::Base
       span(class: "font-medium grow") do
         plain participant.display_name
         span(class: "badge badge-secondary badge-outline badge-sm ml-2") { "owner" } if participant.is_owner?
-        span(class: "text-sm text-base-content/60 ml-2") { "(unclaimed)" } if participant.joined_at.nil?
+        span(class: "text-sm text-base-content/70 ml-2") { "(unclaimed)" } if participant.joined_at.nil?
       end
       next if locked
       div(class: "flex gap-1") do

@@ -116,7 +116,7 @@ class Views::Leagues::Show < Views::Base
 
   def render_copyable_row(label:, value:, button_label:)
     div(class: "space-y-1", data_controller: "clipboard") do
-      span(class: "text-xs uppercase tracking-wide opacity-60") { label }
+      span(class: "text-xs uppercase tracking-wide opacity-70") { label }
       div(class: "join w-full") do
         input(
           type: "text",
@@ -143,6 +143,7 @@ class Views::Leagues::Show < Views::Base
         h2(class: "card-title") { "Have an invite code?" }
         p(class: "text-sm text-base-content/70") { "The league owner can share a short code with you. Enter it to claim your seat." }
         form_with(url: verify_invite_league_path(@league), method: :post, class: "join w-full mt-2") do |form|
+          form.label :code, "Invite code", class: "sr-only"
           form.text_field :code, required: true, autocomplete: "off",
             placeholder: "e.g. frosty-otter-422",
             class: "input input-bordered join-item flex-1 font-mono"
@@ -187,7 +188,7 @@ class Views::Leagues::Show < Views::Base
               strong { p.display_name }
               span(class: "badge badge-primary badge-outline") { "you" } if p == @current_participant
               span(class: "badge badge-secondary badge-outline") { "owner" } if p.is_owner?
-              span(class: "text-sm text-base-content/60") { "(unclaimed)" } if p.joined_at.nil?
+              span(class: "text-sm text-base-content/70") { "(unclaimed)" } if p.joined_at.nil?
             end
           end
         end
@@ -260,7 +261,7 @@ class Views::Leagues::Show < Views::Base
     form(action: league_path(@league), method: "get", class: "flex flex-wrap items-end gap-3",
       data: {controller: "auto-submit", turbo_action: "advance"}) do
       div(class: "space-y-1") do
-        label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+        label(class: "label label-text text-xs uppercase tracking-wide",
           for: "team-directory-status") { "Status" }
         select(
           id: "team-directory-status",
@@ -276,7 +277,7 @@ class Views::Leagues::Show < Views::Base
       end
       if divisions.any?
         div(class: "space-y-1") do
-          label(class: "label label-text text-xs uppercase tracking-wide opacity-60",
+          label(class: "label label-text text-xs uppercase tracking-wide",
             for: "team-directory-division") { "Division" }
           select(
             id: "team-directory-division",
@@ -306,12 +307,12 @@ class Views::Leagues::Show < Views::Base
       table(class: "table table-sm") do
         thead do
           tr do
-            th(class: "w-8")
-            th(class: "w-10")
+            th(class: "w-8", scope: "col") { span(class: "sr-only") { "Details" } }
+            th(class: "w-10", scope: "col") { span(class: "sr-only") { "Logo" } }
             render Views::Components::SortableHeader.new(query: query, column: "name", label: "Team", path: league_path(@league))
             render Views::Components::SortableHeader.new(query: query, column: "division", label: "Conf / Div", path: league_path(@league), class_name: "hidden sm:table-cell")
             render Views::Components::SortableHeader.new(query: query, column: "pick", label: "Pick", path: league_path(@league))
-            th(class: "text-right") { render_points_header(query) }
+            th(class: "text-right", scope: "col", aria_sort: points_aria_sort(query)) { render_points_header(query) }
           end
         end
         if rows.empty?
@@ -321,6 +322,11 @@ class Views::Leagues::Show < Views::Base
         end
       end
     end
+  end
+
+  def points_aria_sort(query)
+    return unless query.sort_column == "points"
+    (query.sort_dir == "asc") ? "ascending" : "descending"
   end
 
   def render_points_header(query)
@@ -335,7 +341,7 @@ class Views::Leagues::Show < Views::Base
       class: "link link-hover inline-flex items-center gap-1",
       data: {turbo_action: "advance"}) do
       plain "Points"
-      span(class: "opacity-60") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
+      span(class: "opacity-70") { render Views::Components::Icon.new(arrow_name, class_name: "size-3") }
     end
   end
 
@@ -352,15 +358,15 @@ class Views::Leagues::Show < Views::Base
     # tbodies alternate cleanly starting from child 2.
     tbody(class: "even:bg-base-200", data: pick ? {controller: "disclosure"} : nil) do
       tr do
-        th(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
-        th { render_team_swatch(team) }
+        td(class: "align-middle") { render_breakdown_toggle(pick.present?, panel_id) }
+        td { render_team_swatch(team) }
         td(class: "font-medium") do
           a(href: season_team_path(@league_season.season, slug: team.slug),
             class: "link link-hover") { team.name }
         end
         td(class: "text-sm whitespace-nowrap hidden sm:table-cell") { division_label(team) || "-" }
         td(class: "text-sm whitespace-nowrap") { render_directory_pick_cell(pick) }
-        th(class: "font-mono text-right") { row.points.to_s }
+        td(class: "font-mono font-semibold text-right") { row.points.to_s }
       end
       if pick
         tr(id: panel_id, class: "hidden", data: {disclosure_target: "panel"}) do
@@ -378,7 +384,7 @@ class Views::Leagues::Show < Views::Base
       aria_expanded: "false", aria_controls: panel_id,
       title: "Show scoring breakdown",
       data: {action: "click->disclosure#toggle"}) do
-      span(class: "inline-block transition-transform",
+      span(class: "inline-block motion-safe:transition-transform",
         data: {disclosure_target: "icon"}) do
         render Views::Components::Icon.new(:chevron_right)
       end
@@ -412,7 +418,7 @@ class Views::Leagues::Show < Views::Base
       span(class: "badge badge-primary badge-outline badge-sm") { "you" } if row.participant == @current_participant
       span(class: "badge badge-secondary badge-outline badge-sm") { "owner" } if row.participant.is_owner?
       span(class: "font-bold tabular-nums") { row.total_points.to_s }
-      span(class: "text-xs opacity-60") { "pts" }
+      span(class: "text-xs opacity-70") { "pts" }
     end
   end
 

@@ -17,7 +17,7 @@ class Views::Leagues::History < Views::Base
         h1(class: "text-3xl font-bold") { "#{@league.name} · history" }
 
         if @league_seasons.empty?
-          p(class: "text-base-content/60") { "This league has no seasons yet." }
+          p(class: "text-base-content/70") { "This league has no seasons yet." }
         else
           div(class: "card bg-base-100 shadow") do
             div(class: "card-body") do
@@ -41,7 +41,7 @@ class Views::Leagues::History < Views::Base
         end
         span(class: "badge badge-sm badge-ghost ml-2") { ls.status }
       end
-      span(class: "text-sm opacity-60") { "#{ls.size} seats" }
+      span(class: "text-sm opacity-70") { "#{ls.size} seats" }
     end
   end
 end

@@ -26,7 +26,7 @@ class Views::Registrations::New < Views::Base
                 required: true, autofocus: true, autocomplete: "email")
               field(form, :password, "Password", :password_field,
                 required: true, autocomplete: "new-password", minlength: 8)
-              p(class: "text-xs text-base-content/60 -mt-1") do
+              p(class: "text-xs text-base-content/70 -mt-1") do
                 plain "Please pick a unique password - don't reuse one from another site."
               end
               field(form, :password_confirmation, "Confirm password", :password_field,
@@ -44,6 +44,9 @@ class Views::Registrations::New < Views::Base
   private
 
   def field(form, name, label, type, **opts)
+    if @user.errors.include?(name)
+      opts[:aria] = {invalid: true, describedby: "form-errors"}
+    end
     div(class: "space-y-1") do
       form.label name, label, class: "label label-text font-medium"
       form.send(type, name, class: "input w-full", **opts)

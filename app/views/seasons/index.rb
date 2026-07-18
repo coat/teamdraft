@@ -10,7 +10,7 @@ class Views::Seasons::Index < Views::Base
       main(class: "py-6 space-y-4") do
         h1(class: "text-3xl font-bold") { "Seasons" }
         if @seasons.empty?
-          p(class: "text-base-content/60") { "No seasons yet." }
+          p(class: "text-base-content/70") { "No seasons yet." }
         else
           div(class: "card bg-base-100 shadow") do
             div(class: "card-body") do

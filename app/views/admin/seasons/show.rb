@@ -83,7 +83,7 @@ class Views::Admin::Seasons::Show < Views::Base
             if @season.sync_paused?
               span(class: "badge badge-warning") { "Automated sync paused" }
             else
-              span(class: "text-sm text-base-content/50") { "Automated sync active" }
+              span(class: "text-sm text-base-content/70") { "Automated sync active" }
             end
             pause_label = @season.sync_paused? ? "Resume sync" : "Pause sync"
             button_to pause_label, toggle_sync_pause_admin_season_path(@season),
@@ -143,7 +143,7 @@ class Views::Admin::Seasons::Show < Views::Base
 
   def stat(label_text, value = nil, &block)
     div do
-      dt(class: "text-xs uppercase tracking-wide opacity-60") { label_text }
+      dt(class: "text-xs uppercase tracking-wide opacity-70") { label_text }
       dd(class: "font-medium") do
         block ? yield : plain(value.to_s)
       end
@@ -156,7 +156,7 @@ class Views::Admin::Seasons::Show < Views::Base
     else
       span(class: "inline-flex items-center gap-1") do
         plain(@season.starts_on&.iso8601 || "?")
-        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-60")
+        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-70")
         plain(@season.ends_on&.iso8601 || "?")
       end
     end

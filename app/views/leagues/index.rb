@@ -43,14 +43,14 @@ class Views::Leagues::Index < Views::Base
       href: league_path(league),
       class: "block group rounded-box focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     ) do
-      div(class: "card bg-base-100 shadow transition hover:shadow-lg hover:-translate-y-0.5 cursor-pointer") do
+      div(class: "card bg-base-100 shadow transition hover:shadow-lg motion-safe:hover:-translate-y-0.5 cursor-pointer") do
         div(class: "card-body") do
           div(class: "flex items-start justify-between gap-3") do
             h2(class: "card-title flex items-center gap-1") do
               plain league.name
               render Views::Components::Icon.new(
                 :chevron_right,
-                class_name: "size-5 text-base-content/60 group-hover:text-base-content group-hover:translate-x-0.5 transition"
+                class_name: "size-5 text-base-content/70 group-hover:text-base-content motion-safe:group-hover:translate-x-0.5 transition"
               )
             end
             span(class: status_badge_class(ls.status)) { render_status_label(ls) }

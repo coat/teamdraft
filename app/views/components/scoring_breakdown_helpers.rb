@@ -13,7 +13,7 @@ module Views::Components::ScoringBreakdownHelpers
   def render_scoring_breakdown(rules, events)
     nonzero = events.reject { |_, points| points.zero? }
     if nonzero.empty?
-      p(class: "text-sm text-base-content/60 py-2 text-right") { "No scoring yet." }
+      p(class: "text-sm text-base-content/70 py-2 text-right") { "No scoring yet." }
     else
       div(class: "py-2 text-sm space-y-1") do
         rules.ordered_rules.each do |rule|

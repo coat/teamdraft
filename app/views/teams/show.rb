@@ -43,17 +43,17 @@ class Views::Teams::Show < Views::Base
       div(class: "card-body") do
         h2(class: "card-title") { "Schedule" }
         if @games.empty?
-          p(class: "text-base-content/60") { "No games scheduled yet." }
+          p(class: "text-base-content/70") { "No games scheduled yet." }
         else
           div(class: "overflow-x-auto") do
             table(class: "table table-sm table-zebra") do
               thead do
                 tr do
-                  th { "Week" }
-                  th { "When" }
-                  th { "Opponent" }
-                  th { "Result" }
-                  th { "Status" }
+                  th(scope: "col") { "Week" }
+                  th(scope: "col") { "When" }
+                  th(scope: "col") { "Opponent" }
+                  th(scope: "col") { "Result" }
+                  th(scope: "col") { "Status" }
                 end
               end
               tbody do

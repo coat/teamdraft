@@ -62,7 +62,7 @@ class Views::Admin::Leagues::Show < Views::Base
   def render_participants
     render Views::Components::Admin::RelatedPanel.new(title: "Participants (#{@participants.size})") do
       if @participants.empty?
-        p(class: "text-sm text-base-content/60") { "None yet." }
+        p(class: "text-sm text-base-content/70") { "None yet." }
       else
         ul(class: "menu bg-base-100 w-full p-0 [&_li>*]:rounded-lg") do
           @participants.each do |p|
@@ -70,7 +70,7 @@ class Views::Admin::Leagues::Show < Views::Base
               if p.user_id && p.user
                 a(href: admin_user_path(p.user)) do
                   span(class: "font-medium") { p.display_name }
-                  span(class: "text-xs opacity-60 ml-2") { p.user.email_address }
+                  span(class: "text-xs opacity-70 ml-2") { p.user.email_address }
                   if p.is_owner
                     span(class: "badge badge-xs badge-ghost ml-1") { "owner" }
                   end
@@ -99,7 +99,7 @@ class Views::Admin::Leagues::Show < Views::Base
           li do
             a(href: admin_season_path(ls.season)) do
               span(class: "font-medium") { ls.season.label }
-              span(class: "text-xs opacity-60 ml-2") { ls.status }
+              span(class: "text-xs opacity-70 ml-2") { ls.status }
             end
           end
         end
@@ -109,7 +109,7 @@ class Views::Admin::Leagues::Show < Views::Base
 
   def stat(label_text, value)
     div do
-      dt(class: "text-xs uppercase tracking-wide opacity-60") { label_text }
+      dt(class: "text-xs uppercase tracking-wide opacity-70") { label_text }
       dd(class: "font-medium") { value.to_s }
     end
   end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Admin::Games::Index < Views::Base
-  LABEL_CLASSES = "label label-text text-xs uppercase tracking-wide opacity-60"
+  LABEL_CLASSES = "label label-text text-xs uppercase tracking-wide"
 
   def initialize(query:, games:, all_seasons:, team_options:, round_options:, pagy:)
     @query = query
@@ -80,10 +80,10 @@ class Views::Admin::Games::Index < Views::Base
           render Views::Components::SortableHeader.new(query: @query, column: "starts_at", label: "When", path: admin_games_path)
           render Views::Components::SortableHeader.new(query: @query, column: "round", label: "Round", path: admin_games_path)
           render Views::Components::SortableHeader.new(query: @query, column: "week", label: "Wk", path: admin_games_path)
-          th { "Matchup" }
-          th { "Score" }
+          th(scope: "col") { "Matchup" }
+          th(scope: "col") { "Score" }
           render Views::Components::SortableHeader.new(query: @query, column: "status", label: "Status", path: admin_games_path)
-          th
+          th(scope: "col") { span(class: "sr-only") { "Actions" } }
         end
       end
       tbody do

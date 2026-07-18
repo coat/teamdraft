@@ -78,6 +78,12 @@ GEM
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
+    axe-core-api (4.12.0)
+      dumb_delegator
+    axe-core-capybara (4.12.0)
+      axe-core-api (= 4.12.0)
+    axe-core-rspec (4.12.0)
+      axe-core-api (= 4.12.0)
     base64 (0.3.0)
     bcrypt (3.1.22)
     bcrypt_pbkdf (1.1.2)
@@ -116,6 +122,7 @@ GEM
     diff-lcs (1.6.2)
     dotenv (3.2.0)
     drb (2.2.3)
+    dumb_delegator (1.1.0)
     ed25519 (1.4.0)
     erb (6.0.4)
     erubi (1.13.1)
@@ -426,6 +433,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  axe-core-capybara
+  axe-core-rspec
   bcrypt (~> 3.1.7)
   bootsnap
   brakeman

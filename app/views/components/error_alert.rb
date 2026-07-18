@@ -9,14 +9,16 @@
 # Renders nothing if the message list is empty, so callers don't need to
 # guard with `errors.any?` themselves.
 class Views::Components::ErrorAlert < Views::Base
-  def initialize(messages: nil, records: nil, class_name: nil)
+  # The id lets invalid fields point here via aria-describedby.
+  def initialize(messages: nil, records: nil, class_name: nil, id: "form-errors")
     @messages = build_messages(messages, records)
     @class_name = class_name
+    @id = id
   end
 
   def view_template
     return if @messages.empty?
-    div(class: alert_classes, role: "alert") do
+    div(id: @id, class: alert_classes, role: "alert") do
       ul(class: "list-disc list-inside") do
         @messages.each { |msg| li { msg } }
       end

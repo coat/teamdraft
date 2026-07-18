@@ -33,8 +33,9 @@ class Views::Layouts::Application < Views::Base
         javascript_importmap_tags
       end
       body(class: "min-h-screen flex flex-col bg-base-200 text-base-content") do
+        render Views::Components::SkipLink.new
         render_nav
-        div(class: "mx-auto w-full max-w-3xl px-4 flex-1") do
+        div(id: "main-content", tabindex: -1, class: "mx-auto w-full max-w-3xl px-4 flex-1") do
           render_flash
           yield
         end
@@ -46,8 +47,8 @@ class Views::Layouts::Application < Views::Base
   private
 
   def render_nav
-    div(class: "bg-base-100 shadow-sm border-b border-base-300") do
-      div(class: "navbar mx-auto w-full max-w-3xl px-4") do
+    header(class: "bg-base-100 shadow-sm border-b border-base-300") do
+      nav(aria_label: "Primary", class: "navbar mx-auto w-full max-w-3xl px-4") do
         div(class: "navbar-start") do
           a(href: root_path, class: "btn btn-ghost text-xl normal-case") { "Team Draft" }
         end
@@ -77,8 +78,11 @@ class Views::Layouts::Application < Views::Base
   end
 
   def render_user_menu(user)
-    div(class: "dropdown dropdown-end") do
-      div(tabindex: 0, role: "button", class: "btn btn-ghost btn-circle", aria_label: "Account menu") do
+    div(class: "dropdown dropdown-end",
+      data: {controller: "dropdown", action: "keydown.esc->dropdown#close"}) do
+      button(type: "button", class: "btn btn-ghost btn-circle",
+        aria_label: "Account menu", aria_haspopup: "true", aria_expanded: "false",
+        data: {dropdown_target: "trigger", action: "click->dropdown#focusTrigger"}) do
         render Views::Components::Icon.new(:user_circle, class_name: "size-6")
       end
       ul(tabindex: 0, class: "menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-56 p-2 shadow") do
@@ -95,7 +99,7 @@ class Views::Layouts::Application < Views::Base
   end
 
   def render_footer
-    footer(class: "mt-12 py-6 text-sm text-base-content/60 border-t border-base-300") do
+    footer(class: "mt-12 py-6 text-sm text-base-content/70 border-t border-base-300") do
       div(class: "mx-auto w-full max-w-3xl px-4 flex flex-wrap items-center justify-between gap-3") do
         div(class: "flex flex-wrap items-center gap-x-4 gap-y-1") do
           a(href: privacy_path, class: "link link-hover") { "Privacy" }
@@ -110,16 +114,22 @@ class Views::Layouts::Application < Views::Base
     end
   end
 
+  # Both wrappers are always rendered, even empty: a live region inserted
+  # into the DOM together with its content is often not announced, but a
+  # message morphing into an existing region is.
   def render_flash
     notice = flash[:notice]
     alert = flash[:alert]
-    return if notice.blank? && alert.blank?
-    div(class: "mt-4 space-y-2", role: "status") do
-      if notice.present?
-        div(class: "alert alert-success") { p { notice } }
+    div(class: ("mt-4 space-y-2" if notice.present? || alert.present?)) do
+      div(role: "status") do
+        if notice.present?
+          div(class: "alert alert-success") { p { notice } }
+        end
       end
-      if alert.present?
-        div(class: "alert alert-warning") { p { alert } }
+      div(role: "alert") do
+        if alert.present?
+          div(class: "alert alert-warning") { p { alert } }
+        end
       end
     end
   end

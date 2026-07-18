@@ -61,7 +61,7 @@ class Views::Admin::Leagues::Edit < Views::Base
   def render_participants
     return unless @league_season
     div(class: "mt-3 space-y-1") do
-      h2(class: "font-medium text-sm uppercase tracking-wide opacity-60") { "Participants" }
+      h2(class: "font-medium text-sm uppercase tracking-wide opacity-70") { "Participants" }
       ul(class: "text-sm space-y-1") do
         @league_season.participants.each do |p|
           li(class: "flex items-center gap-2") do

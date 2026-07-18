@@ -19,13 +19,13 @@ class Views::Admin::Seasons::Index < Views::Base
       render Views::Components::Admin::TableCard.new do
         thead do
           tr do
-            th { "Sport" }
-            th { "Year" }
-            th { "Label" }
-            th { "Status" }
-            th { "Dates" }
-            th { "External" }
-            th
+            th(scope: "col") { "Sport" }
+            th(scope: "col") { "Year" }
+            th(scope: "col") { "Label" }
+            th(scope: "col") { "Status" }
+            th(scope: "col") { "Dates" }
+            th(scope: "col") { "External" }
+            th(scope: "col") { span(class: "sr-only") { "Actions" } }
           end
         end
         tbody do
@@ -86,7 +86,7 @@ class Views::Admin::Seasons::Index < Views::Base
     else
       span(class: "inline-flex items-center gap-1") do
         plain(season.starts_on&.iso8601 || "?")
-        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-60")
+        render Views::Components::Icon.new(:arrow_long_right, class_name: "size-3 opacity-70")
         plain(season.ends_on&.iso8601 || "?")
       end
     end
