@@ -54,22 +54,24 @@ Rails.application.configure do
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Deliveries run through Solid Queue jobs, so raised errors land in the
+  # job log (and retry) instead of being swallowed.
+  config.action_mailer.raise_delivery_errors = true
 
   # Host used by *_url helpers (mailers, jobs, cable broadcasts).
   config.action_mailer.default_url_options = {host: "teamdraft.party", protocol: "https"}
   Rails.application.routes.default_url_options = {host: "teamdraft.party", protocol: "https"}
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Outgoing mail goes through Resend's SMTP relay. The username is the
+  # literal string "resend"; the API key is injected by Kamal (env.secret).
+  config.action_mailer.smtp_settings = {
+    address: "smtp.resend.com",
+    port: 587,
+    user_name: "resend",
+    password: ENV["RESEND_API_KEY"],
+    authentication: :plain,
+    enable_starttls: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

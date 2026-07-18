@@ -62,6 +62,7 @@ env:
     - TEAMDRAFT_DATABASE_PASSWORD
     - THESPORTSDB_KEY
     - MONEYLINE_API_KEY
+    - RESEND_API_KEY
 
 # Force json-file logging - the server's Docker daemon defaults to
 # journald, which rejects Kamal's default `max-size` log option.

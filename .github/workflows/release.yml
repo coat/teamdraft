@@ -96,6 +96,7 @@ jobs:
           POSTGRES_PASSWORD=$TEAMDRAFT_DATABASE_PASSWORD
           THESPORTSDB_KEY=$THESPORTSDB_KEY
           MONEYLINE_API_KEY=$MONEYLINE_API_KEY
+          RESEND_API_KEY=$RESEND_API_KEY
           EOF
 
       - name: Deploy with Kamal
@@ -107,6 +108,7 @@ jobs:
           TEAMDRAFT_DATABASE_PASSWORD: ${{ secrets.TEAMDRAFT_DATABASE_PASSWORD }}
           THESPORTSDB_KEY: ${{ secrets.THESPORTSDB_KEY }}
           MONEYLINE_API_KEY: ${{ secrets.MONEYLINE_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           eval "$(ssh-agent -s)"
           ssh-add - <<< "$SSH_PRIVATE_KEY"
