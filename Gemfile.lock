@@ -151,7 +151,7 @@ GEM
     haikunator (1.1.1)
     hashdiff (1.2.1)
     http-2 (1.2.1)
-    httpx (1.8.0)
+    httpx (1.8.1)
       http-2 (>= 1.2.0)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
