@@ -2,8 +2,7 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -34,10 +33,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push image
         uses: docker/build-push-action@v7
@@ -57,7 +55,7 @@ jobs:
     needs: publish
     # Repository gate keeps forks from ever attempting a deploy (their runs
     # would also lack the environment secrets, but skipping beats failing).
-    if: github.repository == 'coat/teamdraft' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'coat/teamdraft' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -112,4 +110,4 @@ jobs:
         run: |
           eval "$(ssh-agent -s)"
           ssh-add - <<< "$SSH_PRIVATE_KEY"
-          bundle exec kamal deploy --skip-push --version "$GITHUB_REF_NAME"
+          bundle exec kamal deploy --skip-push --version "$GITHUB_SHA"

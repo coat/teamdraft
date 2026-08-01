@@ -1,13 +1,13 @@
 # Kamal config for teamdraft.party. Deploys run from .github/workflows/release.yml
-# on `v*` tag pushes; the job is gated on github.repository == 'coat/teamdraft'.
+# on pushes to main; the job is gated on github.repository == 'coat/teamdraft'.
 #
 # Forks: see config/deploy.example.yml for a generic template, then either
 # overwrite this file or point your fork's deploy job at your own config.
 
 service: teamdraft
 
-# GHCR is the source of truth for images. CI publishes on tags and Kamal
-# pulls the same image during deploys. Kamal prepends `registry.server`
+# GHCR is the source of truth for images. CI publishes on pushes to main and
+# Kamal pulls the same image during deploys. Kamal prepends `registry.server`
 # automatically — do not include `ghcr.io/` here.
 image: coat/teamdraft
 
