@@ -36,11 +36,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1783604885,
-        "narHash": "sha256-E/v/PHozqkEfjEy5iyvJJ+aQxgH+XV6hOjle67HQ+P4=",
-        "rev": "767b0d3ec98a143ad9ed7dfc0d5553510ac27133",
+        "lastModified": 1785452004,
+        "narHash": "sha256-3UBEqd4cjq1FhAn1Hl2msPVQbz5BxR0orw1xI42ktDI=",
+        "rev": "a5e9f2fd9ef6011c6886d6935f3ef678c81385fa",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1031701.767b0d3ec98a/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1044757.a5e9f2fd9ef6/nixexprs.tar.xz"
       },
       "original": {
         "id": "nixpkgs",
@@ -56,11 +56,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783674295,
-        "narHash": "sha256-r3Mbdhr5hfXzltg2C5vcHZV7JjnCJlV3FryqcU/HZWc=",
+        "lastModified": 1784765297,
+        "narHash": "sha256-ozaZxgtAcwCcf8IsUTwn39oLnRITt1i9U9VyD6ahRw4=",
         "owner": "bobvanderlinden",
         "repo": "nixpkgs-ruby",
-        "rev": "bf6cd15413792e16238813349f02422be74a0842",
+        "rev": "3f194ed1d05a97bd5f0306296a310ee66d305e3c",
         "type": "github"
       },
       "original": {
@@ -94,11 +94,11 @@
     },
     "services-flake": {
       "locked": {
-        "lastModified": 1783213527,
-        "narHash": "sha256-yIVKacNpTvEY+xQf2MzNn6jerRrazrkXxTwmwTK4N7M=",
+        "lastModified": 1784799366,
+        "narHash": "sha256-aK4fmqmGbk0J2sUhex79NAZTd1002DNWNsfubO6aic0=",
         "owner": "juspay",
         "repo": "services-flake",
-        "rev": "1c9142a3d74abc53aed62687106ee15e873dc3ff",
+        "rev": "eed1ab55413afbb8fd7bc929076c73894e5104e0",
         "type": "github"
       },
       "original": {
