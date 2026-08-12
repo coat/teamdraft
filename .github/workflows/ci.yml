@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
 
+# Least privilege for GITHUB_TOKEN across every job; the jobs that need
+# more (publish, deploy) widen it themselves.
+permissions:
+  contents: read
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
@@ -121,6 +126,11 @@ jobs:
     needs: publish
     if: github.repository == 'coat/teamdraft' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Kamal has the deploy host pull the image published above from GHCR,
+      # authenticating with GITHUB_TOKEN as the registry password.
+      packages: read
     environment:
       name: production
       url: https://teamdraft.party
