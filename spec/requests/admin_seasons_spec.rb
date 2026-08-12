@@ -104,6 +104,42 @@ RSpec.describe "Admin seasons", type: :request do
     )
   end
 
+  it "keeps only the date pair when a round window carries extra keys" do
+    sign_in_admin
+    season = create(:season, sport: create(:sport, :mlb), year: 2026,
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+
+    patch admin_season_path(season), params: {
+      season: {
+        label: season.label,
+        round_windows: {
+          "wildcard" => {
+            "starts_on" => "2026-09-29", "ends_on" => "2026-10-02",
+            "sync_paused" => "true", "nested" => {"deep" => "value"}
+          }
+        }
+      }
+    }
+
+    expect(response).to redirect_to(admin_seasons_path)
+    expect(season.reload.round_windows).to eq(
+      "wildcard" => {"starts_on" => "2026-09-29", "ends_on" => "2026-10-02"}
+    )
+  end
+
+  it "ignores a round window that is not a date pair" do
+    sign_in_admin
+    season = create(:season, sport: create(:sport, :mlb), year: 2026,
+      starts_on: Date.new(2026, 3, 25), ends_on: Date.new(2026, 11, 5))
+
+    patch admin_season_path(season), params: {
+      season: {label: season.label, round_windows: {"wildcard" => "2026-09-29"}}
+    }
+
+    expect(response).to redirect_to(admin_seasons_path)
+    expect(season.reload.round_windows).to eq({})
+  end
+
   it "re-renders the edit form when round windows are invalid" do
     sign_in_admin
     season = create(:season, sport: create(:sport, :mlb), year: 2026,

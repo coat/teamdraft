@@ -88,13 +88,35 @@ class Admin::SeasonsController < Admin::BaseController
   end
 
   def season_params
-    permitted = params.require(:season).permit(
+    filters = [
       :sport_id, :year, :label, :status,
       :starts_on, :ends_on,
-      :external_provider, :external_id,
-      round_windows: {}
-    )
-    prune_blank_round_windows(permitted)
+      :external_provider, :external_id
+    ]
+    windows_filter = round_windows_filter
+    filters << {round_windows: windows_filter} if windows_filter.any?
+    prune_blank_round_windows(params.require(:season).permit(*filters))
+  end
+
+  # round_windows is a map of playoff round key => date pair, and the round
+  # keys vary by sport, so the nested filter has to be built from the sport's
+  # playoff rules instead of being listed literally. Permitting the round keys
+  # explicitly (rather than an open-ended hash) keeps anything else the form
+  # didn't ask for out of the jsonb column.
+  def round_windows_filter
+    sport_id = submitted_sport_id || @season&.sport_id
+    return {} if sport_id.blank?
+    ScoringRule.where(sport_id: sport_id, kind: "playoff_appearance")
+      .pluck(:round_key).compact
+      .index_with { [:starts_on, :ends_on] }
+  end
+
+  # The sport select can move a season to another sport in the same request
+  # that sets its windows, so prefer the submitted id - but only when it's a
+  # scalar, since a nested value here isn't an id at all.
+  def submitted_sport_id
+    value = params.dig(:season, :sport_id)
+    value.to_s.presence if value.is_a?(String) || value.is_a?(Integer)
   end
 
   # The form always submits every round's date pair; drop rounds the admin
