@@ -3,7 +3,7 @@
 class Admin::SyncsController < Admin::BaseController
   def create
     season = Season.find(params[:season_id])
-    back = redirect_target
+    back = redirect_target(season)
     case params[:kind]
     when "games"
       if params[:dates_from].present? || params[:dates_to].present?
@@ -45,10 +45,14 @@ class Admin::SyncsController < Admin::BaseController
     redirect_to back, alert: "Invalid date(s) supplied."
   end
 
-  # Whitelisted post-sync redirect target. Only /admin paths are accepted
-  # so a stale `redirect_to` query param can't bounce users elsewhere.
-  def redirect_target
-    candidate = params[:redirect_to].to_s
-    candidate.start_with?("/admin") ? candidate : admin_root_path
+  # Post-sync redirect target. The form submits a name for the page it was
+  # rendered on, never a URL, so the path is always one this controller
+  # generates - no user-supplied string reaches `redirect_to`. Anything
+  # unrecognized falls back to the dashboard.
+  def redirect_target(season)
+    case params[:return_to].to_s
+    when "season" then admin_season_path(season)
+    else admin_root_path
+    end
   end
 end

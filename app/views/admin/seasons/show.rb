@@ -91,7 +91,7 @@ class Views::Admin::Seasons::Show < Views::Base
               class: "btn btn-sm #{@season.sync_paused? ? "btn-warning" : "btn-ghost"}"
           end
         end
-        render Views::Components::Admin::SyncActions.new(season: @season, back_path: admin_season_path(@season))
+        render Views::Components::Admin::SyncActions.new(season: @season, return_to: "season")
       end
     end
   end

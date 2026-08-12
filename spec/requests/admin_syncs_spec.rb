@@ -32,26 +32,41 @@ RSpec.describe "Admin syncs", type: :request do
     expect(response.body).to include("Unknown sync kind")
   end
 
-  it "redirects to the provided /admin path when given one" do
+  it "returns to the season page when return_to names it" do
     sign_in_admin
     season = create_nfl_season(team_count: 2)
 
     post admin_syncs_path, params: {
-      kind: "scoring", season_id: season.id, redirect_to: admin_season_path(season)
+      kind: "scoring", season_id: season.id, return_to: "season"
     }
 
     expect(response).to redirect_to(admin_season_path(season))
   end
 
-  it "ignores non-admin redirect targets to prevent open redirects" do
+  it "falls back to the dashboard for an unknown return_to" do
     sign_in_admin
     season = create_nfl_season(team_count: 2)
 
     post admin_syncs_path, params: {
-      kind: "scoring", season_id: season.id, redirect_to: "https://evil.example"
+      kind: "scoring", season_id: season.id, return_to: "https://evil.example"
     }
 
     expect(response).to redirect_to(admin_root_path)
+  end
+
+  # `redirect_to` is the param the old path-echoing version honored; it's
+  # passed here to prove it no longer has any effect.
+  it "never redirects off-site even when handed a URL" do
+    sign_in_admin
+    season = create_nfl_season(team_count: 2)
+
+    ["//evil.example", "/admin.evil.example", "https://evil.example/admin"].each do |target|
+      post admin_syncs_path, params: {
+        kind: "scoring", season_id: season.id, return_to: target, redirect_to: target
+      }
+
+      expect(response).to redirect_to(admin_root_path)
+    end
   end
 
   it "queues a date-range games sync" do
@@ -62,7 +77,7 @@ RSpec.describe "Admin syncs", type: :request do
       post admin_syncs_path, params: {
         kind: "games", season_id: season.id,
         dates_from: "2026-05-15", dates_to: "2026-05-17",
-        redirect_to: admin_season_path(season)
+        return_to: "season"
       }
     }.to have_enqueued_job(Sync::GamesJob).with(season.id, dates: %w[2026-05-15 2026-05-16 2026-05-17])
 
@@ -77,7 +92,7 @@ RSpec.describe "Admin syncs", type: :request do
       post admin_syncs_path, params: {
         kind: "games", season_id: season.id,
         dates_from: "2026-05-17", dates_to: "2026-05-15",
-        redirect_to: admin_season_path(season)
+        return_to: "season"
       }
     }.not_to have_enqueued_job(Sync::GamesJob)
 
@@ -92,7 +107,7 @@ RSpec.describe "Admin syncs", type: :request do
       post admin_syncs_path, params: {
         kind: "games", season_id: season.id,
         dates_from: "2026-01-01", dates_to: "2026-04-01",
-        redirect_to: admin_season_path(season)
+        return_to: "season"
       }
     }.not_to have_enqueued_job(Sync::GamesJob)
 
@@ -106,7 +121,7 @@ RSpec.describe "Admin syncs", type: :request do
     post admin_syncs_path, params: {
       kind: "games", season_id: season.id,
       dates_from: "not-a-date", dates_to: "2026-05-15",
-      redirect_to: admin_season_path(season)
+      return_to: "season"
     }
 
     expect(flash[:alert]).to match(/invalid date/i)

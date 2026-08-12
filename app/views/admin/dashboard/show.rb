@@ -49,7 +49,7 @@ class Views::Admin::Dashboard::Show < Views::Base
         else
           div(class: "space-y-3") do
             @stats[:active_seasons].each do |season|
-              render Views::Components::Admin::SyncActions.new(season: season, back_path: admin_root_path)
+              render Views::Components::Admin::SyncActions.new(season: season, return_to: "dashboard")
             end
           end
         end

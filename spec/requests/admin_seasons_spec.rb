@@ -71,7 +71,7 @@ RSpec.describe "Admin seasons", type: :request do
     expect(response.body).to include("NFL 2024")
     expect(response.body).to include("Sync")
     expect(response.body).to include("Recompute scoring")
-    expect(response.body).to include(%(value="#{admin_season_path(season)}"))
+    expect(response.body).to include(%(name="return_to" value="season"))
   end
 
   it "requires admin to access" do
