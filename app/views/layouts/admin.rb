@@ -48,7 +48,7 @@ class Views::Layouts::Admin < Views::Base
             end
           end
           div(class: "drawer-side z-30") do
-            label(for: "admin-drawer", aria_label: "close sidebar", class: "drawer-overlay")
+            label(for: "admin-drawer", aria_hidden: "true", class: "drawer-overlay")
             render Views::Components::Admin::Sidebar.new(current_section: @section)
           end
         end
@@ -63,8 +63,9 @@ class Views::Layouts::Admin < Views::Base
       div(class: "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8") do
         div(class: "navbar min-h-0 py-2") do
           div(class: "navbar-start gap-2") do
-            label(for: "admin-drawer", class: "btn btn-ghost btn-sm lg:hidden", aria_label: "Open menu") do
+            label(for: "admin-drawer", class: "btn btn-ghost btn-sm lg:hidden") do
               render Views::Components::HamburgerIcon.new
+              span(class: "sr-only") { "Open menu" }
             end
             a(href: admin_root_path, class: "btn btn-ghost btn-sm normal-case text-base font-semibold") { "Team Draft Admin" }
           end
