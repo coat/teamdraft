@@ -71,7 +71,7 @@ group :development, :test do
   gem "standard", require: false
 
   # RSpec test stack
-  gem "rspec-rails", "~> 8.0"
+  gem "rspec-rails", "~> 8.1"
   gem "factory_bot_rails"
 end
 
