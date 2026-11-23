@@ -24,7 +24,7 @@ gem "phlex-icons-hero"
 # Pin prism to 1.x: refract (a dependency of phlex) still references
 # Prism::MissingNode, which was removed in prism 2.0. Without this,
 # `bundle update` pulls prism 2.x and eager loading fails in CI.
-gem "prism", "~> 1.9"
+gem "prism", "~> 2.1"
 
 # Human-readable league slugs (e.g. "badger-apple-blue")
 gem "haikunator"
